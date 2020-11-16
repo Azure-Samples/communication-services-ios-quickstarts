@@ -1,0 +1,4 @@
+DerivedData/
+Pods/
+*.xcuserdatad
+.DS_Store

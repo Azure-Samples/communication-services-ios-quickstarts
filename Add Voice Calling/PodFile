@@ -1,0 +1,17 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '13.0'
+use_frameworks!
+
+source 'https://github.com/Azure/azure-sdk-for-ios.git'
+
+target 'AzureCommunicationCallingSample' do
+  # Uncomment this before release testing
+  pod 'AzureCommunicationCalling', :podspec => 'https://raw.githubusercontent.com/Azure/azure-sdk-for-ios/master/AzureCommunicationCalling.podspec'
+  pod 'AzureCommunication', :git => 'https://github.com/Azure/azure-sdk-for-ios.git', :branch => "master"
+  pod 'AzureCore', :git => 'https://github.com/Azure/azure-sdk-for-ios.git', :branch => "master"
+
+  #pod 'AzureCommunicationCalling', '~> 1.0.0-beta.4'
+  #pod 'AzureCommunication', '~> 1.0.0-beta.2'
+  #pod 'AzureCore', '~> 1.0.0-beta.2'
+end
+
