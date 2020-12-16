@@ -10,7 +10,7 @@ To complete this tutorial, you’ll need the following prerequisites:
 - A Mac running [Xcode](https://go.microsoft.com/fwLink/p/?LinkID=266532), along with a valid developer certificate installed into your Keychain.
 - A deployed Communication Services resource. [Create a Communication Services resource](https://docs.microsoft.com/en-us/azure/communication-services/quickstarts/create-communication-resource).
 - A [User Access Token](https://docs.microsoft.com/en-us/azure/communication-services/quickstarts/access-tokens?pivots=programming-language-csharp) for your Azure Communication Service.
-- Create a `Podfile` for your application to fetch `AzureommunicationCalling.framework`, `AzureCore.framework` and `AzureCommunication.framework` using CocoaPods.
+- Create a `Podfile` for your application to fetch `AzureCommunicationCalling.framework`, `AzureCore.framework` and `AzureCommunication.framework` using CocoaPods.
 
 ## Code Structure
 
