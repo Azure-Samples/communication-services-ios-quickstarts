@@ -2,6 +2,9 @@
 platform :ios, '13.0'
 use_frameworks!
 
+# Uncomment bwlow for pod install as you might get below error
+# [!] Failed to fetch podspec for `AzureCommunicationCalling` at `https://raw.githubusercontent.com/Azure/azure-sdk-for-ios/master/AzureCommunicationCalling.podspec`.
+#  Error: 404 Not Found
 source 'https://github.com/Azure/azure-sdk-for-ios.git'
 
 target 'AzureCommunicationCallingSample' do
@@ -10,8 +13,9 @@ target 'AzureCommunicationCallingSample' do
   pod 'AzureCommunication', :git => 'https://github.com/Azure/azure-sdk-for-ios.git', :branch => "master"
   pod 'AzureCore', :git => 'https://github.com/Azure/azure-sdk-for-ios.git', :branch => "master"
 
-  #pod 'AzureCommunicationCalling', '~> 1.0.0-beta.4'
-  #pod 'AzureCommunication', '~> 1.0.0-beta.2'
-  #pod 'AzureCore', '~> 1.0.0-beta.2'
+  # Uncomment below lines and comment out above if you stil getting 'Error: 404 Not Fount'
+  # pod 'AzureCommunicationCalling', '~> 1.0.0-beta.7'
+  # pod 'AzureCommunication', '~> 1.0.0-beta.7'
+  # pod 'AzureCore', '~> 1.0.0-beta.7'
 end
 
