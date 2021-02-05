@@ -8,10 +8,10 @@ import AVFoundation
 struct ContentView: View {
     @State var callee: String = ""
     @State var status: String = ""
-    @State var callClient: ACSCallClient?
-    @State var callAgent: ACSCallAgent?
-    @State var call: ACSCall?
-    @State var callDelegate: ACSCallDelegate?
+    @State var callClient: CallClient?
+    @State var callAgent: CallAgent?
+    @State var call: Call?
+    @State var callDelegates: CallDelegates?
 
     var body: some View {
         NavigationView {
@@ -30,19 +30,19 @@ struct ContentView: View {
             .navigationBarTitle("Calling Quickstart")
         }.onAppear {
             // Initialize call agent
-            var userCredential: CommunicationUserCredential?
+            var userCredential: CommunicationTokenCredential?
             do {
-                userCredential = try CommunicationUserCredential(token: "<USER_TOKEN_HERE>")
+                userCredential = try CommunicationTokenCredential(token: "<USER_TOKEN_HERE>")
             } catch {
                 print("ERROR: It was not possible to create user credential.")
                 self.status = "Please enter your token in source code"
                 return
             }
 
-            self.callClient = ACSCallClient()
+            self.callClient = CallClient()
 
             // Creates the call agent
-            self.callClient?.createCallAgent(userCredential) { (agent, error) in
+            self.callClient?.createCallAgent(userCredential: userCredential) { (agent, error) in
                 if error != nil {
                     print("ERROR: It was not possible to create a call agent.")
                 }
@@ -59,17 +59,17 @@ struct ContentView: View {
         // Ask permissions
         AVAudioSession.sharedInstance().requestRecordPermission { (granted) in
             if granted {
-                let callees:[CommunicationIdentifier] = [CommunicationUser(identifier: self.callee)]
-                self.call = self.callAgent?.call(callees, options: ACSStartCallOptions())
-                self.callDelegate = CallDelegate(self)
-                self.call!.delegate = self.callDelegate
+                let participants:[CommunicationUserIdentifier] = [CommunicationUserIdentifier(identifier: self.callee)]
+                self.call = self.callAgent?.call(participants: participants, options: StartCallOptions())
+                self.callDelegates = CallDelegates(self)
+                self.call!.delegate = self.callDelegates
             }
         }
     }
 
     func endCall() {
         if let call = call {
-            call.hangup(ACSHangupOptions(), withCompletionHandler: { (error) in
+            call.hangup(options: HangupOptions(), completionHandler: { (error) in
                 if error != nil {
                     print("ERROR: It was not possible to hangup the call.")
                 }
@@ -78,16 +78,16 @@ struct ContentView: View {
     }
 }
 
-class CallDelegate : NSObject, ACSCallDelegate {
+class CallDelegates : NSObject, CallDelegate {
     private var owner:ContentView
     init(_ view:ContentView) {
         owner = view
     }
-    public func onCallStateChanged(_ call: ACSCall!,
-                                   _ args: ACSPropertyChangedEventArgs!) {
-        owner.status = CallDelegate.callStateToString(call.state)
+    public func onCallStateChanged(_ call: Call!,
+                                   args: PropertyChangedEventArgs!) {
+        owner.status = CallDelegates.callStateToString(call.state)
     }
-    private static func callStateToString(_ state:ACSCallState) -> String {
+    private static func callStateToString(_ state:CallState) -> String {
         switch state {
         case .connected: return "Connected"
         case .connecting: return "Connecting"
