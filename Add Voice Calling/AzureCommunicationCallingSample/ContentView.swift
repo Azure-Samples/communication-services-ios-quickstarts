@@ -8,10 +8,11 @@ import AVFoundation
 struct ContentView: View {
     @State var callee: String = ""
     @State var status: String = ""
-    @State var callClient: ACSCallClient?
-    @State var callAgent: ACSCallAgent?
-    @State var call: ACSCall?
-    @State var callDelegate: ACSCallDelegate?
+    @State var message: String = ""
+    @State var callClient: CallClient?
+    @State var callAgent: CallAgent?
+    @State var call: Call?
+    @State var callObserver: CallObserver?
 
     var body: some View {
         NavigationView {
@@ -25,31 +26,35 @@ struct ContentView: View {
                         Text("End Call")
                     }.disabled(call == nil)
                     Text(status)
+                    Text(message)
                 }
             }
             .navigationBarTitle("Calling Quickstart")
         }.onAppear {
             // Initialize call agent
-            var userCredential: CommunicationUserCredential?
+            var userCredential: CommunicationTokenCredential?
             do {
-                userCredential = try CommunicationUserCredential(token: "<USER_TOKEN_HERE>")
+                userCredential = try CommunicationTokenCredential(token: "<USER_TOKEN_HERE>")
             } catch {
                 print("ERROR: It was not possible to create user credential.")
-                self.status = "Please enter your token in source code"
+                self.message = "Please enter your token in source code"
                 return
             }
 
-            self.callClient = ACSCallClient()
+            self.callClient = CallClient()
 
             // Creates the call agent
-            self.callClient?.createCallAgent(userCredential) { (agent, error) in
-                if error != nil {
-                    print("ERROR: It was not possible to create a call agent.")
-                }
+            self.callClient?.createCallAgent(userCredential: userCredential) { (agent, error) in
+                if error == nil {
+                    guard let agent = agent else {
+                        self.message = "Failed to create CallAgent"
+                        return
+                    }
 
-                if let agent = agent {
                     self.callAgent = agent
-                    print("Call agent successfully created.")
+                    self.message = "Call agent successfully created."
+                } else {
+                    self.message = "Failed to create CallAgent with error"
                 }
             }
         }
@@ -59,35 +64,54 @@ struct ContentView: View {
         // Ask permissions
         AVAudioSession.sharedInstance().requestRecordPermission { (granted) in
             if granted {
-                let callees:[CommunicationIdentifier] = [CommunicationUser(identifier: self.callee)]
-                self.call = self.callAgent?.call(callees, options: ACSStartCallOptions())
-                self.callDelegate = CallDelegate(self)
-                self.call!.delegate = self.callDelegate
+                let callees:[CommunicationIdentifier] = [CommunicationUserIdentifier(identifier: self.callee)]
+
+                guard let call = self.callAgent?.call(participants: callees, options: nil) else {
+                    self.message = "Failed to place outgoing call"
+                    return
+                }
+
+                self.call = call
+                self.callObserver = CallObserver(self)
+                self.call!.delegate = self.callObserver
+                self.message = "Outgoing call placed successfully"
             }
         }
     }
 
     func endCall() {
         if let call = call {
-            call.hangup(ACSHangupOptions(), withCompletionHandler: { (error) in
-                if error != nil {
-                    print("ERROR: It was not possible to hangup the call.")
+            call.hangup(options: nil, completionHandler: { (error) in
+                if error == nil {
+                    self.message = "Hangup was successfull"
+                } else {
+                    self.message = "Hangup failed"
                 }
             })
+        } else {
+            self.message = "No active call to hanup"
         }
     }
 }
 
-class CallDelegate : NSObject, ACSCallDelegate {
+class CallObserver : NSObject, CallDelegate {
     private var owner:ContentView
     init(_ view:ContentView) {
         owner = view
     }
-    public func onCallStateChanged(_ call: ACSCall!,
-                                   _ args: ACSPropertyChangedEventArgs!) {
-        owner.status = CallDelegate.callStateToString(call.state)
+
+    public func onCallStateChanged(_ call: Call!,
+                                   args: PropertyChangedEventArgs!) {
+        owner.status = CallObserver.callStateToString(state: call.state)
+        if call.state == .disconnected {
+            owner.call = nil
+            owner.message = "Call ended"
+        } else if call.state == .connected {
+            owner.message = "Call connected !!"
+        }
     }
-    private static func callStateToString(_ state:ACSCallState) -> String {
+
+    private static func callStateToString(state: CallState) -> String {
         switch state {
         case .connected: return "Connected"
         case .connecting: return "Connecting"

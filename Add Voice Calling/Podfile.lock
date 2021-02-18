@@ -1,38 +1,26 @@
 PODS:
-  - AzureCommunication (1.0.0-beta.2):
-    - AzureCore (~> 1.0.0-beta.2)
-  - AzureCommunicationCalling (1.0.0-beta.4):
-    - AzureCommunication (~> 1.0.0-beta.2)
-  - AzureCore (1.0.0-beta.2)
+  - AzureCommunication (1.0.0-beta.8):
+    - AzureCore (~> 1.0.0-beta.8)
+  - AzureCommunicationCalling (1.0.0-beta.8):
+    - AzureCommunication (~> 1.0.0-beta.8)
+  - AzureCore (1.0.0-beta.8)
 
 DEPENDENCIES:
-  - AzureCommunication (from `https://github.com/Azure/azure-sdk-for-ios.git`, branch `master`)
-  - AzureCommunicationCalling (from `https://raw.githubusercontent.com/Azure/azure-sdk-for-ios/master/AzureCommunicationCalling.podspec`)
-  - AzureCore (from `https://github.com/Azure/azure-sdk-for-ios.git`, branch `master`)
+  - AzureCommunication (~> 1.0.0-beta.8)
+  - AzureCommunicationCalling (~> 1.0.0-beta.8)
+  - AzureCore (~> 1.0.0-beta.8)
 
-EXTERNAL SOURCES:
-  AzureCommunication:
-    :branch: master
-    :git: https://github.com/Azure/azure-sdk-for-ios.git
-  AzureCommunicationCalling:
-    :podspec: https://raw.githubusercontent.com/Azure/azure-sdk-for-ios/master/AzureCommunicationCalling.podspec
-  AzureCore:
-    :branch: master
-    :git: https://github.com/Azure/azure-sdk-for-ios.git
-
-CHECKOUT OPTIONS:
-  AzureCommunication:
-    :commit: acfa3ac0491101cb5316502b49e906e4cd689db5
-    :git: https://github.com/Azure/azure-sdk-for-ios.git
-  AzureCore:
-    :commit: acfa3ac0491101cb5316502b49e906e4cd689db5
-    :git: https://github.com/Azure/azure-sdk-for-ios.git
+SPEC REPOS:
+  trunk:
+    - AzureCommunication
+    - AzureCommunicationCalling
+    - AzureCore
 
 SPEC CHECKSUMS:
-  AzureCommunication: 2d6404b8e38dee15faedf69e239c36444f50c5b3
-  AzureCommunicationCalling: 499fbbe0c6182ca20f20c861087d43ac4ce612d1
-  AzureCore: 92bb80ebb449f2b9c26ecf6824223463f50d2161
+  AzureCommunication: 45fc76a131a18419c3ba9bf39c4a07a25f40669b
+  AzureCommunicationCalling: 794732f405315718254359ca739cfe4026d9ad4d
+  AzureCore: dd1775dec02746833668fb05513300fe06f5de0d
 
-PODFILE CHECKSUM: 57870bedc9c58a0466a3443f4057768e2355834e
+PODFILE CHECKSUM: b019f2f6ad182d18e637fd7f9902053fc3020b8b
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.1

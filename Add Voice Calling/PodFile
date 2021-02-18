@@ -2,16 +2,18 @@
 platform :ios, '13.0'
 use_frameworks!
 
-source 'https://github.com/Azure/azure-sdk-for-ios.git'
+# Uncomment this if you want to use podspec in the master of https://github.com/Azure/azure-sdk-for-ios
+#source 'https://github.com/Azure/azure-sdk-for-ios.git'
 
 target 'AzureCommunicationCallingSample' do
-  # Uncomment this before release testing
-  pod 'AzureCommunicationCalling', :podspec => 'https://raw.githubusercontent.com/Azure/azure-sdk-for-ios/master/AzureCommunicationCalling.podspec'
-  pod 'AzureCommunication', :git => 'https://github.com/Azure/azure-sdk-for-ios.git', :branch => "master"
-  pod 'AzureCore', :git => 'https://github.com/Azure/azure-sdk-for-ios.git', :branch => "master"
+  # Uncomment following 3 lines if you want to use podspec in the master of https://github.com/Azure/azure-sdk-for-ios
+  #pod 'AzureCommunicationCalling', :podspec => 'https://raw.githubusercontent.com/Azure/azure-sdk-for-ios/master/AzureCommunicationCalling.podspec'
+  #pod 'AzureCommunication', :git => 'https://github.com/Azure/azure-sdk-for-ios.git', :branch => "master"
+  #pod 'AzureCore', :git => 'https://github.com/Azure/azure-sdk-for-ios.git', :branch => "master"
 
-  #pod 'AzureCommunicationCalling', '~> 1.0.0-beta.4'
-  #pod 'AzureCommunication', '~> 1.0.0-beta.2'
-  #pod 'AzureCore', '~> 1.0.0-beta.2'
+  # Comment the following 3 lines if you want to use podspec in the master of https://github.com/Azure/azure-sdk-for-ios
+  pod 'AzureCommunicationCalling', '~> 1.0.0-beta.8'
+  pod 'AzureCommunication', '~> 1.0.0-beta.8'
+  pod 'AzureCore', '~> 1.0.0-beta.8'
 end
 
