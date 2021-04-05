@@ -2,7 +2,8 @@
 //  IncomingCallHandler.swift
 //  iOSVideo
 //
-//  Created by Xu Mo Microsoft on 2/23/21.
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 //
 
 import Foundation
