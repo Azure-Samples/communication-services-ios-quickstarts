@@ -8,9 +8,6 @@ In this quickstart we are going to get started with Azure Communication Services
 - Create a User Access Token to instantiate the call client. [Learn how to create and manage user access tokens](https://docs.microsoft.com/en-gb/azure/communication-services/quickstarts/access-tokens?pivots=programming-language-csharp).
 
 ## Setting up
-### Creating the Xcode project
-In Xcode, create a new iOS project and select the Single View App template. This tutorial uses the [SwiftUI framework](https://developer.apple.com/xcode/swiftui/), so you should set the Language to Swift and the User Interface to SwiftUI. You're not going to create tests during this quick start. Feel free to uncheck Include Tests.
-
 ### Installing CocoaPods
 Please use this guide to [install CocoaPods](https://guides.cocoapods.org/using/getting-started.html) on your Mac. 
 
@@ -23,9 +20,9 @@ platform :ios, '13.0'
 use_frameworks!
 
 target 'VideoCallingQuickstart' do
-  pod 'AzureCommunicationCalling', '~> 1.0.0-beta.8'
-  pod 'AzureCommunication', '~> 1.0.0-beta.8'
-  pod 'AzureCore', '~> 1.0.0-beta.8'
+  pod 'AzureCommunicationCalling', '~> 1.0.0-beta.9'
+  pod 'AzureCommunication', '~> 1.0.0-beta.9'
+  pod 'AzureCore', '~> 1.0.0-beta.9'
 end
 ```
 3. Run pod install.
