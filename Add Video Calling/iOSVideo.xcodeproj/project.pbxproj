@@ -1,0 +1,409 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 51;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BDCD1ECD261672450039C6B5 /* iOSVideoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD1ECC261672450039C6B5 /* iOSVideoApp.swift */; };
+		BDCD1ECF261672450039C6B5 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD1ECE261672450039C6B5 /* ContentView.swift */; };
+		BDCD1ED1261672470039C6B5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDCD1ED0261672470039C6B5 /* Assets.xcassets */; };
+		BDCD1ED4261672470039C6B5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDCD1ED3261672470039C6B5 /* Preview Assets.xcassets */; };
+		BDCD1EE2261673850039C6B5 /* IncomingCallHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD1EE1261673850039C6B5 /* IncomingCallHandler.swift */; };
+		E561CA315D50CE792EEAD11F /* Pods_iOSVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBFF92893FE8B69E1D39B66B /* Pods_iOSVideo.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		969CB7C9039BDBF49E9893A3 /* Pods-iOSVideo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOSVideo.release.xcconfig"; path = "Target Support Files/Pods-iOSVideo/Pods-iOSVideo.release.xcconfig"; sourceTree = "<group>"; };
+		BDCD1EC9261672450039C6B5 /* iOSVideo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSVideo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BDCD1ECC261672450039C6B5 /* iOSVideoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSVideoApp.swift; sourceTree = "<group>"; };
+		BDCD1ECE261672450039C6B5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BDCD1ED0261672470039C6B5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BDCD1ED3261672470039C6B5 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		BDCD1ED5261672470039C6B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BDCD1EE1261673850039C6B5 /* IncomingCallHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncomingCallHandler.swift; sourceTree = "<group>"; };
+		C1FB3D663D049D236C96C45A /* Pods-iOSVideo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOSVideo.debug.xcconfig"; path = "Target Support Files/Pods-iOSVideo/Pods-iOSVideo.debug.xcconfig"; sourceTree = "<group>"; };
+		FBFF92893FE8B69E1D39B66B /* Pods_iOSVideo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iOSVideo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BDCD1EC6261672450039C6B5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E561CA315D50CE792EEAD11F /* Pods_iOSVideo.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		74DBAF89308FA5C16BCCF4FA /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C1FB3D663D049D236C96C45A /* Pods-iOSVideo.debug.xcconfig */,
+				969CB7C9039BDBF49E9893A3 /* Pods-iOSVideo.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		BDCD1EC0261672450039C6B5 = {
+			isa = PBXGroup;
+			children = (
+				BDCD1ECB261672450039C6B5 /* iOSVideo */,
+				BDCD1ECA261672450039C6B5 /* Products */,
+				74DBAF89308FA5C16BCCF4FA /* Pods */,
+				F499A30ADFEB054F6D2CC36F /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		BDCD1ECA261672450039C6B5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BDCD1EC9261672450039C6B5 /* iOSVideo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BDCD1ECB261672450039C6B5 /* iOSVideo */ = {
+			isa = PBXGroup;
+			children = (
+				BDCD1EE1261673850039C6B5 /* IncomingCallHandler.swift */,
+				BDCD1ECC261672450039C6B5 /* iOSVideoApp.swift */,
+				BDCD1ECE261672450039C6B5 /* ContentView.swift */,
+				BDCD1ED0261672470039C6B5 /* Assets.xcassets */,
+				BDCD1ED5261672470039C6B5 /* Info.plist */,
+				BDCD1ED2261672470039C6B5 /* Preview Content */,
+			);
+			path = iOSVideo;
+			sourceTree = "<group>";
+		};
+		BDCD1ED2261672470039C6B5 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				BDCD1ED3261672470039C6B5 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		F499A30ADFEB054F6D2CC36F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FBFF92893FE8B69E1D39B66B /* Pods_iOSVideo.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BDCD1EC8261672450039C6B5 /* iOSVideo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BDCD1ED8261672470039C6B5 /* Build configuration list for PBXNativeTarget "iOSVideo" */;
+			buildPhases = (
+				6492F9E3FD079D93B0E0DAD3 /* [CP] Check Pods Manifest.lock */,
+				BDCD1EC5261672450039C6B5 /* Sources */,
+				BDCD1EC6261672450039C6B5 /* Frameworks */,
+				BDCD1EC7261672450039C6B5 /* Resources */,
+				B4D9B8D74A9011BDAEC72EF9 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = iOSVideo;
+			productName = iOSVideo;
+			productReference = BDCD1EC9261672450039C6B5 /* iOSVideo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BDCD1EC1261672450039C6B5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1240;
+				LastUpgradeCheck = 1240;
+				TargetAttributes = {
+					BDCD1EC8261672450039C6B5 = {
+						CreatedOnToolsVersion = 12.4;
+					};
+				};
+			};
+			buildConfigurationList = BDCD1EC4261672450039C6B5 /* Build configuration list for PBXProject "iOSVideo" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = BDCD1EC0261672450039C6B5;
+			productRefGroup = BDCD1ECA261672450039C6B5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BDCD1EC8261672450039C6B5 /* iOSVideo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BDCD1EC7261672450039C6B5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BDCD1ED4261672470039C6B5 /* Preview Assets.xcassets in Resources */,
+				BDCD1ED1261672470039C6B5 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6492F9E3FD079D93B0E0DAD3 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-iOSVideo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B4D9B8D74A9011BDAEC72EF9 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-iOSVideo/Pods-iOSVideo-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-iOSVideo/Pods-iOSVideo-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-iOSVideo/Pods-iOSVideo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BDCD1EC5261672450039C6B5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BDCD1ECF261672450039C6B5 /* ContentView.swift in Sources */,
+				BDCD1EE2261673850039C6B5 /* IncomingCallHandler.swift in Sources */,
+				BDCD1ECD261672450039C6B5 /* iOSVideoApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		BDCD1ED6261672470039C6B5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		BDCD1ED7261672470039C6B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BDCD1ED9261672470039C6B5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C1FB3D663D049D236C96C45A /* Pods-iOSVideo.debug.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"iOSVideo/Preview Content\"";
+				DEVELOPMENT_TEAM = 3RPD3783PY;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iOSVideo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = microsoft.iOSVideo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BDCD1EDA261672470039C6B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 969CB7C9039BDBF49E9893A3 /* Pods-iOSVideo.release.xcconfig */;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"iOSVideo/Preview Content\"";
+				DEVELOPMENT_TEAM = 3RPD3783PY;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iOSVideo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = microsoft.iOSVideo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BDCD1EC4261672450039C6B5 /* Build configuration list for PBXProject "iOSVideo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BDCD1ED6261672470039C6B5 /* Debug */,
+				BDCD1ED7261672470039C6B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BDCD1ED8261672470039C6B5 /* Build configuration list for PBXNativeTarget "iOSVideo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BDCD1ED9261672470039C6B5 /* Debug */,
+				BDCD1EDA261672470039C6B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BDCD1EC1261672450039C6B5 /* Project object */;
+}
