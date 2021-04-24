@@ -12,8 +12,8 @@ target 'AzureCommunicationCallingSample' do
   #pod 'AzureCore', :git => 'https://github.com/Azure/azure-sdk-for-ios.git', :branch => "master"
 
   # Comment the following 3 lines if you want to use podspec in the master of https://github.com/Azure/azure-sdk-for-ios
-  pod 'AzureCommunicationCalling', '~> 1.0.0-beta.8'
-  pod 'AzureCommunication', '~> 1.0.0-beta.8'
-  pod 'AzureCore', '~> 1.0.0-beta.8'
+  pod 'AzureCommunicationCalling', '~> 1.0.0-beta.12'
+  pod 'AzureCommunication', '~> 1.0.0-beta.11'
+  pod 'AzureCore', '~> 1.0.0-beta.11'
 end
 
