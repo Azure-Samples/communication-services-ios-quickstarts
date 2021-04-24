@@ -10,7 +10,7 @@ import Foundation
 import AzureCommunicationCalling
 import AVFoundation
 
-final class IncomingCallHandler: NSObject, IncomingCallDelegate, CallAgentDelegate {
+final class IncomingCallHandler: NSObject, CallAgentDelegate, IncomingCallDelegate {
     public var contentView: ContentView?
     private var incomingCall: IncomingCall?
 
@@ -24,15 +24,15 @@ final class IncomingCallHandler: NSObject, IncomingCallDelegate, CallAgentDelega
     }
 
     private override init() {}
-
-    public func onIncomingCall(_ callAgent: CallAgent!, incomingcall: IncomingCall!) {
-        self.incomingCall = incomingcall
+    
+    public func callAgent(_ callAgent: CallAgent, didRecieveIncomingCall incomingCall: IncomingCall) {
+        self.incomingCall = incomingCall
         self.incomingCall?.delegate = self
-        contentView?.incomingCallReceived(self.incomingCall!)
+        contentView?.showIncomingCallBanner(self.incomingCall!)
     }
-
-    public func onCallsUpdated(_ callAgent: CallAgent!, args: CallsUpdatedEventArgs!) {
-        if let removedCall = args.removedCalls?.first {
+    
+    public func callAgent(_ callAgent: CallAgent, didUpdateCalls args: CallsUpdatedEventArgs) {
+        if let removedCall = args.removedCalls.first {
             contentView?.callRemoved(removedCall)
             self.incomingCall = nil
         }

@@ -19,7 +19,7 @@ struct ContentView: View {
     @State var callAgent: CallAgent?
     @State var call: Call?
     @State var deviceManager: DeviceManager?
-    @State var localVideoStream: LocalVideoStream?
+    @State var localVideoStream:[LocalVideoStream]?
     @State var incomingCall: IncomingCall?
     @State var sendingVideo:Bool = false
     @State var errorMessage:String = "Unknown"
@@ -31,6 +31,7 @@ struct ContentView: View {
     @State var remoteViews:[RendererView] = []
     @State var remoteParticipant: RemoteParticipant?
     @State var remoteVideoSize:String = "Unknown"
+    @State var isIncomingCall:Bool = false
     
     @State var callObserver:CallObserver?
     @State var remoteParticipantObserver:RemoteParticipantObserver?
@@ -49,8 +50,36 @@ struct ContentView: View {
                         }.disabled(call == nil)
                         Button(action: toggleLocalVideo) {
                             Text("Video On/Off")
-                        }.disabled(call == nil)
+                        }
                     }
+                }
+                if (isIncomingCall) {
+                    HStack() {
+                        VStack {
+                            Text("Incoming call")
+                                .padding(10)
+                                .frame(maxWidth: .infinity, alignment: .topLeading)
+                        }
+                        Button(action: answerIncomingCall) {
+                            HStack {
+                                Text("Answer")
+                            }
+                            .frame(width:80)
+                            .padding(.vertical, 10)
+                            .background(Color(.green))
+                        }
+                        Button(action: declineIncomingCall) {
+                            HStack {
+                                Text("Decline")
+                            }
+                            .frame(width:80)
+                            .padding(.vertical, 10)
+                            .background(Color(.red))
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
+                    .padding(10)
+                    .background(Color.gray)
                 }
                 ZStack{
                     VStack{
@@ -89,7 +118,7 @@ struct ContentView: View {
             incomingCallHandler.contentView = self
             var userCredential: CommunicationTokenCredential?
             do {
-                userCredential = try CommunicationTokenCredential(token: "<USER ACCESS TOKEN>")
+                userCredential = try CommunicationTokenCredential(token: "<USER_ACCESS_TOKEN>")
             } catch {
                 print("ERROR: It was not possible to create user credential.")
                 return
@@ -98,18 +127,19 @@ struct ContentView: View {
             AVAudioSession.sharedInstance().requestRecordPermission { (granted) in
                 if granted {
                     AVCaptureDevice.requestAccess(for: .video) { (videoGranted) in
-                        /* NO OPERATION */ }
+                        /* NO OPERATION */
+                    }
                 }
             }
 
             self.callClient = CallClient()
-            self.callClient?.createCallAgent(userCredential: userCredential) { (agent, error) in
+            self.callClient?.createCallAgent(userCredential: userCredential!) { (agent, error) in
                 if error != nil {
                     print("ERROR: It was not possible to create a call agent.")
                     return
                 }
 
-                if let agent = agent {
+                else {
                     self.callAgent = agent
                     print("Call agent successfully created.")
                     self.callAgent!.delegate = incomingCallHandler
@@ -125,34 +155,34 @@ struct ContentView: View {
             }
         }
     }
-    
-    func incomingCallReceived(_ incomingCall: IncomingCall?) {
+    func declineIncomingCall(){
+        self.incomingCall!.reject { (error) in }
+        isIncomingCall = false
+    }
+    func showIncomingCallBanner(_ incomingCall: IncomingCall?) {
+        isIncomingCall = true
         self.incomingCall = incomingCall
+    }
+    func answerIncomingCall() {
+        isIncomingCall = false
+        let options = AcceptCallOptions()
         if (self.incomingCall != nil) {
             guard let deviceManager = deviceManager else {
                 return
             }
-            let camera = deviceManager.cameras.first
-            localVideoStream = LocalVideoStream(camera: camera)
-            let videoOptions = VideoOptions(localVideoStream:localVideoStream!)
-
-            let options = AcceptCallOptions()
-            options!.videoOptions = videoOptions
-            let scalingMode = ScalingMode.fit
-            self.previewRenderer = try! VideoStreamRenderer(localVideoStream: localVideoStream!)
-            self.previewView = try! self.previewRenderer?.createView(with: RenderingOptions(scalingMode: scalingMode))
-            self.sendingVideo = true
+            
+            if (self.localVideoStream == nil) {
+                self.localVideoStream = [LocalVideoStream]()
+            }
+            if(sendingVideo)
+            {
+                let camera = deviceManager.cameras.first
+                localVideoStream!.append(LocalVideoStream(camera: camera!))
+                let videoOptions = VideoOptions(localVideoStreams: localVideoStream!)
+                options.videoOptions = videoOptions
+            }
             self.incomingCall!.accept(options: options) { (call, error) in
-                if(error == nil)
-                {
-                    self.call = call
-                    self.callObserver = CallObserver(self)
-                    self.call?.delegate = self.callObserver
-                                
-                    self.remoteParticipantObserver = RemoteParticipantObserver(self)
-                } else {
-                    print("cannot answer incoming call")
-                }
+                setCallAndObersever(call: call, error: error)
             }
         }
     }
@@ -164,65 +194,107 @@ struct ContentView: View {
         for data in remoteVideoStreamData.values {
             data.renderer?.dispose()
         }
-        self.previewRenderer!.dispose()
+        self.previewRenderer?.dispose()
         sendingVideo = false
     }
     
     func toggleLocalVideo() {
-        if (sendingVideo) {
-            call!.stopVideo(stream: localVideoStream!) { (error) in
-                if (error != nil) {
-                    print("cannot stop video")
+        if (call == nil)
+        {
+            if(!sendingVideo)
+            {
+                self.callClient = CallClient()
+                self.callClient?.getDeviceManager { (deviceManager, error) in
+                    if (error == nil) {
+                        print("Got device manager instance")
+                        self.deviceManager = deviceManager
+                    } else {
+                        print("Failed to get device manager instance")
+                    }
                 }
-                else {
-                    self.sendingVideo = false
-                    self.previewView = nil
-                    self.previewRenderer!.dispose()
-                    self.previewRenderer = nil
+                guard let deviceManager = deviceManager else {
+                    return
                 }
+                let camera = deviceManager.cameras.first
+                let scalingMode = ScalingMode.fit
+                if (self.localVideoStream == nil) {
+                    self.localVideoStream = [LocalVideoStream]()
+                }
+                localVideoStream!.append(LocalVideoStream(camera: camera!))
+                previewRenderer = try! VideoStreamRenderer(localVideoStream: localVideoStream!.first!)
+                previewView = try! previewRenderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
+                self.sendingVideo = true
+            }
+            else{
+                self.sendingVideo = false
+                self.previewView = nil
+                self.previewRenderer!.dispose()
+                self.previewRenderer = nil
             }
         }
-        else {
-            let camera = deviceManager?.cameras.first
-            let scalingMode = ScalingMode.fit
-            localVideoStream = LocalVideoStream(camera: camera)
-            previewRenderer = try! VideoStreamRenderer(localVideoStream: localVideoStream!)
-            previewView = try! previewRenderer!.createView(with: RenderingOptions(scalingMode:scalingMode))
-            call!.startVideo(stream:localVideoStream) { (error) in
-                if (error != nil) {
-                    print("cannot start video")
+        else{
+            if (sendingVideo) {
+                call!.stopVideo(stream: localVideoStream!.first!) { (error) in
+                    if (error != nil) {
+                        print("cannot stop video")
+                    }
+                    else {
+                        self.sendingVideo = false
+                        self.previewView = nil
+                        self.previewRenderer!.dispose()
+                        self.previewRenderer = nil
+                    }
                 }
-                else {
-                    self.sendingVideo = true
+            }
+            else {
+                guard let deviceManager = deviceManager else {
+                    return
+                }
+                let camera = deviceManager.cameras.first
+                let scalingMode = ScalingMode.fit
+                if (self.localVideoStream == nil) {
+                    self.localVideoStream = [LocalVideoStream]()
+                }
+                localVideoStream!.append(LocalVideoStream(camera: camera!))
+                previewRenderer = try! VideoStreamRenderer(localVideoStream: localVideoStream!.first!)
+                previewView = try! previewRenderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
+                call!.startVideo(stream:(localVideoStream?.first)!) { (error) in
+                    if (error != nil) {
+                        print("cannot start video")
+                    }
+                    else {
+                        self.sendingVideo = true
+                    }
                 }
             }
         }
     }
 
     func startCall() {
-        guard let deviceManager = deviceManager else {
-            return
-        }
-        let camera = deviceManager.cameras.first
-        self.localVideoStream = LocalVideoStream(camera: camera)
-        let videoOptions = VideoOptions(localVideoStream: localVideoStream)
-                    
-        let scalingMode = ScalingMode.fit
-        self.previewRenderer = try! VideoStreamRenderer(localVideoStream: self.localVideoStream!)
-        self.previewView = try! self.previewRenderer?.createView(with: RenderingOptions(scalingMode: scalingMode))
-        self.sendingVideo = true
-        print("Sending video", self.sendingVideo)
-                    
         let startCallOptions = StartCallOptions()
-        startCallOptions?.videoOptions = videoOptions
-  
+        if(sendingVideo)
+        {
+            if (self.localVideoStream == nil) {
+                self.localVideoStream = [LocalVideoStream]()
+            }
+            let videoOptions = VideoOptions(localVideoStreams: localVideoStream!)
+            startCallOptions.videoOptions = videoOptions
+        }
         let callees:[CommunicationIdentifier] = [CommunicationUserIdentifier(self.callee)]
-        self.call = self.callAgent?.startCall(participants: callees, options: startCallOptions)
-        
-        self.callObserver = CallObserver(self)
-        self.call!.delegate = self.callObserver
-                    
-        self.remoteParticipantObserver = RemoteParticipantObserver(self)
+        self.callAgent?.startCall(participants: callees, options: startCallOptions) { (call, error) in
+            setCallAndObersever(call: call, error: error)
+        }
+    }
+    
+    func setCallAndObersever(call:Call!, error:Error?) {
+        if (error == nil) {
+            self.call = call
+            self.callObserver = CallObserver(self)
+            self.call!.delegate = self.callObserver
+            self.remoteParticipantObserver = RemoteParticipantObserver(self)
+        } else {
+            print("Failed to get call object")
+        }
     }
 
     func endCall() {
@@ -238,7 +310,7 @@ struct ContentView: View {
 }
 
 public class RemoteVideoStreamData : NSObject, RendererDelegate {
-    public func rendererFailedToStart() {
+    public func videoStreamRenderer(didFailToStart renderer: VideoStreamRenderer) {
         owner.errorMessage = "Renderer failed to start"
     }
     
@@ -251,13 +323,15 @@ public class RemoteVideoStreamData : NSObject, RendererDelegate {
             }
         }
     }
+    
     var views:[RendererView] = []
     init(view:ContentView, stream:RemoteVideoStream) {
         owner = view
         self.stream = stream
     }
-    public func onFirstFrameRendered() {
-        let size:StreamSize = renderer!.size
+    
+    public func videoStreamRenderer(didRenderFirstFrame renderer: VideoStreamRenderer) {
+        let size:StreamSize = renderer.size
         owner.remoteVideoSize = String(size.width) + " X " + String(size.height)
     }
 }
@@ -267,24 +341,24 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
     init(_ view:ContentView) {
             owner = view
     }
-    
-    public func onStateChanged(_ call: Call!, args: PropertyChangedEventArgs!) {
+        
+    public func call(_ call: Call, didChangeState args: PropertyChangedEventArgs) {
         if(call.state == CallState.connected) {
             initialCallParticipant()
         }
     }
-    
-    public func onRemoteParticipantsUpdated(_ call: Call!,args: ParticipantsUpdatedEventArgs!) {
+
+    public func call(_ call: Call, didUpdateRemoteParticipant args: ParticipantsUpdatedEventArgs) {
         for participant in args.addedParticipants {
             participant.delegate = owner.remoteParticipantObserver
-            for stream in participant.videoStreams! {
+            for stream in participant.videoStreams {
                 if !owner.remoteVideoStreamData.isEmpty {
                     return
                 }
                 let data:RemoteVideoStreamData = RemoteVideoStreamData(view: owner, stream: stream)
                 let scalingMode = ScalingMode.fit
                 data.renderer = try! VideoStreamRenderer(remoteVideoStream: stream)
-                let view:RendererView = try! data.renderer!.createView(with: RenderingOptions(scalingMode:scalingMode)!)
+                let view:RendererView = try! data.renderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
                 data.views.append(view)
                 self.owner.remoteViews.append(view)
                 owner.remoteVideoStreamData[stream.id] = data
@@ -296,7 +370,7 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
     public func initialCallParticipant() {
         for participant in owner.call!.remoteParticipants {
             participant.delegate = owner.remoteParticipantObserver
-            for stream in participant.videoStreams! {
+            for stream in participant.videoStreams {
                 renderRemoteStream(stream)
             }
             owner.remoteParticipant = participant
@@ -310,7 +384,7 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
         let data:RemoteVideoStreamData = RemoteVideoStreamData(view: owner, stream: stream)
         let scalingMode = ScalingMode.fit
         data.renderer = try! VideoStreamRenderer(remoteVideoStream: stream)
-        let view:RendererView = try! data.renderer!.createView(with: RenderingOptions(scalingMode:scalingMode)!)
+        let view:RendererView = try! data.renderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
         self.owner.remoteViews.append(view)
         owner.remoteVideoStreamData[stream.id] = data
     }
@@ -326,13 +400,12 @@ public class RemoteParticipantObserver : NSObject, RemoteParticipantDelegate {
         let data:RemoteVideoStreamData = RemoteVideoStreamData(view: owner, stream: stream)
         let scalingMode = ScalingMode.fit
         data.renderer = try! VideoStreamRenderer(remoteVideoStream: stream)
-        let view:RendererView = try! data.renderer!.createView(with: RenderingOptions(scalingMode:scalingMode)!)
+        let view:RendererView = try! data.renderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
         self.owner.remoteViews.append(view)
         owner.remoteVideoStreamData[stream.id] = data
     }
 
-    public func onVideoStreamsUpdated(_ remoteParticipant: RemoteParticipant!, args: RemoteVideoStreamsEventArgs!)
-    {
+    public func remoteParticipant(_ remoteParticipant: RemoteParticipant, didUpdateVideoStreams args: RemoteVideoStreamsEventArgs) {
         for stream in args.addedRemoteVideoStreams {
             renderRemoteStream(stream)
         }
