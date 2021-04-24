@@ -44,17 +44,14 @@ struct ContentView: View {
             self.callClient = CallClient()
 
             // Creates the call agent
-            self.callClient?.createCallAgent(userCredential: userCredential) { (agent, error) in
-                if error == nil {
-                    guard let agent = agent else {
-                        self.message = "Failed to create CallAgent"
-                        return
-                    }
-
+            self.callClient?.createCallAgent(userCredential: userCredential!) { (agent, error) in
+                if error != nil {
+                    print("ERROR: It was not possible to create a call agent.")
+                    return
+                }
+                else {
                     self.callAgent = agent
                     self.message = "Call agent successfully created."
-                } else {
-                    self.message = "Failed to create CallAgent with error"
                 }
             }
         }
@@ -64,24 +61,25 @@ struct ContentView: View {
         // Ask permissions
         AVAudioSession.sharedInstance().requestRecordPermission { (granted) in
             if granted {
-                let callees:[CommunicationIdentifier] = [CommunicationUserIdentifier(identifier: self.callee)]
+                let callees:[CommunicationIdentifier] = [CommunicationUserIdentifier(self.callee)]
 
-                guard let call = self.callAgent?.call(participants: callees, options: nil) else {
-                    self.message = "Failed to place outgoing call"
-                    return
+                self.callAgent?.startCall(participants: callees, options: nil) { (call, error) in
+                    if (error == nil) {
+                        self.call = call
+                        self.callObserver = CallObserver(self)
+                        self.call!.delegate = self.callObserver
+                        self.message = "Outgoing call placed successfully"
+                    } else {
+                        print("Failed to get call object")
+                    }
                 }
-
-                self.call = call
-                self.callObserver = CallObserver(self)
-                self.call!.delegate = self.callObserver
-                self.message = "Outgoing call placed successfully"
             }
         }
     }
 
     func endCall() {
         if let call = call {
-            call.hangup(options: nil, completionHandler: { (error) in
+            call.hangUp(options: nil, completionHandler: { (error) in
                 if error == nil {
                     self.message = "Hangup was successfull"
                 } else {
@@ -118,8 +116,6 @@ class CallObserver : NSObject, CallDelegate {
         case .disconnected: return "Disconnected"
         case .disconnecting: return "Disconnecting"
         case .earlyMedia: return "EarlyMedia"
-        case .hold: return "Hold"
-        case .incoming: return "Incoming"
         case .none: return "None"
         case .ringing: return "Ringing"
         default: return "Unknown"
