@@ -49,7 +49,9 @@ struct ContentView: View {
                             Text("End Call")
                         }.disabled(call == nil)
                         Button(action: toggleLocalVideo) {
-                            Text("Video On/Off")
+                            HStack {
+                                Text(sendingVideo ? "Turn Off Video" : "Turn On Video")
+                            }
                         }
                     }
                 }
@@ -95,7 +97,9 @@ struct ContentView: View {
                                 Text("End Call")
                             }.disabled(call == nil)
                             Button(action: toggleLocalVideo) {
-                                Text("Video On/Off")
+                                HStack {
+                                    Text(sendingVideo ? "Turn Off Video" : "Turn On Video")
+                                }
                             }
                         }
                         
