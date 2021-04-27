@@ -2,7 +2,5 @@ platform :ios, '13.0'
 use_frameworks!
 
 target 'iOSVideo' do
-  pod 'AzureCommunicationCalling', '~> 1.0.0-beta.12'
-  pod 'AzureCommunication', '~> 1.0.0-beta.11'
-  pod 'AzureCore', '~> 1.0.0-beta.11'
+  pod 'AzureCommunicationCalling', '~> 1.0.0'
 end
