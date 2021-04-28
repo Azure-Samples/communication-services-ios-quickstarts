@@ -20,9 +20,7 @@ platform :ios, '13.0'
 use_frameworks!
 
 target 'VideoCallingQuickstart' do
-  pod 'AzureCommunicationCalling', '~> 1.0.0-beta.9'
-  pod 'AzureCommunication', '~> 1.0.0-beta.9'
-  pod 'AzureCore', '~> 1.0.0-beta.9'
+  pod 'AzureCommunicationCalling', '~> 1.0.0'
 end
 ```
 3. Run pod install.
