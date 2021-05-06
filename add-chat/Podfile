@@ -1,0 +1,12 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'ChatQuickstart' do
+pod 'AzureCommunication', '~> 1.0.0-beta.11'
+pod 'AzureCommunicationChat', '~> 1.0.0-beta.11'
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for ChatQuickstart
+
+end
