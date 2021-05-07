@@ -18,7 +18,7 @@ To complete this tutorial, you’ll need the following prerequisites:
 - An Azure account with an active subscription. [Create an account for free](https://azure.microsoft.com/free/?WT.mc_id=A261C142F). 
 - Install [Xcode](https://developer.apple.com/xcode/) and [CocoaPods](https://cocoapods.org/). You use Xcode to create an iOS application for the quickstart, and CocoaPods to install dependencies.
 - A deployed Communication Services resource. [Create a Communication Services resource](https://docs.microsoft.com/en-us/azure/communication-services/quickstarts/create-communication-resource).
-- Create two users in Azure Communication Services, and issue them a [user access token](https://docs.microsoft.com/en-us/azure/communication-services/quickstarts/access-tokens). Be sure to set the scope to chat, and note the token string as well as the userId string. In this quickstart, you create a thread with an initial participant, and then add a second participant to the thread.
+- Create two users in Azure Communication Services, and issue them a [user access token](https://docs.microsoft.com/azure/communication-services/quickstarts/access-tokens). Be sure to set the scope to chat, and note the token string as well as the userId string. In this quickstart, you create a thread with an initial participant, and then add a second participant to the thread.
 
 
 ## Before running sample code
