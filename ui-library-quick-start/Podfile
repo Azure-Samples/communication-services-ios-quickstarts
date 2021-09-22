@@ -1,7 +1,0 @@
-platform :ios, '13.0'
-
-target 'UILibraryQuickStart' do
-    use_frameworks!
-    pod 'AzureCommunicationCalling', '2.0.1-beta.1'
-    pod 'MicrosoftFluentUI'
-end
