@@ -7,7 +7,7 @@ import UIKit
 import AzureCommunicationCalling
 import CallingComposite
 
-class ViewController: UIViewController, CallingCompositeDelegate {
+class ViewController: UIViewController {
 
     private var callingComposite: CallingComposite?
 
@@ -28,10 +28,7 @@ class ViewController: UIViewController, CallingCompositeDelegate {
     }
 
     @objc private func startCallingComposite() {
-        let callingCompositeOptions = CallingCompositeOptions(
-        logger: ConsoleLogger(minimumLogLevel: .info),
-        themeConfiguration: nil,
-        callingCompositeCallStateDelegate: self)
+        let callingCompositeOptions = CallingCompositeOptions()
 
         callingComposite = ACSCallingComposite(withOptions: callingCompositeOptions)
 
