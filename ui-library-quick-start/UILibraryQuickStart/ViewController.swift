@@ -18,7 +18,7 @@ class ViewController: UIViewController {
         button.contentEdgeInsets = UIEdgeInsets(top: 10.0, left: 20.0, bottom: 10.0, right: 20.0)
         button.layer.cornerRadius = 10
         button.backgroundColor = .systemBlue
-        button.setTitle("Start Calling Composite", for: .normal)
+        button.setTitle("Start Experience", for: .normal)
         button.addTarget(self, action: #selector(startCallingComposite), for: .touchUpInside)
 
         button.translatesAutoresizingMaskIntoConstraints = false
