@@ -9,7 +9,7 @@ import CallingComposite
 
 class ViewController: UIViewController {
 
-    private var callingComposite: CallingComposite?
+    private var callComposite: CallComposite?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,7 +19,7 @@ class ViewController: UIViewController {
         button.layer.cornerRadius = 10
         button.backgroundColor = .systemBlue
         button.setTitle("Start Experience", for: .normal)
-        button.addTarget(self, action: #selector(startCallingComposite), for: .touchUpInside)
+        button.addTarget(self, action: #selector(startCallComposite), for: .touchUpInside)
 
         button.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(button)
@@ -27,17 +27,17 @@ class ViewController: UIViewController {
         button.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
 
-    @objc private func startCallingComposite() {
-        let callingCompositeOptions = CallingCompositeOptions()
+    @objc private func startCallComposite() {
+        let callCompositeOptions = CallCompositeOptions()
 
-        callingComposite = ACSCallingComposite(withOptions: callingCompositeOptions)
+        callComposite = CallComposite(withOptions: callCompositeOptions)
 
         let communicationTokenCredential = try! CommunicationTokenCredential(token: "<USER_ACCESS_TOKEN>")
 
-        let parameters = try! GroupCallParameters(communicationTokenCredential: communicationTokenCredential,
+        let options = GroupCallOptions(communicationTokenCredential: communicationTokenCredential,
                                                   displayName: "<DISPLAY_NAME>",
                                                   groupId: "<GROUP_CALL_ID>")
 
-        callingComposite?.startExperience(with: parameters)
+        callComposite?.launch(with: options)
     }
 }

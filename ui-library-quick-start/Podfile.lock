@@ -1,4 +1,7 @@
 PODS:
+  - azure-communication-ui-library (1.0.0-alpha.1):
+    - AzureCommunicationCalling (= 2.0.1-beta.1)
+    - MicrosoftFluentUI
   - AzureCommunicationCalling (2.0.1-beta.1):
     - AzureCommunicationCommon (~> 1.0.2)
   - AzureCommunicationCommon (1.0.2)
@@ -166,20 +169,24 @@ PODS:
   - MicrosoftFluentUI/Utilities_ios (0.3.3)
 
 DEPENDENCIES:
+  - azure-communication-ui-library (= 1.0.0-alpha.1)
   - AzureCommunicationCalling (= 2.0.1-beta.1)
-  - MicrosoftFluentUI
+  - MicrosoftFluentUI (= 0.3.3)
 
 SPEC REPOS:
+  https://github.com/Azure/communication-ui-toolkit-ios-pr:
+    - azure-communication-ui-library
   trunk:
     - AzureCommunicationCalling
     - AzureCommunicationCommon
     - MicrosoftFluentUI
 
 SPEC CHECKSUMS:
+  azure-communication-ui-library: dbfc7a12ba2eb5888beaab6b625c206eb3848d51
   AzureCommunicationCalling: ad5b6c328ecfe4729dcf0b5d99d9415c42c68429
   AzureCommunicationCommon: 743009b95ca5de0b32fb5327b1105c6239b7d15d
   MicrosoftFluentUI: 2134838e4314cdaba8b4f874d1b515b84d627dfe
 
-PODFILE CHECKSUM: 550d2c1156b5bf1ce852436c3efe258b6ebd0ace
+PODFILE CHECKSUM: 47833f39f678a2d7477493442655224f2e14266c
 
 COCOAPODS: 1.10.0
