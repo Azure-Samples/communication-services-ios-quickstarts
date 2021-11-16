@@ -5,7 +5,7 @@
 
 import UIKit
 import AzureCommunicationCalling
-import CallingComposite
+import CallComposite
 
 class ViewController: UIViewController {
 
@@ -35,8 +35,8 @@ class ViewController: UIViewController {
         let communicationTokenCredential = try! CommunicationTokenCredential(token: "<USER_ACCESS_TOKEN>")
 
         let options = GroupCallOptions(communicationTokenCredential: communicationTokenCredential,
-                                                  displayName: "<DISPLAY_NAME>",
-                                                  groupId: "<GROUP_CALL_ID>")
+                                       groupId: UUID(uuidString: "<GROUP_CALL_ID>")!,
+                                       displayName: "<DISPLAY_NAME>")
 
         callComposite?.launch(with: options)
     }
