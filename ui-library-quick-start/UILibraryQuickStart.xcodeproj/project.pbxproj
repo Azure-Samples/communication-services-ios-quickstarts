@@ -7,17 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A0E51787D4849555EA3AFB88 /* Pods_UILibraryQuickStart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28219F10938A3D00C86E77A4 /* Pods_UILibraryQuickStart.framework */; };
 		A894973C26FBDAC30016918F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A894973B26FBDAC30016918F /* AppDelegate.swift */; };
 		A894973E26FBDAC30016918F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A894973D26FBDAC30016918F /* SceneDelegate.swift */; };
 		A894974026FBDAC30016918F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A894973F26FBDAC30016918F /* ViewController.swift */; };
 		A894974326FBDAC30016918F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A894974126FBDAC30016918F /* Main.storyboard */; };
 		A894974526FBDAC60016918F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A894974426FBDAC60016918F /* Assets.xcassets */; };
 		A894974826FBDAC60016918F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A894974626FBDAC60016918F /* LaunchScreen.storyboard */; };
+		AD296D46029828BF4753DEA5 /* Pods_UILibraryQuickStart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51122C57A2F33DFEA9ED7944 /* Pods_UILibraryQuickStart.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		28219F10938A3D00C86E77A4 /* Pods_UILibraryQuickStart.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_UILibraryQuickStart.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D361F3644349AAC8E2A2BCC /* Pods-UILibraryQuickStart.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UILibraryQuickStart.release.xcconfig"; path = "Target Support Files/Pods-UILibraryQuickStart/Pods-UILibraryQuickStart.release.xcconfig"; sourceTree = "<group>"; };
+		51122C57A2F33DFEA9ED7944 /* Pods_UILibraryQuickStart.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_UILibraryQuickStart.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B95091888E6E73451815697 /* Pods-UILibraryQuickStart.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UILibraryQuickStart.debug.xcconfig"; path = "Target Support Files/Pods-UILibraryQuickStart/Pods-UILibraryQuickStart.debug.xcconfig"; sourceTree = "<group>"; };
 		A894973826FBDAC30016918F /* UILibraryQuickStart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UILibraryQuickStart.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A894973B26FBDAC30016918F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A894973D26FBDAC30016918F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -26,8 +28,6 @@
 		A894974426FBDAC60016918F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A894974726FBDAC60016918F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A894974926FBDAC60016918F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		BCA5B91ADAFEF7D75FEA8824 /* Pods-UILibraryQuickStart.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UILibraryQuickStart.release.xcconfig"; path = "Target Support Files/Pods-UILibraryQuickStart/Pods-UILibraryQuickStart.release.xcconfig"; sourceTree = "<group>"; };
-		C937C7DC0CAA72FBC327799B /* Pods-UILibraryQuickStart.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UILibraryQuickStart.debug.xcconfig"; path = "Target Support Files/Pods-UILibraryQuickStart/Pods-UILibraryQuickStart.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,28 +35,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A0E51787D4849555EA3AFB88 /* Pods_UILibraryQuickStart.framework in Frameworks */,
+				AD296D46029828BF4753DEA5 /* Pods_UILibraryQuickStart.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0356223ADE3068A13D70E861 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				51122C57A2F33DFEA9ED7944 /* Pods_UILibraryQuickStart.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		04F0FAA701526FE8D51D9317 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				C937C7DC0CAA72FBC327799B /* Pods-UILibraryQuickStart.debug.xcconfig */,
-				BCA5B91ADAFEF7D75FEA8824 /* Pods-UILibraryQuickStart.release.xcconfig */,
+				9B95091888E6E73451815697 /* Pods-UILibraryQuickStart.debug.xcconfig */,
+				3D361F3644349AAC8E2A2BCC /* Pods-UILibraryQuickStart.release.xcconfig */,
 			);
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		784B63CC4F7C63783C3E7B82 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				28219F10938A3D00C86E77A4 /* Pods_UILibraryQuickStart.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		A894972F26FBDAC30016918F = {
@@ -65,7 +65,7 @@
 				A894973A26FBDAC30016918F /* UILibraryQuickStart */,
 				A894973926FBDAC30016918F /* Products */,
 				04F0FAA701526FE8D51D9317 /* Pods */,
-				784B63CC4F7C63783C3E7B82 /* Frameworks */,
+				0356223ADE3068A13D70E861 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -98,11 +98,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A894974C26FBDAC60016918F /* Build configuration list for PBXNativeTarget "UILibraryQuickStart" */;
 			buildPhases = (
-				EE99D9AA11C1522108BDBE2F /* [CP] Check Pods Manifest.lock */,
+				1C989DBB12B6EFFE8D440899 /* [CP] Check Pods Manifest.lock */,
 				A894973426FBDAC30016918F /* Sources */,
 				A894973526FBDAC30016918F /* Frameworks */,
 				A894973626FBDAC30016918F /* Resources */,
-				0D8ED9273F33320BD9723AA2 /* [CP] Embed Pods Frameworks */,
+				FF1FE1F35CCBC1A888C38053 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -160,24 +160,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0D8ED9273F33320BD9723AA2 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-UILibraryQuickStart/Pods-UILibraryQuickStart-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-UILibraryQuickStart/Pods-UILibraryQuickStart-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-UILibraryQuickStart/Pods-UILibraryQuickStart-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		EE99D9AA11C1522108BDBE2F /* [CP] Check Pods Manifest.lock */ = {
+		1C989DBB12B6EFFE8D440899 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -197,6 +180,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FF1FE1F35CCBC1A888C38053 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-UILibraryQuickStart/Pods-UILibraryQuickStart-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-UILibraryQuickStart/Pods-UILibraryQuickStart-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-UILibraryQuickStart/Pods-UILibraryQuickStart-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -354,7 +354,7 @@
 		};
 		A894974D26FBDAC60016918F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C937C7DC0CAA72FBC327799B /* Pods-UILibraryQuickStart.debug.xcconfig */;
+			baseConfigurationReference = 9B95091888E6E73451815697 /* Pods-UILibraryQuickStart.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -383,7 +383,7 @@
 		};
 		A894974E26FBDAC60016918F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BCA5B91ADAFEF7D75FEA8824 /* Pods-UILibraryQuickStart.release.xcconfig */;
+			baseConfigurationReference = 3D361F3644349AAC8E2A2BCC /* Pods-UILibraryQuickStart.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

@@ -1,6 +1,3 @@
-source 'https://github.com/CocoaPods/Specs.git'
-source 'https://github.com/Azure/AzurePrivatePodspecs.git'
-
 platform :ios, '13.0'
 
 target 'UILibraryQuickStart' do
