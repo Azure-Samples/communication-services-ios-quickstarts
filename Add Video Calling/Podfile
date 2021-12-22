@@ -1,6 +1,21 @@
 platform :ios, '13.0'
 use_frameworks!
 
+ACSFrameworkVersion = '2.2.0-beta.1'
+
 target 'iOSVideo' do
-  pod 'AzureCommunicationCalling', '~> 1.0.0'
+  pod 'AzureCommunicationCalling', ACSFrameworkVersion
+end
+
+post_install do |installer|
+  app_project = Xcodeproj::Project.open(Dir.glob("*.xcodeproj")[0])
+  app_project.native_targets.each do |target|
+        target.build_configurations.each do |config|
+          config.build_settings['OTHER_SWIFT_FLAGS'] = ['$(inherited)']
+          if ACSFrameworkVersion.include?('beta')
+            config.build_settings['OTHER_SWIFT_FLAGS'] << '-D BETA'
+          end
+          app_project.save
+        end
+  end
 end
