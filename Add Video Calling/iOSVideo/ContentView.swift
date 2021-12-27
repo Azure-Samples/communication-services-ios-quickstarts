@@ -5,17 +5,24 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 //
-
 import SwiftUI
 import AzureCommunicationCommon
 import AzureCommunicationCalling
 import AVFoundation
 import Foundation
-
+import PushKit
+import os.log
 
 struct ContentView: View {
+    init(appPubs: AppPubs) {
+        self.appPubs = appPubs
+    }
+
+    private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "ACSVideoSample")
+    private let token = "<USER_ACCESS_TOKEN>"
+
     @State var callee: String = ""
-    @State var callClient: CallClient?
+    @State var callClient = CallClient()
     @State var callAgent: CallAgent?
     @State var call: Call?
     @State var deviceManager: DeviceManager?
@@ -32,9 +39,15 @@ struct ContentView: View {
     @State var remoteParticipant: RemoteParticipant?
     @State var remoteVideoSize:String = "Unknown"
     @State var isIncomingCall:Bool = false
-    
+    @State var showAlert = false
+    @State var alertMessage = ""
+    @State var isCallKitEnabled = true
+    @State var isSpeakerOn:Bool = false
+
     @State var callObserver:CallObserver?
     @State var remoteParticipantObserver:RemoteParticipantObserver?
+
+    var appPubs: AppPubs
 
     var body: some View {
         NavigationView {
@@ -53,6 +66,15 @@ struct ContentView: View {
                                 Text(sendingVideo ? "Turn Off Video" : "Turn On Video")
                             }
                         }
+                        Toggle("Enable CallKit", isOn: $isCallKitEnabled)
+                            .onChange(of: isCallKitEnabled) { _ in
+                                createCallAgent()
+                            }.disabled(call != nil)
+
+                        Toggle("Speaker", isOn: $isSpeakerOn)
+                            .onChange(of: isSpeakerOn) { _ in
+                                switchSpeaker()
+                            }.disabled(call == nil)
                     }
                 }
                 if (isIncomingCall) {
@@ -84,7 +106,7 @@ struct ContentView: View {
                     .background(Color.gray)
                 }
                 ZStack{
-                    VStack{
+                    VStack {
                         ForEach(remoteViews, id:\.self) { renderer in
                             ZStack{
                                 VStack{
@@ -101,10 +123,15 @@ struct ContentView: View {
                                     Text(sendingVideo ? "Turn Off Video" : "Turn On Video")
                                 }
                             }
+                            Button(action: switchSpeaker) {
+                                HStack {
+                                    Text(isSpeakerOn ? "Turn Off Speaker" : "Turn On Speaker")
+                                }
+                            }
                         }
-                        
+
                     }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                    VStack{
+                    VStack {
                         if(sendingVideo)
                         {
                             VStack{
@@ -117,17 +144,30 @@ struct ContentView: View {
                 }
             }
      .navigationBarTitle("Video Calling Quickstart")
-        }.onAppear{
-            let incomingCallHandler = IncomingCallHandler.getOrCreateInstance()
-            incomingCallHandler.contentView = self
-            var userCredential: CommunicationTokenCredential?
-            do {
-                userCredential = try CommunicationTokenCredential(token: "<USER_ACCESS_TOKEN>")
-            } catch {
-                print("ERROR: It was not possible to create user credential.")
+        }
+        .onReceive(self.appPubs.$pushToken, perform: { newPushToken in
+            guard let pushToken = newPushToken else {
+                print("Got empty token")
                 return
             }
-            
+
+            guard let callAgent = callAgent else {
+                self.showAlert = true
+                self.alertMessage = "Failed to register for Push, no CallAgent"
+                return
+            }
+
+            callAgent.registerPushNotifications(deviceToken: pushToken) { error in
+                if error != nil {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to register for Push"
+                }
+            }
+        })
+        .onReceive(self.appPubs.$pushPayload, perform: { payload in
+            handlePushNotification(payload)
+        })
+     .onAppear{
             AVAudioSession.sharedInstance().requestRecordPermission { (granted) in
                 if granted {
                     AVCaptureDevice.requestAccess(for: .video) { (videoGranted) in
@@ -136,37 +176,171 @@ struct ContentView: View {
                 }
             }
 
-            self.callClient = CallClient()
-            self.callClient?.createCallAgent(userCredential: userCredential!) { (agent, error) in
+            self.callClient.getDeviceManager { (deviceManager, error) in
+                if (error == nil) {
+                    print("Got device manager instance")
+                    // This app does not support landscape mode
+                    // But iOS still generates the device orientation events
+                    // This is a work-around so that iOS stops generating those events
+                    // And stop sending it to the SDK.
+                    UIDevice.current.endGeneratingDeviceOrientationNotifications()
+                    self.deviceManager = deviceManager
+                } else {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to get DeviceManager"
+                }
+            }
+            createCallAgent()
+        }
+        .alert(isPresented: $showAlert) { () -> Alert in
+            Alert(title: Text("ERROR"), message: Text(alertMessage), dismissButton: .default(Text("Dismiss")))
+        }
+    }
+
+    func switchSpeaker() -> Void {
+        let audioSession = AVAudioSession.sharedInstance()
+        if isSpeakerOn {
+            try! audioSession.overrideOutputAudioPort(AVAudioSession.PortOverride.none)
+        } else {
+            try! audioSession.overrideOutputAudioPort(AVAudioSession.PortOverride.speaker)
+        }
+        isSpeakerOn = !isSpeakerOn
+    }
+
+    #if BETA
+    private func createProviderConfig() -> CXProviderConfiguration {
+        let providerConfig = CXProviderConfiguration()
+        providerConfig.supportsVideo = true
+        providerConfig.maximumCallsPerCallGroup = 1
+        providerConfig.includesCallsInRecents = true
+        providerConfig.supportedHandleTypes = [.phoneNumber, .generic]
+        return providerConfig
+    }
+    #endif
+
+    public func handlePushNotification(_ pushPayload: PKPushPayload?)
+    {
+        guard let pushPayload = pushPayload else {
+            print("Got empty payload")
+            return
+        }
+
+        if pushPayload.dictionaryPayload.isEmpty {
+            os_log("ACS SDK got empty dictionary in push payload", log:self.log)
+            return
+        }
+
+        let callNotification = PushNotificationInfo.fromDictionary(pushPayload.dictionaryPayload)
+        guard let callAgent = callAgent else {
+            #if BETA
+            // App is in kill mode, agent isn't created
+            CallClient.reportToCallKit(with: callNotification, cxproviderConfig: createProviderConfig()) { (error) in
                 if error != nil {
-                    print("ERROR: It was not possible to create a call agent.")
+                    os_log("ACS SDK reportToCallKit has failed", log:self.log)
                     return
                 }
 
-                else {
-                    self.callAgent = agent
-                    print("Call agent successfully created.")
-                    self.callAgent!.delegate = incomingCallHandler
-                    self.callClient?.getDeviceManager { (deviceManager, error) in
-                        if (error == nil) {
-                            print("Got device manager instance")
-                            self.deviceManager = deviceManager
+                // We have already reported call to CallKit. Init SDK in background
+                DispatchQueue.global().async {
+                    // App is in the killed state use os_log and use Console to see what's happening
+                    os_log("ACS SDK initialize completed, calling handlePush", log:self.log)
+                    self.isCallKitEnabled = true
+                    createCallAgent()
+                    guard let callAgent = callAgent else {
+                        os_log("ACS SDK handle push notification failed to create CallAgent instance", log:self.log)
+                        return
+                    }
+
+                    callAgent.handlePush(notification: callNotification) { (error) in
+                        if error == nil {
+                            os_log("ACS SDK handle push notification kill mode: passed", log:self.log)
                         } else {
-                            print("Failed to get device manager instance")
+                            os_log("ACS SDK handle push notification kill mode: failed", log:self.log)
                         }
                     }
                 }
             }
+            #else
+                os_log("ACS SDK CallKit not enabled", log:self.log)
+            #endif
+            return
+        }
+
+        // CallAgent is created normally handle the push
+        callAgent.handlePush(notification: callNotification) { (error) in
+            if error == nil {
+                os_log("SDK handle push notification normal mode: passed", log:self.log)
+            } else {
+                os_log("SDK handle push notification normal mode: failed", log:self.log)
+            }
         }
     }
-    func declineIncomingCall(){
+
+    private func createCallAgent() {
+        let incomingCallHandler = IncomingCallHandler.getOrCreateInstance()
+        incomingCallHandler.contentView = self
+        var userCredential: CommunicationTokenCredential
+        let oldCallKitEnabledState = self.isCallKitEnabled
+        do {
+            userCredential = try CommunicationTokenCredential(token: token)
+        } catch {
+            self.showAlert = true
+            self.alertMessage = "Failed to create CommunicationTokenCredential"
+            self.isCallKitEnabled = oldCallKitEnabledState
+            return
+        }
+
+        if callAgent != nil {
+            // Have to dispose existing CallAgent if present
+            // Because we cannot create two CallAgent's
+            callAgent!.dispose()
+            callAgent = nil
+        }
+
+        if isCallKitEnabled {
+            #if BETA
+            self.callClient.createCallAgent(userCredential: userCredential,
+                                                              options: nil,
+                                             cxproviderConfig: createProviderConfig()) { (agent, error) in
+                if error != nil {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to create CallAgent (with CallKit)"
+                    self.isCallKitEnabled = oldCallKitEnabledState
+                } else {
+                    self.callAgent = agent
+                    print("Call agent successfully created.")
+                    self.callAgent!.delegate = incomingCallHandler
+                }
+            }
+            #else
+                self.showAlert = true
+                self.alertMessage = "ACS CallKit available only in Beta builds"
+                self.isCallKitEnabled = false
+            #endif
+        } else {
+            self.callClient.createCallAgent(userCredential: userCredential) { (agent, error) in
+                if error != nil {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to create CallAgent (without CallKit)"
+                } else {
+                    self.callAgent = agent
+                    print("Call agent successfully created.")
+                    self.callAgent!.delegate = incomingCallHandler
+                }
+            }
+        }
+    }
+
+    func declineIncomingCall() {
         self.incomingCall!.reject { (error) in }
         isIncomingCall = false
     }
+
     func showIncomingCallBanner(_ incomingCall: IncomingCall?) {
         isIncomingCall = true
         self.incomingCall = incomingCall
     }
+
     func answerIncomingCall() {
         isIncomingCall = false
         let options = AcceptCallOptions()
@@ -174,10 +348,11 @@ struct ContentView: View {
             guard let deviceManager = deviceManager else {
                 return
             }
-            
+
             if (self.localVideoStream == nil) {
                 self.localVideoStream = [LocalVideoStream]()
             }
+
             if(sendingVideo)
             {
                 let camera = deviceManager.cameras.first
@@ -190,7 +365,7 @@ struct ContentView: View {
             }
         }
     }
-    
+
     func callRemoved(_ call: Call) {
         self.call = nil
         self.incomingCall = nil
@@ -201,73 +376,55 @@ struct ContentView: View {
         self.previewRenderer?.dispose()
         sendingVideo = false
     }
-    
+
+    private func createLocalVideoPreview() -> Bool {
+        guard let deviceManager = self.deviceManager else {
+            self.showAlert = true
+            self.alertMessage = "No DeviceManager instance exists"
+            return false
+        }
+
+        let camera = deviceManager.cameras.first
+        let scalingMode = ScalingMode.fit
+        if (self.localVideoStream == nil) {
+            self.localVideoStream = [LocalVideoStream]()
+        }
+        localVideoStream!.append(LocalVideoStream(camera: camera!))
+        previewRenderer = try! VideoStreamRenderer(localVideoStream: localVideoStream!.first!)
+        previewView = try! previewRenderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
+        self.sendingVideo = true
+        return true
+    }
+
     func toggleLocalVideo() {
-        if (call == nil)
-        {
-            if(!sendingVideo)
-            {
-                self.callClient = CallClient()
-                self.callClient?.getDeviceManager { (deviceManager, error) in
-                    if (error == nil) {
-                        print("Got device manager instance")
-                        self.deviceManager = deviceManager
-                    } else {
-                        print("Failed to get device manager instance")
-                    }
-                }
-                guard let deviceManager = deviceManager else {
-                    return
-                }
-                let camera = deviceManager.cameras.first
-                let scalingMode = ScalingMode.fit
-                if (self.localVideoStream == nil) {
-                    self.localVideoStream = [LocalVideoStream]()
-                }
-                localVideoStream!.append(LocalVideoStream(camera: camera!))
-                previewRenderer = try! VideoStreamRenderer(localVideoStream: localVideoStream!.first!)
-                previewView = try! previewRenderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
-                self.sendingVideo = true
-            }
-            else{
+        guard let call = self.call else {
+            if(!sendingVideo) {
+                _ = createLocalVideoPreview()
+            } else {
                 self.sendingVideo = false
                 self.previewView = nil
                 self.previewRenderer!.dispose()
                 self.previewRenderer = nil
             }
+            return
         }
-        else{
-            if (sendingVideo) {
-                call!.stopVideo(stream: localVideoStream!.first!) { (error) in
-                    if (error != nil) {
-                        print("cannot stop video")
-                    }
-                    else {
-                        self.sendingVideo = false
-                        self.previewView = nil
-                        self.previewRenderer!.dispose()
-                        self.previewRenderer = nil
-                    }
+
+        if (sendingVideo) {
+            call.stopVideo(stream: localVideoStream!.first!) { (error) in
+                if (error != nil) {
+                    print("Cannot stop video")
+                } else {
+                    self.sendingVideo = false
+                    self.previewView = nil
+                    self.previewRenderer!.dispose()
+                    self.previewRenderer = nil
                 }
             }
-            else {
-                guard let deviceManager = deviceManager else {
-                    return
-                }
-                let camera = deviceManager.cameras.first
-                let scalingMode = ScalingMode.fit
-                if (self.localVideoStream == nil) {
-                    self.localVideoStream = [LocalVideoStream]()
-                }
-                localVideoStream!.append(LocalVideoStream(camera: camera!))
-                previewRenderer = try! VideoStreamRenderer(localVideoStream: localVideoStream!.first!)
-                previewView = try! previewRenderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
-                call!.startVideo(stream:(localVideoStream?.first)!) { (error) in
+        } else {
+            if createLocalVideoPreview() {
+                call.startVideo(stream:(localVideoStream!.first)!) { (error) in
                     if (error != nil) {
-                        print("cannot start video")
-                    }
-                    else {
-                        self.sendingVideo = true
+                        print("Cannot send local video")
                     }
                 }
             }
@@ -289,7 +446,7 @@ struct ContentView: View {
             setCallAndObersever(call: call, error: error)
         }
     }
-    
+
     func setCallAndObersever(call:Call!, error:Error?) {
         if (error == nil) {
             self.call = call
@@ -317,7 +474,7 @@ public class RemoteVideoStreamData : NSObject, RendererDelegate {
     public func videoStreamRenderer(didFailToStart renderer: VideoStreamRenderer) {
         owner.errorMessage = "Renderer failed to start"
     }
-    
+
     private var owner:ContentView
     let stream:RemoteVideoStream
     var renderer:VideoStreamRenderer? {
@@ -327,13 +484,13 @@ public class RemoteVideoStreamData : NSObject, RendererDelegate {
             }
         }
     }
-    
+
     var views:[RendererView] = []
     init(view:ContentView, stream:RemoteVideoStream) {
         owner = view
         self.stream = stream
     }
-    
+
     public func videoStreamRenderer(didRenderFirstFrame renderer: VideoStreamRenderer) {
         let size:StreamSize = renderer.size
         owner.remoteVideoSize = String(size.width) + " X " + String(size.height)
@@ -345,7 +502,7 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
     init(_ view:ContentView) {
             owner = view
     }
-        
+
     public func call(_ call: Call, didChangeState args: PropertyChangedEventArgs) {
         if(call.state == CallState.connected) {
             initialCallParticipant()
@@ -370,7 +527,7 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
             owner.remoteParticipant = participant
         }
     }
-    
+
     public func initialCallParticipant() {
         for participant in owner.call!.remoteParticipants {
             participant.delegate = owner.remoteParticipantObserver
@@ -380,7 +537,7 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
             owner.remoteParticipant = participant
         }
     }
-    
+
     public func renderRemoteStream(_ stream: RemoteVideoStream!) {
         if !owner.remoteVideoStreamData.isEmpty {
             return
@@ -403,17 +560,22 @@ public class RemoteParticipantObserver : NSObject, RemoteParticipantDelegate {
     public func renderRemoteStream(_ stream: RemoteVideoStream!) {
         let data:RemoteVideoStreamData = RemoteVideoStreamData(view: owner, stream: stream)
         let scalingMode = ScalingMode.fit
-        data.renderer = try! VideoStreamRenderer(remoteVideoStream: stream)
-        let view:RendererView = try! data.renderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
-        self.owner.remoteViews.append(view)
-        owner.remoteVideoStreamData[stream.id] = data
+        do {
+            data.renderer = try VideoStreamRenderer(remoteVideoStream: stream)
+            let view:RendererView = try data.renderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
+            self.owner.remoteViews.append(view)
+            owner.remoteVideoStreamData[stream.id] = data
+        } catch let error as NSError {
+            self.owner.alertMessage = error.localizedDescription
+            self.owner.showAlert = true
+        }
     }
 
     public func remoteParticipant(_ remoteParticipant: RemoteParticipant, didUpdateVideoStreams args: RemoteVideoStreamsEventArgs) {
         for stream in args.addedRemoteVideoStreams {
             renderRemoteStream(stream)
         }
-        for stream in args.removedRemoteVideoStreams {
+        for _ in args.removedRemoteVideoStreams {
             for data in owner.remoteVideoStreamData.values {
                 data.renderer?.dispose()
             }
@@ -440,6 +602,6 @@ struct RemoteVideoView: UIViewRepresentable {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(appPubs: AppPubs())
     }
 }
