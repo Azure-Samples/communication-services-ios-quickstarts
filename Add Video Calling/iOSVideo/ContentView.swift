@@ -21,7 +21,7 @@ struct ContentView: View {
     private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "ACSVideoSample")
     private let token = "<USER_ACCESS_TOKEN>"
 
-    @State var callee: String = ""
+    @State var callee: String = "8:echo123"
     @State var callClient = CallClient()
     @State var callAgent: CallAgent?
     @State var call: Call?
@@ -176,21 +176,26 @@ struct ContentView: View {
                 }
             }
 
-            self.callClient.getDeviceManager { (deviceManager, error) in
-                if (error == nil) {
-                    print("Got device manager instance")
-                    // This app does not support landscape mode
-                    // But iOS still generates the device orientation events
-                    // This is a work-around so that iOS stops generating those events
-                    // And stop sending it to the SDK.
-                    UIDevice.current.endGeneratingDeviceOrientationNotifications()
-                    self.deviceManager = deviceManager
-                } else {
-                    self.showAlert = true
-                    self.alertMessage = "Failed to get DeviceManager"
+             if deviceManager == nil {
+                self.callClient.getDeviceManager { (deviceManager, error) in
+                    if (error == nil) {
+                        print("Got device manager instance")
+                        // This app does not support landscape mode
+                        // But iOS still generates the device orientation events
+                        // This is a work-around so that iOS stops generating those events
+                        // And stop sending it to the SDK.
+                        UIDevice.current.endGeneratingDeviceOrientationNotifications()
+                        self.deviceManager = deviceManager
+                    } else {
+                        self.showAlert = true
+                        self.alertMessage = "Failed to get DeviceManager"
+                    }
                 }
-            }
-            createCallAgent()
+             }
+
+             if callAgent == nil {
+                createCallAgent()
+             }
         }
         .alert(isPresented: $showAlert) { () -> Alert in
             Alert(title: Text("ERROR"), message: Text(alertMessage), dismissButton: .default(Text("Dismiss")))
@@ -280,13 +285,11 @@ struct ContentView: View {
         let incomingCallHandler = IncomingCallHandler.getOrCreateInstance()
         incomingCallHandler.contentView = self
         var userCredential: CommunicationTokenCredential
-        let oldCallKitEnabledState = self.isCallKitEnabled
         do {
             userCredential = try CommunicationTokenCredential(token: token)
         } catch {
             self.showAlert = true
             self.alertMessage = "Failed to create CommunicationTokenCredential"
-            self.isCallKitEnabled = oldCallKitEnabledState
             return
         }
 
@@ -300,12 +303,11 @@ struct ContentView: View {
         if isCallKitEnabled {
             #if BETA
             self.callClient.createCallAgent(userCredential: userCredential,
-                                                              options: nil,
-                                             cxproviderConfig: createProviderConfig()) { (agent, error) in
+                                            options: nil,
+                                            cxproviderConfig: createProviderConfig()) { (agent, error) in
                 if error != nil {
                     self.showAlert = true
                     self.alertMessage = "Failed to create CallAgent (with CallKit)"
-                    self.isCallKitEnabled = oldCallKitEnabledState
                 } else {
                     self.callAgent = agent
                     print("Call agent successfully created.")
