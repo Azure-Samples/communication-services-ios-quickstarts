@@ -9,8 +9,6 @@ import AzureCommunicationUI
 
 class ViewController: UIViewController {
 
-    private var callComposite: CallComposite?
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -30,7 +28,7 @@ class ViewController: UIViewController {
     @objc private func startCallComposite() {
         let callCompositeOptions = CallCompositeOptions()
 
-        callComposite = CallComposite(withOptions: callCompositeOptions)
+        let callComposite = CallComposite(withOptions: callCompositeOptions)
 
         let communicationTokenCredential = try! CommunicationTokenCredential(token: "<USER_ACCESS_TOKEN>")
 
@@ -38,6 +36,6 @@ class ViewController: UIViewController {
                                        groupId: UUID(uuidString: "<GROUP_CALL_ID>")!,
                                        displayName: "<DISPLAY_NAME>")
 
-        callComposite?.launch(with: options)
+        callComposite.launch(with: options)
     }
 }
