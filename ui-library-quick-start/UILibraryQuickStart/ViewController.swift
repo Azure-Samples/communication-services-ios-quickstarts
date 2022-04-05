@@ -32,6 +32,7 @@ class ViewController: UIViewController {
 
         callComposite = CallComposite(withOptions: callCompositeOptions)
 
+        let communicationTokenCredential = try! CommunicationTokenCredential(token: "<USER_ACCESS_TOKEN>")
 
         let options = GroupCallOptions(credential: communicationTokenCredential,
                                        groupId: UUID(uuidString: "<GROUP_CALL_ID>")!,
