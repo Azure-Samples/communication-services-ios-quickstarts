@@ -2,5 +2,5 @@ platform :ios, '13.0'
 
 target 'UILibraryQuickStart' do
     use_frameworks!
-    pod 'AzureCommunicationUI', '1.0.0-beta.1'
+    pod 'AzureCommunicationUI', '1.0.0-beta.2'
 end
