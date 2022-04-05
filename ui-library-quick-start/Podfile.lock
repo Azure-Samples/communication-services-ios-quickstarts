@@ -56,9 +56,9 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   AzureCommunicationCalling: df1fdad2fc9bbeabfeff93b0975df3487dc6978e
   AzureCommunicationCommon: 85a3f0ab952db4f88e03bbdb03e79197f90f1d5d
-  AzureCommunicationUI: 1ca4932a831d787b1018183a17c1ca316e1518f8
+  AzureCommunicationUI: 17db6a6c0c3a3164f948b9ec139d2d01f9b93762
   MicrosoftFluentUI: a1e8f35e43e615a3522c53492f1bc52e9d2a191e
 
 PODFILE CHECKSUM: dd1081f12532e15ddfb59edb5a1d08e91dcbc329
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3
