@@ -5,7 +5,7 @@
 
 import UIKit
 import AzureCommunicationCalling
-import AzureCommunicationUI
+import AzureCommunicationUICalling
 
 class ViewController: UIViewController {
 
@@ -34,7 +34,7 @@ class ViewController: UIViewController {
 
         let communicationTokenCredential = try! CommunicationTokenCredential(token: "<USER_ACCESS_TOKEN>")
 
-        let options = GroupCallOptions(communicationTokenCredential: communicationTokenCredential,
+        let options = GroupCallOptions(credential: communicationTokenCredential,
                                        groupId: UUID(uuidString: "<GROUP_CALL_ID>")!,
                                        displayName: "<DISPLAY_NAME>")
 
