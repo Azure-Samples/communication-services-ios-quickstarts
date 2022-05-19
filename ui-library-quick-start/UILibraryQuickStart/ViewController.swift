@@ -5,7 +5,7 @@
 
 import UIKit
 import AzureCommunicationCalling
-import AzureCommunicationUI
+import AzureCommunicationUICalling
 
 class ViewController: UIViewController {
 
