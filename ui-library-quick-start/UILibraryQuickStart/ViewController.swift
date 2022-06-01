@@ -34,10 +34,11 @@ class ViewController: UIViewController {
 
         let communicationTokenCredential = try! CommunicationTokenCredential(token: "<USER_ACCESS_TOKEN>")
 
-        let options = GroupCallOptions(credential: communicationTokenCredential,
-                                       groupId: UUID(uuidString: "<GROUP_CALL_ID>")!,
-                                       displayName: "<DISPLAY_NAME>")
+        let remoteOptions = RemoteOptions(
+            for: .groupCall(UUID(uuidString: "<GROUP_CALL_ID>")!),
+            credential: communicationTokenCredential,
+            displayName: "<DISPLAY_NAME>")
 
-        callComposite?.launch(with: options)
+        callComposite?.launch(remoteOptions: remoteOptions)
     }
 }
