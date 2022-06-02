@@ -35,7 +35,7 @@ class ViewController: UIViewController {
         let communicationTokenCredential = try! CommunicationTokenCredential(token: "<USER_ACCESS_TOKEN>")
 
         let remoteOptions = RemoteOptions(
-            for: .groupCall(UUID(uuidString: "<GROUP_CALL_ID>")!),
+            for: .groupCall(groupId: UUID(uuidString: "<GROUP_CALL_ID>")!),
             credential: communicationTokenCredential,
             displayName: "<DISPLAY_NAME>")
 
