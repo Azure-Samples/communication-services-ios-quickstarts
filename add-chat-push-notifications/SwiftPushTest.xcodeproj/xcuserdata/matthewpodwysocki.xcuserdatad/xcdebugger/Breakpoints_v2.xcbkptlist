@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "A192CA81-DC1E-4BD8-9024-8C6AA0E5798D"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2E6E8864-5664-4564-9E29-D9BCF5976254"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SwiftPushTest/AppDelegate.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "72"
+            endingLineNumber = "72"
+            landmarkName = "application(_:didReceiveRemoteNotification:fetchCompletionHandler:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "83F73FA4-916E-4062-9DE0-A49F258E8442"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SwiftPushTest/AppDelegate.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "100"
+            endingLineNumber = "100"
+            landmarkName = "userNotificationCenter(_:didReceive:withCompletionHandler:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "8EFB21FD-CFD8-4475-A7D1-18A9A3B389DB"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SwiftPushTestNotificationExtension/NotificationService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "30"
+            endingLineNumber = "30"
+            landmarkName = "serviceExtensionTimeWillExpire()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "8EFB21FD-CFD8-4475-A7D1-18A9A3B389DB - a1ef75c0569adbde"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SwiftPushTestNotificationExtension.NotificationService.serviceExtensionTimeWillExpire() -&gt; ()"
+                  moduleName = "SwiftPushTestNotificationExtension"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/matthewp/git/SwiftPushTest/SwiftPushTestNotificationExtension/NotificationService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "30"
+                  endingLineNumber = "30"
+                  offsetFromSymbolStart = "44">
+               </Location>
+               <Location
+                  uuid = "8EFB21FD-CFD8-4475-A7D1-18A9A3B389DB - a1ef75c0569adbde"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SwiftPushTestNotificationExtension.NotificationService.serviceExtensionTimeWillExpire() -&gt; ()"
+                  moduleName = "SwiftPushTestNotificationExtension"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/matthewp/git/SwiftPushTest/SwiftPushTestNotificationExtension/NotificationService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "30"
+                  endingLineNumber = "30"
+                  offsetFromSymbolStart = "108">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E54E1E13-1C99-4E96-9F92-85169DD17576"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SwiftPushTestNotificationExtension/NotificationService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "19"
+            endingLineNumber = "19"
+            landmarkName = "didReceive(_:withContentHandler:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "E54E1E13-1C99-4E96-9F92-85169DD17576 - 83e48d1eb2fab26f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SwiftPushTestNotificationExtension.NotificationService.didReceive(_: __C.UNNotificationRequest, withContentHandler: (__C.UNNotificationContent) -&gt; ()) -&gt; ()"
+                  moduleName = "SwiftPushTestNotificationExtension"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/matthewp/git/SwiftPushTest/SwiftPushTestNotificationExtension/NotificationService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "19"
+                  endingLineNumber = "19"
+                  offsetFromSymbolStart = "340">
+               </Location>
+               <Location
+                  uuid = "E54E1E13-1C99-4E96-9F92-85169DD17576 - 83e48d1eb2fab26f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SwiftPushTestNotificationExtension.NotificationService.didReceive(_: __C.UNNotificationRequest, withContentHandler: (__C.UNNotificationContent) -&gt; ()) -&gt; ()"
+                  moduleName = "SwiftPushTestNotificationExtension"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/matthewp/git/SwiftPushTest/SwiftPushTestNotificationExtension/NotificationService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "19"
+                  endingLineNumber = "19"
+                  offsetFromSymbolStart = "384">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

@@ -1,0 +1,5 @@
+${PODS_ROOT}/Target Support Files/Pods-SwiftPushTest/Pods-SwiftPushTest-frameworks.sh
+${BUILT_PRODUCTS_DIR}/AzureCommunicationChat/AzureCommunicationChat.framework
+${BUILT_PRODUCTS_DIR}/AzureCommunicationCommon/AzureCommunicationCommon.framework
+${BUILT_PRODUCTS_DIR}/AzureCore/AzureCore.framework
+${PODS_XCFRAMEWORKS_BUILD_DIR}/Trouter/Trouter.framework/Trouter
