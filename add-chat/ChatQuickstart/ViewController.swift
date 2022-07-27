@@ -135,7 +135,11 @@ class ViewController: UIViewController {
                     chatThreadClient.add(participants: [user]) { result, _ in
                         switch result {
                         case let .success(result):
-                            (result.invalidParticipants != nil) ? print("Added participant") : print("Error adding participant")
+                            if let errors = result.invalidParticipants, !errors.isEmpty {
+                                print("Error adding participant")
+                            } else {
+                                print("Added participant")
+                            }
                         case .failure:
                             print("Failed to add the participant")
                         }
