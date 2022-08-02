@@ -1,6 +1,0 @@
-framework module AzureCore {
-  umbrella header "AzureCore-umbrella.h"
-
-  export *
-  module * { export * }
-}

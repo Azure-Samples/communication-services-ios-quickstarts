@@ -49,7 +49,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             registerForPushNotifications()
             return true
         } catch {
-            print("Failed to initialize chat client")
             return false
         }
     }
@@ -71,7 +70,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // MARK: Register for Push Notifications after the launch of App
     func registerForPushNotifications() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] granted, _ in
-            print("Permission granted: \(granted)")
             guard granted else { return }
             self?.getNotificationSettings()
             UNUserNotificationCenter.current().delegate = self
@@ -81,7 +79,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     func getNotificationSettings() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
-            print("Notification settings: \(settings)")
             guard settings.authorizationStatus == .authorized else { return }
             DispatchQueue.main.async {
                 UIApplication.shared.registerForRemoteNotifications()
@@ -112,8 +109,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         do{
             /*
                Please copy the below line of code if you want to implement an Advanced Version of PushNotification.
-               As the SDK user, you are supposed to generate the push notification key handler on your end.
-               In this sample app, we use the default AppGroupPushNotificationKeyHandler class provided by chat SDK to generate a key handler.
+               PushNotificationKeyHandler is required for Advanced version. As the SDK user, you could use the default AppGroupPushNotificationKeyHandler class provided by chat SDK to generate a key handler.
+               If you don't use App Group as the key storage or would like to customize the key handling methods, please create your own class which conforms to PushNotificationKeyHandler protocol.
              */
             let appGroupPushNotificationKeyHandler: PushNotificationKeyHandler? = try AppGroupPushNotificationKeyHandler(appGroupId: appGroupId, keyTag: keyTag)
             
@@ -123,7 +120,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 guard let chatClient = self.chatClient else { return }
                 
                 /* Please copy the below line of code if you want to implement an Advanced Version of PushNotification.
-                   As the SDK user, you are supposed to set the key handler on your end.
+                   As the SDK user, you are supposed to assign the previously created pushNotificationKeyHandler to chatClient.
                  */
                 chatClient.pushNotificationKeyHandler = appGroupPushNotificationKeyHandler
                 

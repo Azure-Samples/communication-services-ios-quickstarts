@@ -1,4 +1,0 @@
-${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AzureCommunicationChat.framework
-${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AzureCommunicationCommon.framework
-${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AzureCore.framework
-${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Trouter.framework

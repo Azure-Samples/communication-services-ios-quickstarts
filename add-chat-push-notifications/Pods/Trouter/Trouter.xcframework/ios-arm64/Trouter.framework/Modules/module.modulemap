@@ -1,6 +1,0 @@
-framework module Trouter {
-  umbrella header "SelfHostedTrouterClient.h"
-
-  export *
-  module * { export * }
-}
