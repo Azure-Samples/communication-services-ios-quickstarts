@@ -65,7 +65,6 @@ class NotificationService: UNNotificationServiceExtension {
                  "Message Title": "New Message"
                  "Message Body": "Please tap here to see the message."
                  */
-                print("Failed to decrypt the notification payload with the error: \(error)")
                 contentHandler(bestAttemptContent)
             }
         }
@@ -77,7 +76,6 @@ class NotificationService: UNNotificationServiceExtension {
         if let contentHandler = contentHandler, let bestAttemptContent =  bestAttemptContent {
             contentHandler(bestAttemptContent)
         }
-        print("serviceExtensionTimeWillExpire called")
     }
 
 }

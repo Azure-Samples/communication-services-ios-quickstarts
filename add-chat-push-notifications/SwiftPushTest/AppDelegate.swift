@@ -94,10 +94,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Get APNS device token
         let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
         let token = tokenParts.joined()
-        print("Device Token: \(token)")
         UserDefaults.standard.set(token, forKey: "APNSToken")
         guard let apnsToken = UserDefaults.standard.string(forKey: "APNSToken") else {
-            print("Failed to get APNS token")
             return
         }
         
@@ -128,16 +126,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 chatClient.startPushNotifications(deviceToken: apnsToken) { result in
                     switch result {
                     case .success:
-                        print("Started Push Notifications")
+                        //TODO: Add the code to do things when you succeeded to start Push Notifications.
                     case let .failure(error):
-                        print("Failed To Start Push Notifications: \(error)")
+                        //TODO: Add the code to do things when you failed to start Push Notifications.
                     }
                     semaphore.signal()
                 }
                 semaphore.wait()
             }
         }catch {
-            print("Failed to init PushNotificationKeyHandler")
             return
         }
     }
@@ -146,7 +143,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        print("Failed to register: \(error)")
+        //TODO: Add the code to do things when you failed to register for Push Notification with APNS.
     }
 }
 
