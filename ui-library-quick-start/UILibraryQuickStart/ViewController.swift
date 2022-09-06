@@ -39,6 +39,18 @@ class ViewController: UIViewController {
             credential: communicationTokenCredential,
             displayName: "<DISPLAY_NAME>")
 
+        /*
+        // Optional parameter - localOptions
+        //    - to customize participant view data such as avatar image and display name 
+        //    - and to customize navigation bar's title and subtitle
+            let participantViewData = ParticipantViewData(avatar: UIImage(named: "<AVATAR_IMAGE>"),
+                                                          displayName: "<USER_DISPLAY_NAME>")
+            let navigationBarViewData = NavigationBarViewData(title: "<NAV_TITLE>",
+                                                              subtitle: "<NAV_SUBTITLE>")
+            let localOptions = LocalOptions(participantViewData: participantViewData,
+                                            navigationBarViewData: navigationBarViewData)
+            callComposite?.launch(remoteOptions: remoteOptions, localOptions: localOptions)
+        */
         callComposite?.launch(remoteOptions: remoteOptions)
     }
 }
