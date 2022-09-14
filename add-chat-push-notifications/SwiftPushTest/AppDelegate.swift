@@ -107,8 +107,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         do{
             /*
                Please copy the below line of code if you want to implement an Advanced Version of PushNotification.
-               PushNotificationKeyStorage is required for Advanced version. As the SDK user, you could use the default AppGroupPushNotificationKeyStorage class provided by chat SDK to generate a key handler.
-               If you don't use App Group as the key storage or would like to customize the key handling methods, please create your own class which conforms to PushNotificationKeyStorage protocol.
+               PushNotificationKeyStorage is required for Advanced version. As the SDK user, you could use the default AppGroupPushNotificationKeyStorage class provided by chat SDK to generate a key storage.
+               If you don't use App Group as the key storage or would like to customize the key storage methods, please create your own class which conforms to PushNotificationKeyStorage protocol.
              */
             let appGroupPushNotificationKeyStorage: PushNotificationKeyStorage? = try AppGroupPushNotificationKeyStorage(appGroupId: appGroupId, keyTag: keyTag)
             

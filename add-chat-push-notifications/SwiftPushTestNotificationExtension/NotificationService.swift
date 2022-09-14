@@ -23,8 +23,8 @@ class NotificationService: UNNotificationServiceExtension {
                 let data = bestAttemptContent.userInfo
                 
                 /*
-                   As the SDK user, you are supposed to generate the push notification key handler on your end.
-                   In this sample app, we use the default AppGroupPushNotificationKeyStorage class provided by chat SDK to generate a key handler.
+                   As the SDK user, you are supposed to generate the push notification key storage on your end.
+                   In this sample app, we use the default AppGroupPushNotificationKeyStorage class provided by chat SDK to generate a key storage.
                  */
                 let appGroupId = "group.microsoft.contoso"
                 let keyTag = "PNKey"
