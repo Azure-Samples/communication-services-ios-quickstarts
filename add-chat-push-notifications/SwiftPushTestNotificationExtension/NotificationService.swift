@@ -23,18 +23,18 @@ class NotificationService: UNNotificationServiceExtension {
                 let data = bestAttemptContent.userInfo
                 
                 /*
-                   As the SDK user, you are supposed to generate the push notification key handler on your end.
-                   In this sample app, we use the default AppGroupPushNotificationKeyHandler class provided by chat SDK to generate a key handler.
+                   As the SDK user, you are supposed to generate the push notification key storage on your end.
+                   In this sample app, we use the default AppGroupPushNotificationKeyStorage class provided by chat SDK to generate a key storage.
                  */
                 let appGroupId = "group.microsoft.contoso"
                 let keyTag = "PNKey"
-                guard let keyHandler = try AppGroupPushNotificationKeyHandler(appGroupId: appGroupId, keyTag: keyTag) else {
+                guard let keyStorage = try AppGroupPushNotificationKeyStorage(appGroupId: appGroupId, keyTag: keyTag) else {
                     contentHandler(bestAttemptContent)
                     return
                 }
                 
                 // Call decryptPayload(notification:) function provided by chat SDK to decrypt notification payload
-                let pushNotificationEvent = try keyHandler.decryptPayload(notification: data)
+                let pushNotificationEvent = try keyStorage.decryptPayload(notification: data)
                 
                 // You will get an enum which only contains one type - ".chatMessageReceivedEvent".
                 // Get all the useful information from the enum and customize the content in alert banner

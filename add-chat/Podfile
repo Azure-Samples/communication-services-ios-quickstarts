@@ -2,8 +2,7 @@
 # platform :ios, '9.0'
 
 target 'ChatQuickstart' do
-pod 'AzureCommunication', '~> 1.0.0-beta.11'
-pod 'AzureCommunicationChat', '~> 1.0.0-beta.11'
+pod 'AzureCommunicationChat', '~> 1.3'
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 

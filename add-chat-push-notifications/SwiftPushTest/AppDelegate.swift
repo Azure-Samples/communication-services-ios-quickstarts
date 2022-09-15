@@ -107,10 +107,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         do{
             /*
                Please copy the below line of code if you want to implement an Advanced Version of PushNotification.
-               PushNotificationKeyHandler is required for Advanced version. As the SDK user, you could use the default AppGroupPushNotificationKeyHandler class provided by chat SDK to generate a key handler.
-               If you don't use App Group as the key storage or would like to customize the key handling methods, please create your own class which conforms to PushNotificationKeyHandler protocol.
+               PushNotificationKeyStorage is required for Advanced version. As the SDK user, you could use the default AppGroupPushNotificationKeyStorage class provided by chat SDK to generate a key storage.
+               If you don't use App Group as the key storage or would like to customize the key storage methods, please create your own class which conforms to PushNotificationKeyStorage protocol.
              */
-            let appGroupPushNotificationKeyHandler: PushNotificationKeyHandler? = try AppGroupPushNotificationKeyHandler(appGroupId: appGroupId, keyTag: keyTag)
+            let appGroupPushNotificationKeyStorage: PushNotificationKeyStorage? = try AppGroupPushNotificationKeyStorage(appGroupId: appGroupId, keyTag: keyTag)
             
             let semaphore = DispatchSemaphore(value: 0)
             DispatchQueue.global(qos: .background).async { [weak self] in
@@ -118,9 +118,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 guard let chatClient = self.chatClient else { return }
                 
                 /* Please copy the below line of code if you want to implement an Advanced Version of PushNotification.
-                   As the SDK user, you are supposed to assign the previously created pushNotificationKeyHandler to chatClient.
+                   As the SDK user, you are supposed to assign the previously created pushNotificationKeyStorage to chatClient.
                  */
-                chatClient.pushNotificationKeyHandler = appGroupPushNotificationKeyHandler
+                chatClient.pushNotificationKeyStorage = appGroupPushNotificationKeyStorage
                 
                 // Enable Push Notification by registering device token
                 chatClient.startPushNotifications(deviceToken: apnsToken) { result in
