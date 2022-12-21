@@ -1,8 +1,6 @@
 //
-//  AppDelegate.swift
-//  Chat
-//
-//  Created by Leah Xia on 2022-12-20.
+//  Copyright (c) Microsoft Corporation. All rights reserved.
+//  Licensed under the MIT License.
 //
 
 import UIKit
