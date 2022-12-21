@@ -1,6 +1,18 @@
 platform :ios, '14.0'
 
-target 'UILibraryQuickStart' do
+workspace 'UILibraryQuickStart'
+
+project 'Calling/Calling.xcodeproj'
+project 'Chat/Chat.xcodeproj'
+
+target 'Calling' do
+    project 'Calling/Calling.xcodeproj'
+    use_frameworks!
+    pod 'AzureCommunicationUICalling', '1.1.0'
+end
+
+target 'Chat' do
+    project 'Chat/Chat.xcodeproj'
     use_frameworks!
     pod 'AzureCommunicationUICalling', '1.1.0'
 end

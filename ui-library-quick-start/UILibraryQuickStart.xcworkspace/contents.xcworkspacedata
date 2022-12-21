@@ -2,7 +2,10 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:UILibraryQuickStart.xcodeproj">
+      location = "group:Calling/Calling.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Chat/Chat.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
