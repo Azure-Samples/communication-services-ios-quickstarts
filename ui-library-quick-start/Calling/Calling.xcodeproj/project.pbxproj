@@ -55,7 +55,7 @@
 		A894972F26FBDAC30016918F = {
 			isa = PBXGroup;
 			children = (
-				A894973A26FBDAC30016918F /* UILibraryQuickStart */,
+				A894973A26FBDAC30016918F /* Calling */,
 				A894973926FBDAC30016918F /* Products */,
 				2DBD524F51DA62285D37067B /* Pods */,
 				D1044D4EFFD519C69502DB86 /* Frameworks */,
@@ -70,7 +70,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A894973A26FBDAC30016918F /* UILibraryQuickStart */ = {
+		A894973A26FBDAC30016918F /* Calling */ = {
 			isa = PBXGroup;
 			children = (
 				A894973B26FBDAC30016918F /* AppDelegate.swift */,
@@ -81,7 +81,6 @@
 				A894974626FBDAC60016918F /* LaunchScreen.storyboard */,
 				A894974926FBDAC60016918F /* Info.plist */,
 			);
-			name = UILibraryQuickStart;
 			path = Calling;
 			sourceTree = "<group>";
 		};

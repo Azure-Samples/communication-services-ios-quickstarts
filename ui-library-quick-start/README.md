@@ -1,6 +1,6 @@
 # iOS Quick Starts
 
-Quick starts provide a quick example on how easy it is to integrate Azure Communication Services into your own app
+Quick starts provide a quick example on how easy it is to integrate Azure Communication Services into your own app.
 
 ## Calling
 
