@@ -14,5 +14,5 @@ end
 target 'Chat' do
     project 'Chat/Chat.xcodeproj'
     use_frameworks!
-    pod 'AzureCommunicationUICalling', '1.1.0'
+    pod 'AzureCommunicationUIChat', '0.1.0-beta.1'
 end
