@@ -19,7 +19,7 @@ struct ContentView: View {
     }
 
     private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "ACSVideoSample")
-    private let token = "<USER_ACCESS_TOKEN>"
+    private let token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEwNiIsIng1dCI6Im9QMWFxQnlfR3hZU3pSaXhuQ25zdE5PU2p2cyIsInR5cCI6IkpXVCJ9.eyJza3lwZWlkIjoiYWNzOmI2YWFkYTFmLTBiMWQtNDdhYy04NjZmLTkxYWFlMDBhMWQwMV8wMDAwMDAxNi0xOGQxLTA5MmYtZDUyYS0zNDNhMGQwMDlhMzIiLCJzY3AiOjE3OTIsImNzaSI6IjE2NzI3NzEyMzMiLCJleHAiOjE2NzI4NTc2MzMsImFjc1Njb3BlIjoidm9pcCIsInJlc291cmNlSWQiOiJiNmFhZGExZi0wYjFkLTQ3YWMtODY2Zi05MWFhZTAwYTFkMDEiLCJyZXNvdXJjZUxvY2F0aW9uIjoidW5pdGVkc3RhdGVzIiwiaWF0IjoxNjcyNzcxMjMzfQ.N2fOraUcB0yFKNBwB3xQrvGYohwhv9Lu6jLyLPHAXGGfp1L9nTiEJzPBYMoUH2NougV9F0zY12CE--_2ov0cB95kM7_nQ8R1VecGOh3VYr4jaYByWcf2pRHRk0kXyhZNs7xumv-xYWh0QmPqRm4wpx6V6n8YqsnEvGmhTNcccBl0Kk7C5XFUuHn8F6uvGQM5VZEm_PwE-4WBNOD759P6xlKzDYYN6Qz-ZYgpTMrf0pMsw2Asw1-VlRJTF98y_35EkSBeDe9QFsmyTuTRqG9jfTVeCBaFl_YJ14dfhC9rgFBEbiID2tMLFEMKi9495sfdJvYg5p5ESiTie1izbRDL_Q"
 
     @State var callee: String = "8:echo123"
     @State var callClient = CallClient()
@@ -41,11 +41,18 @@ struct ContentView: View {
     @State var isIncomingCall:Bool = false
     @State var showAlert = false
     @State var alertMessage = ""
-    @State var isCallKitEnabled = true
+    @State var userDefaults: UserDefaults = .standard
+    @State var isCallKitInSDKEnabled = false
     @State var isSpeakerOn:Bool = false
 
+    @State var incomingCallHandler: IncomingCallHandler?
+    @State var cxProvider: CXProvider?
     @State var callObserver:CallObserver?
     @State var remoteParticipantObserver:RemoteParticipantObserver?
+    @State var cxProviderImpl: ProviderDelegateImpl?
+    @State var callKitHelper: CallKitHelper?
+    
+    @State var pushToken: Data?
 
     var appPubs: AppPubs
 
@@ -66,9 +73,10 @@ struct ContentView: View {
                                 Text(sendingVideo ? "Turn Off Video" : "Turn On Video")
                             }
                         }
-                        Toggle("Enable CallKit", isOn: $isCallKitEnabled)
-                            .onChange(of: isCallKitEnabled) { _ in
+                        Toggle("Enable CallKit in SDK", isOn: $isCallKitInSDKEnabled)
+                            .onChange(of: isCallKitInSDKEnabled) { _ in
                                 createCallAgent()
+                                userDefaults.set(self.isCallKitInSDKEnabled, forKey: "isCallKitInSDKEnabled")
                             }.disabled(call != nil)
 
                         Toggle("Speaker", isOn: $isSpeakerOn)
@@ -146,28 +154,25 @@ struct ContentView: View {
      .navigationBarTitle("Video Calling Quickstart")
         }
         .onReceive(self.appPubs.$pushToken, perform: { newPushToken in
-            guard let pushToken = newPushToken else {
+            guard let newPushToken = newPushToken else {
                 print("Got empty token")
                 return
             }
 
-            guard let callAgent = callAgent else {
-                self.showAlert = true
-                self.alertMessage = "Failed to register for Push, no CallAgent"
-                return
-            }
-
-            callAgent.registerPushNotifications(deviceToken: pushToken) { error in
-                if error != nil {
-                    self.showAlert = true
-                    self.alertMessage = "Failed to register for Push"
+            if let existingToken = self.pushToken {
+                if existingToken != newPushToken {
+                    self.pushToken = newPushToken
                 }
+            } else {
+                self.pushToken = newPushToken
             }
         })
         .onReceive(self.appPubs.$pushPayload, perform: { payload in
             handlePushNotification(payload)
         })
      .onAppear{
+            isCallKitInSDKEnabled = userDefaults.value(forKey: "isCallKitInSDKEnabled") as? Bool ?? false
+            isSpeakerOn = userDefaults.value(forKey: "isSpeakerOn") as? Bool ?? false
             AVAudioSession.sharedInstance().requestRecordPermission { (granted) in
                 if granted {
                     AVCaptureDevice.requestAccess(for: .video) { (videoGranted) in
@@ -210,10 +215,19 @@ struct ContentView: View {
             try! audioSession.overrideOutputAudioPort(AVAudioSession.PortOverride.speaker)
         }
         isSpeakerOn = !isSpeakerOn
+        userDefaults.set(self.isSpeakerOn, forKey: "isSpeakerOn")
     }
 
-    #if BETA
-    private func createProviderConfig() -> CXProviderConfiguration {
+    private func createCallAgentOptions() -> CallAgentOptions {
+        let options = CallAgentOptions()
+        #if BETA
+        options.callKitOptions = createCallKitOptions()
+        #endif
+        
+        return options
+    }
+
+    private func createCXProvideConfiguration() -> CXProviderConfiguration {
         let providerConfig = CXProviderConfiguration()
         providerConfig.supportsVideo = true
         providerConfig.maximumCallsPerCallGroup = 1
@@ -221,6 +235,22 @@ struct ContentView: View {
         providerConfig.supportedHandleTypes = [.phoneNumber, .generic]
         return providerConfig
     }
+
+    #if BETA
+    private func createCallKitOptions() -> CallKitOptions {
+        let callKitOptions = CallKitOptions(with: createCXProvideConfiguration())
+        callKitOptions.provideRemoteInfo = self.provideCallKitRemoteInfo
+        return callKitOptions
+    }
+    
+    func provideCallKitRemoteInfo(callerInfo: CallerInfo) -> CallKitRemoteInfo
+    {
+        let callKitRemoteInfo = CallKitRemoteInfo()
+        callKitRemoteInfo.displayName = "CALL_TO_PHONENUMBER_BY_APP"
+        callKitRemoteInfo.handle = CXHandle(type: .generic, value: "VALUE_TO_CXHANDLE")
+        return callKitRemoteInfo;
+    }
+
     #endif
 
     public func handlePushNotification(_ pushPayload: PKPushPayload?)
@@ -236,38 +266,65 @@ struct ContentView: View {
         }
 
         let callNotification = PushNotificationInfo.fromDictionary(pushPayload.dictionaryPayload)
-        guard let callAgent = callAgent else {
-            #if BETA
-            // App is in kill mode, agent isn't created
-            CallClient.reportToCallKit(with: callNotification, cxproviderConfig: createProviderConfig()) { (error) in
-                if error != nil {
-                    os_log("ACS SDK reportToCallKit has failed", log:self.log)
-                    return
-                }
+        let isCallinSDKEnabled = userDefaults.value(forKey: "isCallKitInSDKEnabled") as? Bool ?? isCallKitInSDKEnabled
 
-                // We have already reported call to CallKit. Init SDK in background
-                DispatchQueue.global().async {
-                    // App is in the killed state use os_log and use Console to see what's happening
-                    os_log("ACS SDK initialize completed, calling handlePush", log:self.log)
-                    self.isCallKitEnabled = true
-                    createCallAgent()
-                    guard let callAgent = callAgent else {
-                        os_log("ACS SDK handle push notification failed to create CallAgent instance", log:self.log)
+        guard let callAgent = callAgent else {
+            if isCallinSDKEnabled {
+            #if BETA
+                // App is in kill mode, agent isn't created
+                CallClient.reportIncomingCallFromKillState(with: callNotification, callKitOptions: createCallKitOptions()) { (error) in
+                    if error != nil {
+                        os_log("ACS SDK reportToCallKit has failed", log:self.log)
                         return
                     }
+                    
+                    // We have already reported call to CallKit. Init SDK in background
+                    DispatchQueue.global().async {
+                        // App is in the killed state use os_log and use Console to see what's happening
+                        os_log("ACS SDK initialize completed, calling handlePush", log:self.log)
+                        self.isCallKitInSDKEnabled = true
+                        createCallAgent()
+                        guard let callAgent = callAgent else {
+                            os_log("ACS SDK handle push notification failed to create CallAgent instance", log:self.log)
+                            return
+                        }
+                        
+                        callAgent.handlePush(notification: callNotification) { (error) in
+                            if error == nil {
+                                os_log("ACS SDK handle push notification kill mode: passed", log:self.log)
+                            } else {
+                                os_log("ACS SDK handle push notification kill mode: failed", log:self.log)
+                            }
+                        }
+                    }
+                }
+                #else
+                os_log("ACS SDK CallKit not enabled", log:self.log)
+                #endif
+            } else {
+                createCXProvider()
+                let incomingCallReporter = CallKitIncomingCallReporter(cxProvider: self.cxProvider!)
 
-                    callAgent.handlePush(notification: callNotification) { (error) in
-                        if error == nil {
-                            os_log("ACS SDK handle push notification kill mode: passed", log:self.log)
-                        } else {
-                            os_log("ACS SDK handle push notification kill mode: failed", log:self.log)
+                incomingCallReporter.reportIncomingCall(callId: callNotification.callId.uuidString,
+                                                       caller: callNotification.from,
+                                                       callerDisplayName: callNotification.fromDisplayName,
+                                                       videoEnabled: callNotification.incomingWithVideo) { error in
+                    if error == nil {
+                        self.isCallKitInSDKEnabled = false
+                        createCallAgent()
+                        if let callAgent = self.callAgent {
+                            self.cxProviderImpl!.setCallAgent(callAgent: callAgent)
+                            callAgent.handlePush(notification: callNotification) { (error) in
+                                if error == nil {
+                                    os_log("ACS SDK handle push notification kill mode: passed", log:self.log)
+                                } else {
+                                    os_log("ACS SDK handle push notification kill mode: failed", log:self.log)
+                                }
+                            }
                         }
                     }
                 }
             }
-            #else
-                os_log("ACS SDK CallKit not enabled", log:self.log)
-            #endif
             return
         }
 
@@ -281,9 +338,32 @@ struct ContentView: View {
         }
     }
 
+    private func registerForPushNotification() {
+        if let callAgent = self.callAgent,
+           let pushToken = self.pushToken {
+            callAgent.registerPushNotifications(deviceToken: pushToken) { error in
+                if error != nil {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to register for Push"
+                }
+            }
+        } else {
+            self.showAlert = true
+            self.alertMessage = "No token for registering to push"
+        }
+    }
+        
+
+    private func createCXProvider() {
+        if self.cxProvider == nil {
+            self.cxProvider = CXProvider(configuration: createCXProvideConfiguration())
+            self.callKitHelper = CallKitHelper(cxProvider: self.cxProvider!)
+            self.cxProviderImpl = ProviderDelegateImpl(with: callKitHelper!, callAgent: callAgent)
+            self.cxProvider!.setDelegate(self.cxProviderImpl, queue: nil)
+        }
+    }
+
     private func createCallAgent() {
-        let incomingCallHandler = IncomingCallHandler.getOrCreateInstance()
-        incomingCallHandler.contentView = self
         var userCredential: CommunicationTokenCredential
         do {
             userCredential = try CommunicationTokenCredential(token: token)
@@ -300,24 +380,26 @@ struct ContentView: View {
             callAgent = nil
         }
 
-        if isCallKitEnabled {
+        if userDefaults.value(forKey: "isCallKitInSDKEnabled") as? Bool ?? isCallKitInSDKEnabled {
             #if BETA
             self.callClient.createCallAgent(userCredential: userCredential,
-                                            options: nil,
-                                            cxproviderConfig: createProviderConfig()) { (agent, error) in
+                                            options: createCallAgentOptions()) { (agent, error) in
                 if error != nil {
                     self.showAlert = true
                     self.alertMessage = "Failed to create CallAgent (with CallKit)"
                 } else {
                     self.callAgent = agent
+                    self.cxProvider = nil
                     print("Call agent successfully created.")
+                    incomingCallHandler = IncomingCallHandler(contentView: self)
                     self.callAgent!.delegate = incomingCallHandler
+                    registerForPushNotification()
                 }
             }
             #else
                 self.showAlert = true
                 self.alertMessage = "ACS CallKit available only in Beta builds"
-                self.isCallKitEnabled = false
+                self.isCallKitInSDKEnabled = false
             #endif
         } else {
             self.callClient.createCallAgent(userCredential: userCredential) { (agent, error) in
@@ -326,8 +408,11 @@ struct ContentView: View {
                     self.alertMessage = "Failed to create CallAgent (without CallKit)"
                 } else {
                     self.callAgent = agent
-                    print("Call agent successfully created.")
+                    print("Call agent successfully created (without CallKit)")
+                    createCXProvider()
+                    incomingCallHandler = IncomingCallHandler(with: callKitHelper, contentView: self)
                     self.callAgent!.delegate = incomingCallHandler
+                    registerForPushNotification()
                 }
             }
         }
@@ -377,6 +462,11 @@ struct ContentView: View {
         }
         self.previewRenderer?.dispose()
         sendingVideo = false
+        Task {
+            await self.callKitHelper?.endCall(callId: call.id) { error in
+                
+            }
+        }
     }
 
     private func createLocalVideoPreview() -> Bool {
@@ -444,15 +534,27 @@ struct ContentView: View {
             startCallOptions.videoOptions = videoOptions
         }
         let callees:[CommunicationIdentifier] = [CommunicationUserIdentifier(self.callee)]
-        self.callAgent?.startCall(participants: callees, options: startCallOptions) { (call, error) in
-            setCallAndObersever(call: call, error: error)
+        
+        if !self.isCallKitInSDKEnabled {
+            Task {
+                await self.callKitHelper!.placeCall(participants: callees,
+                                              callerDisplayName: "Alice",
+                                              meetingLocator: nil,
+                                              options: startCallOptions) { call, error in
+                    setCallAndObersever(call: call, error: error)
+                }
+            }
+        } else {
+            self.callAgent?.startCall(participants: callees, options: startCallOptions) { (call, error) in
+                setCallAndObersever(call: call, error: error)
+            }
         }
     }
 
     func setCallAndObersever(call:Call!, error:Error?) {
         if (error == nil) {
             self.call = call
-            self.callObserver = CallObserver(self)
+            self.callObserver = CallObserver(self, self.callKitHelper)
             self.call!.delegate = self.callObserver
             self.remoteParticipantObserver = RemoteParticipantObserver(self)
         } else {
@@ -461,14 +563,25 @@ struct ContentView: View {
     }
 
     func endCall() {
-        self.call!.hangUp(options: HangUpOptions()) { (error) in
-            if (error != nil) {
-                print("ERROR: It was not possible to hangup the call.")
+        if self.isCallKitInSDKEnabled {
+            self.call!.hangUp(options: HangUpOptions()) { (error) in
+                if (error != nil) {
+                    print("ERROR: It was not possible to hangup the call.") 
+                }
+            }
+        } else {
+            Task {
+                await self.callKitHelper!.endCall(callId: self.call!.id) { error in
+                    if (error != nil) {
+                        print("ERROR: It was not possible to hangup the call.")
+                    }
+                }
             }
         }
         self.previewRenderer?.dispose()
         self.remoteRenderer?.dispose()
         sendingVideo = false
+        isSpeakerOn = false
     }
 }
 
@@ -501,13 +614,20 @@ public class RemoteVideoStreamData : NSObject, RendererDelegate {
 
 public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
     private var owner: ContentView
-    init(_ view:ContentView) {
-            owner = view
+    private var callKitHelper: CallKitHelper?
+    
+    init(_ view:ContentView, _ callKitHelper: CallKitHelper?) {
+        owner = view
+        self.callKitHelper = callKitHelper
     }
 
     public func call(_ call: Call, didChangeState args: PropertyChangedEventArgs) {
         if(call.state == CallState.connected) {
             initialCallParticipant()
+        }
+
+        Task {
+            await callKitHelper?.reportOutgoingCall(call: call)
         }
     }
 

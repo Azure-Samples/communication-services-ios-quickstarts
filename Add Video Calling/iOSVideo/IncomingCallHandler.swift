@@ -12,25 +12,46 @@ import AVFoundation
 final class IncomingCallHandler: NSObject, CallAgentDelegate, IncomingCallDelegate {
     public var contentView: ContentView?
     private var incomingCall: IncomingCall?
+    private var callKitHelper: CallKitHelper?
 
-    private static var instance: IncomingCallHandler?
-    static func getOrCreateInstance() -> IncomingCallHandler {
-        if let c = instance {
-            return c
-        }
-        instance = IncomingCallHandler()
-        return instance!
+    convenience init(with callKitHelper: CallKitHelper?, contentView: ContentView?) {
+        self.init(contentView: contentView)
+        self.callKitHelper = callKitHelper
     }
 
-    private override init() {}
+    init(contentView: ContentView?) {
+        self.contentView = contentView
+    }
 
     public func callAgent(_ callAgent: CallAgent, didRecieveIncomingCall incomingCall: IncomingCall) {
         self.incomingCall = incomingCall
-        self.incomingCall?.delegate = self
+        self.incomingCall!.delegate = self
         contentView?.showIncomingCallBanner(self.incomingCall!)
+        Task {
+            await callKitHelper?.addIncomingCall(incomingCall: self.incomingCall!)
+        }
+        let incomingCallReporter = CallKitIncomingCallReporter(cxProvider: self.contentView!.cxProvider!)
+        incomingCallReporter.reportIncomingCall(callId: self.incomingCall!.id,
+                                               callerInfo: self.incomingCall!.callerInfo,
+                                               videoEnabled: self.incomingCall!.isVideoEnabled,
+                                               completionHandler: { error in
+            if error == nil {
+                print("Incoming call was reported successfully")
+            } else {
+                print("Incoming call was not reported successfully")
+            }
+        })
     }
 
-    public func callAgent(_ callAgent: CallAgent, didUpdateCalls args: CallsUpdatedEventArgs) {
+    func incomingCall(_ incomingCall: IncomingCall, didEnd args: PropertyChangedEventArgs) {
+        contentView?.isIncomingCall = false
+        self.incomingCall = nil
+        Task {
+            await callKitHelper?.removeIncomingCall(callId: incomingCall.id)
+        }
+    }
+    
+    func callAgent(_ callAgent: CallAgent, didUpdateCalls args: CallsUpdatedEventArgs) {
         if let removedCall = args.removedCalls.first {
             contentView?.callRemoved(removedCall)
             self.incomingCall = nil
