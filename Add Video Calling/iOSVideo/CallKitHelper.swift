@@ -12,8 +12,7 @@ import AzureCommunicationCalling
 import AVFAudio
 
 enum CallKitErrors: String, Error {
-    case invalidParticipant = "Could not get participants"
-    case failedToConfigureAudioSession = "Failed to configure audio session"
+    case invalidParticipants = "Invalid participants provided"
     case unknownOutgoingCallType = "Unknown outgoing call type"
     case noIncomingCallFound = "No inoming call found to accept"
     case noActiveCallToEnd = "No active call found to end"
@@ -93,10 +92,11 @@ final class ProviderDelegateImpl : NSObject, CXProviderDelegate {
                     await self.callKitHelper.removeOutInCallInfo(transactionId: action.uuid)
                 }
             }
+            
+            let acceptCallOptions = outInCallInfo?.options as? AcceptCallOptions
 
-            if let incomingCall = await callKitHelper.getIncomingCall(callId: action.callUUID),
-               let acceptCallOptions = outInCallInfo?.options as? AcceptCallOptions {
-                incomingCall.accept(options: acceptCallOptions, completionHandler: completionBlock)
+            if let incomingCall = await callKitHelper.getIncomingCall(callId: action.callUUID) {
+                incomingCall.accept(options: acceptCallOptions ?? AcceptCallOptions(), completionHandler: completionBlock)
                 return
             }
             
@@ -104,9 +104,8 @@ final class ProviderDelegateImpl : NSObject, CXProviderDelegate {
             DispatchQueue.global().async {
                 _ = dispatchSemaphore.wait(timeout: DispatchTime(uptimeNanoseconds: 10 * NSEC_PER_SEC))
                 Task {
-                    if let incomingCall = await self.callKitHelper.getIncomingCall(callId: action.callUUID),
-                       let acceptCallOptions = outInCallInfo?.options as? AcceptCallOptions {
-                        incomingCall.accept(options: acceptCallOptions, completionHandler: completionBlock)
+                    if let incomingCall = await self.callKitHelper.getIncomingCall(callId: action.callUUID) {
+                        incomingCall.accept(options: acceptCallOptions ?? AcceptCallOptions(), completionHandler: completionBlock)
                     } else {
                         completionBlock(nil, CallKitErrors.noIncomingCallFound)
                     }
@@ -140,7 +139,7 @@ final class ProviderDelegateImpl : NSObject, CXProviderDelegate {
                 print("No active calls found !!")
                 return
             }
-            
+
             activeCall.unmute { error in
                 if error == nil {
                     print("Successfully unmuted mic")
@@ -155,7 +154,6 @@ final class ProviderDelegateImpl : NSObject, CXProviderDelegate {
     }
 
     func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
-        print("Perform CXStartCallAction")
         Task {
             // This will be raised by CallKit always after raising a transaction
             // Which means an API call will have to happen to reach here
@@ -252,8 +250,7 @@ class CallKitIncomingCallReporter {
                             caller:CommunicationIdentifier,
                             callerDisplayName: String,
                             videoEnabled: Bool,
-                            completionHandler: @escaping (Error?) -> Void)
-    {
+                            completionHandler: @escaping (Error?) -> Void) {
         let handleType: CXHandle.HandleType = caller .isKind(of: PhoneNumberIdentifier.self) ? .phoneNumber : .generic
         let handle = CXHandle(type: handleType, value: caller.rawId)
         let callUpdate = createCallUpdate(isVideoEnabled: videoEnabled, localizedCallerName: callerDisplayName, handle: handle)
@@ -262,7 +259,6 @@ class CallKitIncomingCallReporter {
         }
     }
 }
-
 
 actor CallKitHelper {
     private var callController = CXCallController()
@@ -283,11 +279,17 @@ actor CallKitHelper {
     }
 
     private func onIdChanged(newId: String, oldId: String) {
+        // For outgoing call we need to report an initial callId to CallKit
+        // But that callId wont match with what is set in SDK.
+        // So we need to maintain this map between which callId was reported to CallKit
+        // and what is new callId in the SDK.
+        // For incoming call this wont happen because in the push notification
+        // we already get the id of the call.
         if newId != oldId {
             updatedCallIdMap[newId.uppercased()] = oldId.uppercased()
         }
     }
-    
+
     init(cxProvider: CXProvider) {
         self.cxProvider = cxProvider
     }
@@ -302,7 +304,7 @@ actor CallKitHelper {
     }
 
     func addIncomingCall(incomingCall: IncomingCall) {
-        incomingCallMap[incomingCall.id] = incomingCall
+        incomingCallMap[incomingCall.id.uppercased()] = incomingCall
         self.incomingCallSemaphore?.signal()
     }
     
@@ -316,7 +318,7 @@ actor CallKitHelper {
     }
 
     func addActiveCall(callId: String, call: Call) {
-        onIdChanged(newId: call.id.uppercased(), oldId: callId.uppercased())
+        onIdChanged(newId: call.id, oldId: callId)
         activeCalls[callId] = call
     }
 
@@ -398,9 +400,7 @@ actor CallKitHelper {
 
     func acceptCall(callId: String,
                     options: AcceptCallOptions?,
-                    completionHandler: @escaping (Call?, Error?) -> Void)
-    
-    {
+                    completionHandler: @escaping (Call?, Error?) -> Void) {
         let callId = UUID(uuidString: callId.uppercased())!
         let answerCallAction = CXAnswerCallAction(call: callId)
         let outInCallInfo = OutInCallInfo(participants: nil,
@@ -415,17 +415,17 @@ actor CallKitHelper {
         }
 
         let finalCallId = getReportedCallIdToCallKit(callId: call.id)
-
+        print("Report outgoing call for: \(finalCallId)")
         if call.state == .connected {
-            self.cxProvider.reportOutgoingCall(with: UUID(uuidString: finalCallId.uppercased())! , connectedAt: nil)
+            self.cxProvider.reportOutgoingCall(with: UUID(uuidString: finalCallId)! , connectedAt: nil)
         } else if call.state != .connecting {
-            self.cxProvider.reportOutgoingCall(with: UUID(uuidString: finalCallId.uppercased())! , startedConnectingAt: nil)
+            self.cxProvider.reportOutgoingCall(with: UUID(uuidString: finalCallId)! , startedConnectingAt: nil)
         }
     }
 
     func endCall(callId: String, completionHandler: @escaping (Error?) -> Void) {
         let finalCallId = getReportedCallIdToCallKit(callId: callId)
-        let endCallAction = CXEndCallAction(call: UUID(uuidString: finalCallId.uppercased())!)
+        let endCallAction = CXEndCallAction(call: UUID(uuidString: finalCallId)!)
         transactWithCallKit(action: endCallAction, activeCallInfo: ActiveCallInfo(completionHandler: completionHandler))
     }
 
@@ -465,7 +465,7 @@ actor CallKitHelper {
         #endif
         
         if (compressedParticipant == "") {
-            completionHandler(nil, CallKitErrors.invalidParticipant)
+            completionHandler(nil, CallKitErrors.invalidParticipants)
             return
         }
 
