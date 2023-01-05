@@ -24,7 +24,7 @@ final class IncomingCallHandler: NSObject, CallAgentDelegate, IncomingCallDelega
         Task {
             await CallKitObjectManager.getOrCreateCallKitHelper().addIncomingCall(incomingCall: self.incomingCall!)
         }
-        let incomingCallReporter = CallKitIncomingCallReporter(cxProvider: self.contentView!.cxProvider!)
+        let incomingCallReporter = CallKitIncomingCallReporter()
         incomingCallReporter.reportIncomingCall(callId: self.incomingCall!.id,
                                                callerInfo: self.incomingCall!.callerInfo,
                                                videoEnabled: self.incomingCall!.isVideoEnabled,

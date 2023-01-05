@@ -13,20 +13,25 @@ import Foundation
 import PushKit
 import os.log
 
+enum CreateCallAgentErrors: Error {
+    case noToken
+    case callKitInSDKNotSupported
+}
+
 struct ContentView: View {
     init(appPubs: AppPubs) {
         self.appPubs = appPubs
     }
 
     private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "ACSVideoSample")
-    private let token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEwNiIsIng1dCI6Im9QMWFxQnlfR3hZU3pSaXhuQ25zdE5PU2p2cyIsInR5cCI6IkpXVCJ9.eyJza3lwZWlkIjoiYWNzOmI2YWFkYTFmLTBiMWQtNDdhYy04NjZmLTkxYWFlMDBhMWQwMV8wMDAwMDAxNi0xOGQxLTA5MmYtZDUyYS0zNDNhMGQwMDlhMzIiLCJzY3AiOjE3OTIsImNzaSI6IjE2NzI3NzEyMzMiLCJleHAiOjE2NzI4NTc2MzMsImFjc1Njb3BlIjoidm9pcCIsInJlc291cmNlSWQiOiJiNmFhZGExZi0wYjFkLTQ3YWMtODY2Zi05MWFhZTAwYTFkMDEiLCJyZXNvdXJjZUxvY2F0aW9uIjoidW5pdGVkc3RhdGVzIiwiaWF0IjoxNjcyNzcxMjMzfQ.N2fOraUcB0yFKNBwB3xQrvGYohwhv9Lu6jLyLPHAXGGfp1L9nTiEJzPBYMoUH2NougV9F0zY12CE--_2ov0cB95kM7_nQ8R1VecGOh3VYr4jaYByWcf2pRHRk0kXyhZNs7xumv-xYWh0QmPqRm4wpx6V6n8YqsnEvGmhTNcccBl0Kk7C5XFUuHn8F6uvGQM5VZEm_PwE-4WBNOD759P6xlKzDYYN6Qz-ZYgpTMrf0pMsw2Asw1-VlRJTF98y_35EkSBeDe9QFsmyTuTRqG9jfTVeCBaFl_YJ14dfhC9rgFBEbiID2tMLFEMKi9495sfdJvYg5p5ESiTie1izbRDL_Q"
+    private let token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEwNiIsIng1dCI6Im9QMWFxQnlfR3hZU3pSaXhuQ25zdE5PU2p2cyIsInR5cCI6IkpXVCJ9.eyJza3lwZWlkIjoiYWNzOmI2YWFkYTFmLTBiMWQtNDdhYy04NjZmLTkxYWFlMDBhMWQwMV8wMDAwMDAxNi0xOGQxLTA5MmYtZDUyYS0zNDNhMGQwMDlhMzIiLCJzY3AiOjE3OTIsImNzaSI6IjE2NzI5NDg5NjMiLCJleHAiOjE2NzMwMzUzNjMsImFjc1Njb3BlIjoidm9pcCIsInJlc291cmNlSWQiOiJiNmFhZGExZi0wYjFkLTQ3YWMtODY2Zi05MWFhZTAwYTFkMDEiLCJyZXNvdXJjZUxvY2F0aW9uIjoidW5pdGVkc3RhdGVzIiwiaWF0IjoxNjcyOTQ4OTYzfQ.IvZKVw7yTNgVtdSQsqukjNbVONageTPWy2nfWEpTmnqOubNHFwSfrleLRtzRPa-J1H-EG6Eq7muCQGVwwRCX3FVxqLJn-AB8ZmMIVKqmSvBzh0Py0gG2CHugy00T4qBoMsjOFSi-jGFB_g8UjXj4et2f04rQfK2iYAK6G_S2rRj6v876TqbCHQIe2Y2aEMq_GYJ9MFShuQdVLkupsa6xwLj4vtfP6Go2PVPgr1rgOinkQoHvF4wHQVF2dc9TIqVCCLZmZvfY59NIKs2Wbr7hutVIC2ykuzZqQeaduQ6N1jpgJBUng9eWjL8p7hq2CdZG-4UmopypsUyd3mgiyrxcOA"
 
     @State var callee: String = "8:echo123"
     @State var callClient = CallClient()
     @State var callAgent: CallAgent?
     @State var call: Call?
     @State var deviceManager: DeviceManager?
-    @State var localVideoStream:[LocalVideoStream]?
+    @State var localVideoStream = [LocalVideoStream]()
     @State var incomingCall: IncomingCall?
     @State var sendingVideo:Bool = false
     @State var errorMessage:String = "Unknown"
@@ -73,8 +78,8 @@ struct ContentView: View {
                         }
                         Toggle("Enable CallKit in SDK", isOn: $isCallKitInSDKEnabled)
                             .onChange(of: isCallKitInSDKEnabled) { _ in
-                                createCallAgent()
                                 userDefaults.set(self.isCallKitInSDKEnabled, forKey: "isCallKitInSDKEnabled")
+                                createCallAgent(completionHandler: nil)
                             }.disabled(call != nil)
 
                         Toggle("Speaker", isOn: $isSpeakerOn)
@@ -197,7 +202,7 @@ struct ContentView: View {
              }
 
              if callAgent == nil {
-                createCallAgent()
+                 createCallAgent(completionHandler: nil)
              }
         }
         .alert(isPresented: $showAlert) { () -> Alert in
@@ -225,18 +230,9 @@ struct ContentView: View {
         return options
     }
 
-    public static func createCXProvideConfiguration() -> CXProviderConfiguration {
-        let providerConfig = CXProviderConfiguration()
-        providerConfig.supportsVideo = true
-        providerConfig.maximumCallsPerCallGroup = 1
-        providerConfig.includesCallsInRecents = true
-        providerConfig.supportedHandleTypes = [.phoneNumber, .generic]
-        return providerConfig
-    }
-
     #if BETA
     private func createCallKitOptions() -> CallKitOptions {
-        let callKitOptions = CallKitOptions(with: ContentView.createCXProvideConfiguration())
+        let callKitOptions = CallKitOptions(with: CallKitObjectManager.createCXProvideConfiguration())
         callKitOptions.provideRemoteInfo = self.provideCallKitRemoteInfo
         return callKitOptions
     }
@@ -264,26 +260,31 @@ struct ContentView: View {
         }
 
         let callNotification = PushNotificationInfo.fromDictionary(pushPayload.dictionaryPayload)
-        let isCallinSDKEnabled = userDefaults.value(forKey: "isCallKitInSDKEnabled") as? Bool ?? isCallKitInSDKEnabled
+
+        let handlePush : (() -> Void) = {
+            guard let callAgent = callAgent else {
+                os_log("ACS SDK failed to create callAgent when handling push", log:self.log)
+                self.showAlert = true
+                self.alertMessage = "Failed to create CallAgent when handling push"
+                return
+            }
+
+            // CallAgent is created normally handle the push
+            callAgent.handlePush(notification: callNotification) { (error) in
+                if error == nil {
+                    os_log("SDK handle push notification normal mode: passed", log:self.log)
+                } else {
+                    os_log("SDK handle push notification normal mode: failed", log:self.log)
+                }
+            }
+        }
 
         if self.callAgent == nil {
-            createCallAgent()
-        }
-
-        guard let callAgent = callAgent else {
-            os_log("ACS SDK failed to create callAgent when handling push", log:self.log)
-            self.showAlert = true
-            self.alertMessage = "Failed to create CallAgent when handling push"
-            return
-        }
-
-        // CallAgent is created normally handle the push
-        callAgent.handlePush(notification: callNotification) { (error) in
-            if error == nil {
-                os_log("SDK handle push notification normal mode: passed", log:self.log)
-            } else {
-                os_log("SDK handle push notification normal mode: failed", log:self.log)
+            createCallAgent { error in
+                handlePush()
             }
+        } else {
+            handlePush()
         }
     }
 
@@ -302,13 +303,14 @@ struct ContentView: View {
         }
     }
 
-    private func createCallAgent() {
+    private func createCallAgent(completionHandler: ((Error?) -> Void)?) {
         var userCredential: CommunicationTokenCredential
         do {
             userCredential = try CommunicationTokenCredential(token: token)
         } catch {
             self.showAlert = true
             self.alertMessage = "Failed to create CommunicationTokenCredential"
+            completionHandler?(CreateCallAgentErrors.noToken)
             return
         }
 
@@ -323,41 +325,46 @@ struct ContentView: View {
             #if BETA
             self.callClient.createCallAgent(userCredential: userCredential,
                                             options: createCallAgentOptions()) { (agent, error) in
-                if error != nil {
-                    self.showAlert = true
-                    self.alertMessage = "Failed to create CallAgent (with CallKit)"
-                } else {
+                if error == nil {
                     self.callAgent = agent
                     self.cxProvider = nil
                     print("Call agent successfully created.")
                     incomingCallHandler = IncomingCallHandler(contentView: self)
                     self.callAgent!.delegate = incomingCallHandler
                     registerForPushNotification()
+                } else {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to create CallAgent (with CallKit)"
                 }
+                completionHandler?(error)
             }
             #else
                 self.showAlert = true
                 self.alertMessage = "ACS CallKit available only in Beta builds"
                 self.isCallKitInSDKEnabled = false
+                completionHandler?(CreateCallAgentErrors.callKitInSDKNotSupported)
             #endif
         } else {
             self.callClient.createCallAgent(userCredential: userCredential) { (agent, error) in
-                if error != nil {
-                    self.showAlert = true
-                    self.alertMessage = "Failed to create CallAgent (without CallKit)"
-                } else {
+                if error == nil {
                     self.callAgent = agent
                     print("Call agent successfully created (without CallKit)")
                     incomingCallHandler = IncomingCallHandler(contentView: self)
                     self.callAgent!.delegate = incomingCallHandler
+                    let _ = CallKitObjectManager.getOrCreateCXProvider()
+                    CallKitObjectManager.getCXProviderImpl().setCallAgent(callAgent: callAgent!)
                     registerForPushNotification()
+                } else {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to create CallAgent (without CallKit)"
                 }
+                completionHandler?(error)
             }
         }
     }
 
     func declineIncomingCall() {
-        self.incomingCall!.reject { (error) in }
+        self.incomingCall?.reject { (error) in }
         isIncomingCall = false
     }
 
@@ -369,24 +376,34 @@ struct ContentView: View {
     func answerIncomingCall() {
         isIncomingCall = false
         let options = AcceptCallOptions()
-        if (self.incomingCall != nil) {
-            guard let deviceManager = deviceManager else {
-                return
-            }
+        guard let incomingCall = self.incomingCall else {
+            return
+        }
 
-            if (self.localVideoStream == nil) {
-                self.localVideoStream = [LocalVideoStream]()
-            }
+        guard let deviceManager = deviceManager else {
+            return
+        }
 
-            if(sendingVideo)
-            {
-                let camera = deviceManager.cameras.first
-                localVideoStream!.append(LocalVideoStream(camera: camera!))
-                let videoOptions = VideoOptions(localVideoStreams: localVideoStream!)
-                options.videoOptions = videoOptions
-            }
-            self.incomingCall!.accept(options: options) { (call, error) in
+        localVideoStream.removeAll()
+
+        if(sendingVideo)
+        {
+            let camera = deviceManager.cameras.first
+            localVideoStream.append(LocalVideoStream(camera: camera!))
+            let videoOptions = VideoOptions(localVideoStreams: localVideoStream)
+            options.videoOptions = videoOptions
+        }
+
+        if isCallKitInSDKEnabled {
+            incomingCall.accept(options: options) { (call, error) in
                 setCallAndObersever(call: call, error: error)
+            }
+        } else {
+            Task {
+                await CallKitObjectManager.getOrCreateCallKitHelper().acceptCall(callId: incomingCall.id,
+                                                                           options: options) { call, error in
+                    setCallAndObersever(call: call, error: error)
+                }
             }
         }
     }
@@ -413,13 +430,10 @@ struct ContentView: View {
             return false
         }
 
-        let camera = deviceManager.cameras.first
         let scalingMode = ScalingMode.fit
-        if (self.localVideoStream == nil) {
-            self.localVideoStream = [LocalVideoStream]()
-        }
-        localVideoStream!.append(LocalVideoStream(camera: camera!))
-        previewRenderer = try! VideoStreamRenderer(localVideoStream: localVideoStream!.first!)
+        localVideoStream.removeAll()
+        localVideoStream.append(LocalVideoStream(camera: deviceManager.cameras.first!))
+        previewRenderer = try! VideoStreamRenderer(localVideoStream: localVideoStream.first!)
         previewView = try! previewRenderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
         self.sendingVideo = true
         return true
@@ -439,7 +453,7 @@ struct ContentView: View {
         }
 
         if (sendingVideo) {
-            call.stopVideo(stream: localVideoStream!.first!) { (error) in
+            call.stopVideo(stream: localVideoStream.first!) { (error) in
                 if (error != nil) {
                     print("Cannot stop video")
                 } else {
@@ -451,7 +465,7 @@ struct ContentView: View {
             }
         } else {
             if createLocalVideoPreview() {
-                call.startVideo(stream:(localVideoStream!.first)!) { (error) in
+                call.startVideo(stream:(localVideoStream.first)!) { (error) in
                     if (error != nil) {
                         print("Cannot send local video")
                     }
@@ -464,10 +478,15 @@ struct ContentView: View {
         let startCallOptions = StartCallOptions()
         if(sendingVideo)
         {
-            if (self.localVideoStream == nil) {
-                self.localVideoStream = [LocalVideoStream]()
+            guard let deviceManager = self.deviceManager else {
+                self.showAlert = true
+                self.alertMessage = "No DeviceManager instance exists"
+                return
             }
-            let videoOptions = VideoOptions(localVideoStreams: localVideoStream!)
+
+            localVideoStream.removeAll()
+            localVideoStream.append(LocalVideoStream(camera: deviceManager.cameras.first!))
+            let videoOptions = VideoOptions(localVideoStreams: localVideoStream)
             startCallOptions.videoOptions = videoOptions
         }
         let callees:[CommunicationIdentifier] = [CommunicationUserIdentifier(self.callee)]
@@ -482,7 +501,13 @@ struct ContentView: View {
                 }
             }
         } else {
-            self.callAgent?.startCall(participants: callees, options: startCallOptions) { (call, error) in
+            guard let callAgent = self.callAgent else {
+                self.showAlert = true
+                self.alertMessage = "No CallAgent instance exists to place the call"
+                return
+            }
+
+            callAgent.startCall(participants: callees, options: startCallOptions) { (call, error) in
                 setCallAndObersever(call: call, error: error)
             }
         }

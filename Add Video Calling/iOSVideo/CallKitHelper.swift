@@ -16,6 +16,7 @@ enum CallKitErrors: String, Error {
     case unknownOutgoingCallType = "Unknown outgoing call type"
     case noIncomingCallFound = "No inoming call found to accept"
     case noActiveCallToEnd = "No active call found to end"
+    case noCallAgent = "No CallAgent created"
 }
 
 struct ActiveCallInfo {
@@ -29,12 +30,16 @@ struct OutInCallInfo {
     var completionHandler: (Call?, Error?) -> Void
 }
 
+// We cannot create recreate CXProvider everytime
+// For e.g. if one CXProvider reports incoming call and another
+// CXProvider instance accepts the call, the operation fails.
+// So we need to ensure we have Singleton CXProvider instance
 final class CallKitObjectManager {
     private static var callKitHelper: CallKitHelper?
     private static var cxProvider: CXProvider?
     private static var cxProviderImpl: CxProviderDelegateImpl?
 
-    private static func createCXProvideConfiguration() -> CXProviderConfiguration {
+    static func createCXProvideConfiguration() -> CXProviderConfiguration {
         let providerConfig = CXProviderConfiguration()
         providerConfig.supportsVideo = true
         providerConfig.maximumCallsPerCallGroup = 1
@@ -53,13 +58,16 @@ final class CallKitObjectManager {
         return cxProvider!
     }
 
+    static func getCXProviderImpl() -> CxProviderDelegateImpl {
+        return cxProviderImpl!
+    }
+
     static func getOrCreateCallKitHelper() -> CallKitHelper {
         if callKitHelper == nil {
             callKitHelper = CallKitHelper()
         }
-
         return callKitHelper!
-    }    
+    }
 }
 
 final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
@@ -87,12 +95,74 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
         return configError
     }
 
+    private func stopAudio(call: Call, completionHandler: @escaping (Error?) -> Void) {
+        call.mute { error in
+            if error == nil {
+                call.speaker(mute: true) { error in completionHandler(error) }
+            } else {
+                completionHandler(error)
+            }
+        }
+    }
+    
+    private func startAudio(call: Call, completionHandler: @escaping (Error?) -> Void) {
+        call.unmute { error in
+            if error == nil {
+                call.speaker(mute: false) { error in completionHandler(error) }
+            } else {
+                completionHandler(error)
+            }
+        }
+    }
+
     func providerDidReset(_ provider: CXProvider) {
         
     }
     
     func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
-        
+        Task {
+            guard let activeCall = await self.callKitHelper.getActiveCall(callId: action.callUUID.uuidString) else {
+                action.fail()
+                return
+            }
+            
+            if action.isOnHold {
+                stopAudio(call: activeCall) { error in
+                    if error == nil {
+                        activeCall.hold { error in
+                            error == nil ? action.fulfill() : action.fail()
+                        }
+                    } else {
+                        print("Failed to stop audio")
+                        action.fail()
+                    }
+                }
+            } else {
+                // Dont resume the audio here, have to to wait for `didActivateAudioSession`
+                activeCall.resume { error in
+                    error == nil ? action.fulfill() : action.fail()
+                }
+            }
+        }
+    }
+    
+    func provider(_ provider: CXProvider, perform action: CXSetMutedCallAction) {
+        Task {
+            guard let activeCall = await self.callKitHelper.getActiveCall(callId: action.callUUID.uuidString) else {
+                action.fail()
+                return
+            }
+            
+            if action.isMuted {
+                activeCall.mute { error in
+                    error == nil ? action.fulfill() : action.fail()
+                }
+            } else {
+                activeCall.unmute { error in
+                    error == nil ? action.fulfill() : action.fail()
+                }
+            }
+        }
     }
 
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
@@ -122,6 +192,7 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 outInCallInfo?.completionHandler(call, error)
                 Task {
                     await self.callKitHelper.removeOutInCallInfo(transactionId: action.uuid)
+                    await self.callKitHelper.removeIncomingCall(callId: action.callUUID.uuidString)
                 }
             }
             
@@ -149,6 +220,7 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         Task {
             guard let activeCall = await self.callKitHelper.getActiveCall(callId: action.callUUID.uuidString) else {
+                action.fail()
                 return
             }
 
@@ -172,14 +244,11 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 return
             }
 
-            activeCall.unmute { error in
+            startAudio(call: activeCall) { error in
                 if error == nil {
-                    print("Successfully unmuted mic")
-                    activeCall.speaker(mute: false) { error in
-                        if error == nil {
-                            print("Successfully unmuted speaker")
-                        }
-                    }
+                    print("Successfully started Audio")
+                } else {
+                    print("Failed to started Audio")
                 }
             }
         }
@@ -192,8 +261,6 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
             guard let outInCallInfo = await callKitHelper.getOutInCallInfo(transactionId: action.uuid) else {
                 return
             }
-            
-            let error = configureAudioSession()
             
             let completionBlock : ((Call?, Error?) -> Void) = { (call, error) in
                 
@@ -212,6 +279,13 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 }
             }
 
+            guard let callAgent = self.callAgent else {
+                completionBlock(nil, CallKitErrors.noCallAgent)
+                return
+            }
+
+            let error = configureAudioSession()
+
             if error == nil {
                 // Start by muting both speaker and mic audio and unmute when
                 // didActivateAudioSession callback is recieved.
@@ -226,7 +300,7 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                     }
                     
                     copyStartCallOptions.audioOptions = mutedAudioOptions
-                    callAgent!.startCall(participants: participants,
+                    callAgent.startCall(participants: participants,
                                         options: copyStartCallOptions,
                                         completionHandler: completionBlock)
                 } else if let meetingLocator = outInCallInfo.meetingLocator {
@@ -236,7 +310,7 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                     }
                     
                     copyJoinCallOptions.audioOptions = mutedAudioOptions
-                    callAgent!.join(with: meetingLocator,
+                    callAgent.join(with: meetingLocator,
                                    joinCallOptions: copyJoinCallOptions,
                                    completionHandler: completionBlock)
                 } else {
@@ -332,7 +406,7 @@ actor CallKitHelper {
     }
     
     func removeIncomingCall(callId: String) {
-        incomingCallMap.removeValue(forKey: callId)
+        incomingCallMap.removeValue(forKey: callId.uppercased())
         self.incomingCallSemaphore?.signal()
     }
     
@@ -342,12 +416,12 @@ actor CallKitHelper {
 
     func addActiveCall(callId: String, call: Call) {
         onIdChanged(newId: call.id, oldId: callId)
-        activeCalls[callId] = call
+        activeCalls[callId.uppercased()] = call
     }
 
     func removeActiveCall(callId: String) {
         let finalCallId = getReportedCallIdToCallKit(callId: callId)
-        activeCalls.removeValue(forKey: finalCallId.uppercased())
+        activeCalls.removeValue(forKey: finalCallId)
     }
 
     func getActiveCall(callId: String) -> Call? {
