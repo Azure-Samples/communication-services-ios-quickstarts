@@ -49,8 +49,6 @@ struct ContentView: View {
     @State var cxProvider: CXProvider?
     @State var callObserver:CallObserver?
     @State var remoteParticipantObserver:RemoteParticipantObserver?
-    @State var cxProviderImpl: ProviderDelegateImpl?
-    @State var callKitHelper: CallKitHelper?
     
     @State var pushToken: Data?
 
@@ -227,7 +225,7 @@ struct ContentView: View {
         return options
     }
 
-    private func createCXProvideConfiguration() -> CXProviderConfiguration {
+    public static func createCXProvideConfiguration() -> CXProviderConfiguration {
         let providerConfig = CXProviderConfiguration()
         providerConfig.supportsVideo = true
         providerConfig.maximumCallsPerCallGroup = 1
@@ -238,7 +236,7 @@ struct ContentView: View {
 
     #if BETA
     private func createCallKitOptions() -> CallKitOptions {
-        let callKitOptions = CallKitOptions(with: createCXProvideConfiguration())
+        let callKitOptions = CallKitOptions(with: ContentView.createCXProvideConfiguration())
         callKitOptions.provideRemoteInfo = self.provideCallKitRemoteInfo
         return callKitOptions
     }
@@ -268,63 +266,14 @@ struct ContentView: View {
         let callNotification = PushNotificationInfo.fromDictionary(pushPayload.dictionaryPayload)
         let isCallinSDKEnabled = userDefaults.value(forKey: "isCallKitInSDKEnabled") as? Bool ?? isCallKitInSDKEnabled
 
-        guard let callAgent = callAgent else {
-            if isCallinSDKEnabled {
-            #if BETA
-                // App is in kill mode, agent isn't created
-                CallClient.reportIncomingCallFromKillState(with: callNotification, callKitOptions: createCallKitOptions()) { (error) in
-                    if error != nil {
-                        os_log("ACS SDK reportToCallKit has failed", log:self.log)
-                        return
-                    }
-                    
-                    // We have already reported call to CallKit. Init SDK in background
-                    DispatchQueue.global().async {
-                        // App is in the killed state use os_log and use Console to see what's happening
-                        os_log("ACS SDK initialize completed, calling handlePush", log:self.log)
-                        self.isCallKitInSDKEnabled = true
-                        createCallAgent()
-                        guard let callAgent = callAgent else {
-                            os_log("ACS SDK handle push notification failed to create CallAgent instance", log:self.log)
-                            return
-                        }
-                        
-                        callAgent.handlePush(notification: callNotification) { (error) in
-                            if error == nil {
-                                os_log("ACS SDK handle push notification kill mode: passed", log:self.log)
-                            } else {
-                                os_log("ACS SDK handle push notification kill mode: failed", log:self.log)
-                            }
-                        }
-                    }
-                }
-                #else
-                os_log("ACS SDK CallKit not enabled", log:self.log)
-                #endif
-            } else {
-                createCXProvider()
-                let incomingCallReporter = CallKitIncomingCallReporter(cxProvider: self.cxProvider!)
+        if self.callAgent == nil {
+            createCallAgent()
+        }
 
-                incomingCallReporter.reportIncomingCall(callId: callNotification.callId.uuidString,
-                                                       caller: callNotification.from,
-                                                       callerDisplayName: callNotification.fromDisplayName,
-                                                       videoEnabled: callNotification.incomingWithVideo) { error in
-                    if error == nil {
-                        self.isCallKitInSDKEnabled = false
-                        createCallAgent()
-                        if let callAgent = self.callAgent {
-                            self.cxProviderImpl!.setCallAgent(callAgent: callAgent)
-                            callAgent.handlePush(notification: callNotification) { (error) in
-                                if error == nil {
-                                    os_log("ACS SDK handle push notification kill mode: passed", log:self.log)
-                                } else {
-                                    os_log("ACS SDK handle push notification kill mode: failed", log:self.log)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        guard let callAgent = callAgent else {
+            os_log("ACS SDK failed to create callAgent when handling push", log:self.log)
+            self.showAlert = true
+            self.alertMessage = "Failed to create CallAgent when handling push"
             return
         }
 
@@ -350,16 +299,6 @@ struct ContentView: View {
         } else {
             self.showAlert = true
             self.alertMessage = "No token for registering to push"
-        }
-    }
-        
-
-    private func createCXProvider() {
-        if self.cxProvider == nil {
-            self.cxProvider = CXProvider(configuration: createCXProvideConfiguration())
-            self.callKitHelper = CallKitHelper(cxProvider: self.cxProvider!)
-            self.cxProviderImpl = ProviderDelegateImpl(with: callKitHelper!, callAgent: callAgent)
-            self.cxProvider!.setDelegate(self.cxProviderImpl, queue: nil)
         }
     }
 
@@ -409,8 +348,7 @@ struct ContentView: View {
                 } else {
                     self.callAgent = agent
                     print("Call agent successfully created (without CallKit)")
-                    createCXProvider()
-                    incomingCallHandler = IncomingCallHandler(with: callKitHelper, contentView: self)
+                    incomingCallHandler = IncomingCallHandler(contentView: self)
                     self.callAgent!.delegate = incomingCallHandler
                     registerForPushNotification()
                 }
@@ -463,8 +401,7 @@ struct ContentView: View {
         self.previewRenderer?.dispose()
         sendingVideo = false
         Task {
-            await self.callKitHelper?.endCall(callId: call.id) { error in
-                
+            await CallKitObjectManager.getOrCreateCallKitHelper().endCall(callId: call.id) { error in
             }
         }
     }
@@ -537,7 +474,7 @@ struct ContentView: View {
         
         if !self.isCallKitInSDKEnabled {
             Task {
-                await self.callKitHelper!.placeCall(participants: callees,
+                await CallKitObjectManager.getOrCreateCallKitHelper().placeCall(participants: callees,
                                               callerDisplayName: "Alice",
                                               meetingLocator: nil,
                                               options: startCallOptions) { call, error in
@@ -554,7 +491,7 @@ struct ContentView: View {
     func setCallAndObersever(call:Call!, error:Error?) {
         if (error == nil) {
             self.call = call
-            self.callObserver = CallObserver(self, self.callKitHelper)
+            self.callObserver = CallObserver(self)
             self.call!.delegate = self.callObserver
             self.remoteParticipantObserver = RemoteParticipantObserver(self)
         } else {
@@ -571,7 +508,7 @@ struct ContentView: View {
             }
         } else {
             Task {
-                await self.callKitHelper!.endCall(callId: self.call!.id) { error in
+                await CallKitObjectManager.getOrCreateCallKitHelper().endCall(callId: self.call!.id) { error in
                     if (error != nil) {
                         print("ERROR: It was not possible to hangup the call.")
                     }
@@ -616,9 +553,8 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
     private var owner: ContentView
     private var callKitHelper: CallKitHelper?
     
-    init(_ view:ContentView, _ callKitHelper: CallKitHelper?) {
+    init(_ view:ContentView) {
         owner = view
-        self.callKitHelper = callKitHelper
     }
 
     public func call(_ call: Call, didChangeState args: PropertyChangedEventArgs) {

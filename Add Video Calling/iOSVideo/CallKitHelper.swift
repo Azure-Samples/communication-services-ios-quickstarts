@@ -29,13 +29,45 @@ struct OutInCallInfo {
     var completionHandler: (Call?, Error?) -> Void
 }
 
-final class ProviderDelegateImpl : NSObject, CXProviderDelegate {
+final class CallKitObjectManager {
+    private static var callKitHelper: CallKitHelper?
+    private static var cxProvider: CXProvider?
+    private static var cxProviderImpl: CxProviderDelegateImpl?
+
+    private static func createCXProvideConfiguration() -> CXProviderConfiguration {
+        let providerConfig = CXProviderConfiguration()
+        providerConfig.supportsVideo = true
+        providerConfig.maximumCallsPerCallGroup = 1
+        providerConfig.includesCallsInRecents = true
+        providerConfig.supportedHandleTypes = [.phoneNumber, .generic]
+        return providerConfig
+    }
+
+    static func getOrCreateCXProvider() -> CXProvider {
+        if cxProvider == nil {
+            cxProvider = CXProvider(configuration: createCXProvideConfiguration())
+            cxProviderImpl = CxProviderDelegateImpl(with: getOrCreateCallKitHelper())
+            cxProvider!.setDelegate(self.cxProviderImpl, queue: nil)
+        }
+
+        return cxProvider!
+    }
+
+    static func getOrCreateCallKitHelper() -> CallKitHelper {
+        if callKitHelper == nil {
+            callKitHelper = CallKitHelper()
+        }
+
+        return callKitHelper!
+    }    
+}
+
+final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
     private var callKitHelper: CallKitHelper
     private var callAgent: CallAgent?
     
-    init(with callKitHelper: CallKitHelper, callAgent: CallAgent?) {
+    init(with callKitHelper: CallKitHelper) {
         self.callKitHelper = callKitHelper
-        self.callAgent = callAgent
     }
 
     func setCallAgent(callAgent: CallAgent) {
@@ -218,10 +250,6 @@ final class ProviderDelegateImpl : NSObject, CXProviderDelegate {
 }
 
 class CallKitIncomingCallReporter {
-    var cxProvider: CXProvider
-    init(cxProvider: CXProvider) {
-        self.cxProvider = cxProvider
-    }
     
     private func createCallUpdate(isVideoEnabled: Bool, localizedCallerName: String, handle: CXHandle) -> CXCallUpdate {
         let callUpdate = CXCallUpdate()
@@ -254,7 +282,7 @@ class CallKitIncomingCallReporter {
         let handleType: CXHandle.HandleType = caller .isKind(of: PhoneNumberIdentifier.self) ? .phoneNumber : .generic
         let handle = CXHandle(type: handleType, value: caller.rawId)
         let callUpdate = createCallUpdate(isVideoEnabled: videoEnabled, localizedCallerName: callerDisplayName, handle: handle)
-        self.cxProvider.reportNewIncomingCall(with: UUID(uuidString: callId.uppercased())!, update: callUpdate) { error in
+        CallKitObjectManager.getOrCreateCXProvider().reportNewIncomingCall(with: UUID(uuidString: callId.uppercased())!, update: callUpdate) { error in
             completionHandler(error)
         }
     }
@@ -266,7 +294,6 @@ actor CallKitHelper {
     private var incomingCallMap: [String: IncomingCall] = [:]
     private var incomingCallSemaphore: DispatchSemaphore?
     private var activeCalls: [String : Call] = [:]
-    private var cxProvider: CXProvider
     private var updatedCallIdMap: [String:String] = [:]
     private var activeCallInfos: [String: ActiveCallInfo] = [:]
 
@@ -288,10 +315,6 @@ actor CallKitHelper {
         if newId != oldId {
             updatedCallIdMap[newId.uppercased()] = oldId.uppercased()
         }
-    }
-
-    init(cxProvider: CXProvider) {
-        self.cxProvider = cxProvider
     }
 
     func setAndGetSemaphore() -> DispatchSemaphore {
@@ -417,9 +440,9 @@ actor CallKitHelper {
         let finalCallId = getReportedCallIdToCallKit(callId: call.id)
         print("Report outgoing call for: \(finalCallId)")
         if call.state == .connected {
-            self.cxProvider.reportOutgoingCall(with: UUID(uuidString: finalCallId)! , connectedAt: nil)
+            CallKitObjectManager.getOrCreateCXProvider().reportOutgoingCall(with: UUID(uuidString: finalCallId)! , connectedAt: nil)
         } else if call.state != .connecting {
-            self.cxProvider.reportOutgoingCall(with: UUID(uuidString: finalCallId)! , startedConnectingAt: nil)
+            CallKitObjectManager.getOrCreateCXProvider().reportOutgoingCall(with: UUID(uuidString: finalCallId)! , startedConnectingAt: nil)
         }
     }
 

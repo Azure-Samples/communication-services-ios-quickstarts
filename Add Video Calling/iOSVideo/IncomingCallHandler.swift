@@ -12,12 +12,6 @@ import AVFoundation
 final class IncomingCallHandler: NSObject, CallAgentDelegate, IncomingCallDelegate {
     public var contentView: ContentView?
     private var incomingCall: IncomingCall?
-    private var callKitHelper: CallKitHelper?
-
-    convenience init(with callKitHelper: CallKitHelper?, contentView: ContentView?) {
-        self.init(contentView: contentView)
-        self.callKitHelper = callKitHelper
-    }
 
     init(contentView: ContentView?) {
         self.contentView = contentView
@@ -28,7 +22,7 @@ final class IncomingCallHandler: NSObject, CallAgentDelegate, IncomingCallDelega
         self.incomingCall!.delegate = self
         contentView?.showIncomingCallBanner(self.incomingCall!)
         Task {
-            await callKitHelper?.addIncomingCall(incomingCall: self.incomingCall!)
+            await CallKitObjectManager.getOrCreateCallKitHelper().addIncomingCall(incomingCall: self.incomingCall!)
         }
         let incomingCallReporter = CallKitIncomingCallReporter(cxProvider: self.contentView!.cxProvider!)
         incomingCallReporter.reportIncomingCall(callId: self.incomingCall!.id,
@@ -47,7 +41,7 @@ final class IncomingCallHandler: NSObject, CallAgentDelegate, IncomingCallDelega
         contentView?.isIncomingCall = false
         self.incomingCall = nil
         Task {
-            await callKitHelper?.removeIncomingCall(callId: incomingCall.id)
+            await CallKitObjectManager.getOrCreateCallKitHelper().removeIncomingCall(callId: incomingCall.id)
         }
     }
     
