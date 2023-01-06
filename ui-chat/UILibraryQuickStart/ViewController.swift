@@ -8,6 +8,7 @@ import AzureCommunicationCommon
 import AzureCommunicationUIChat
 
 class ViewController: UIViewController {
+    var chatAdapter: ChatAdapter?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,34 +35,45 @@ class ViewController: UIViewController {
             return
         }
 
-        let chatAdapter = ChatAdapter(
+        self.chatAdapter = ChatAdapter(
             endpoint: "<ENDPOINT_URL>", identifier: communicationIdentifier,
             credential: communicationTokenCredential,
             threadId: "<THREAD_ID>",
             displayName: "<DISPLAY_NAME>")
 
-        Task {
-            try await chatAdapter.connect()
-            DispatchQueue.main.async {
-                let chatCompositeViewController = ChatCompositeViewController(
-                    with: chatAdapter)
-
-                let closeItem = UIBarButtonItem(
-                    barButtonSystemItem: .close,
-                    target: nil,
-                    action: #selector(self.onBackBtnPressed))
-                chatCompositeViewController.title = "Chat"
-                chatCompositeViewController.navigationItem.leftBarButtonItem = closeItem
-
-                let navController = UINavigationController(rootViewController: chatCompositeViewController)
-                navController.modalPresentationStyle = .fullScreen
-
-                self.present(navController, animated: true, completion: nil)
+        Task { @MainActor in
+            guard let chatAdapter = self.chatAdapter else {
+                return
             }
+            try await chatAdapter.connect()
+            let chatCompositeViewController = ChatCompositeViewController(
+                with: chatAdapter)
+
+            let closeItem = UIBarButtonItem(
+                barButtonSystemItem: .close,
+                target: nil,
+                action: #selector(self.onBackBtnPressed))
+            chatCompositeViewController.title = "Chat"
+            chatCompositeViewController.navigationItem.leftBarButtonItem = closeItem
+
+            let navController = UINavigationController(rootViewController: chatCompositeViewController)
+            navController.modalPresentationStyle = .fullScreen
+
+            self.present(navController, animated: true, completion: nil)
         }
     }
 
     @objc func onBackBtnPressed() {
         self.dismiss(animated: true, completion: nil)
+        Task { @MainActor in
+            self.chatAdapter?.disconnect(completionHandler: { [weak self] result in
+                switch result {
+                case .success:
+                    self?.chatAdapter = nil
+                case .failure(let error):
+                    print("disconnect error \(error)")
+                }
+            })
+        }
     }
 }
