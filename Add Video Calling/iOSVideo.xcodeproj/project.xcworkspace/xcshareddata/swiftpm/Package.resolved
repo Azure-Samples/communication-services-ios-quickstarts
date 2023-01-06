@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "swiftpm-azurecommunicationcalling",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/raosanat/SwiftPM-AzureCommunicationCalling.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "fc2d2657754acdf7cce4986ec2f9667da3dcc5b4"
+      }
+    },
+    {
+      "identity" : "swiftpm-azurecommunicationcommon",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/raosanat/SwiftPM-AzureCommunicationCommon.git",
+      "state" : {
+        "revision" : "fe07546bd9e12b54154dfc075c4bdb626326b224",
+        "version" : "1.0.2"
+      }
+    }
+  ],
+  "version" : 2
+}
