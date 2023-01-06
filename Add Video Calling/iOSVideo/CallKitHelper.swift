@@ -14,7 +14,7 @@ import AVFAudio
 enum CallKitErrors: String, Error {
     case invalidParticipants = "Invalid participants provided"
     case unknownOutgoingCallType = "Unknown outgoing call type"
-    case noIncomingCallFound = "No inoming call found to accept"
+    case noIncomingCallFound = "No incoming call found to accept"
     case noActiveCallToEnd = "No active call found to end"
     case noCallAgent = "No CallAgent created"
 }
