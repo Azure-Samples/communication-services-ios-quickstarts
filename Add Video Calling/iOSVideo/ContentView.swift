@@ -297,9 +297,6 @@ struct ContentView: View {
                     self.alertMessage = "Failed to register for Push"
                 }
             }
-        } else {
-            self.showAlert = true
-            self.alertMessage = "No token for registering to push"
         }
     }
 

@@ -1,10 +1,3 @@
-//
-//  ProviderDelegate.swift
-//  iOSVideo
-//
-//  Created by Sanath Rao on 12/29/22.
-//
-
 import Foundation
 import CallKit
 import AzureCommunicationCommon
@@ -95,28 +88,18 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
         return configError
     }
 
-    private func stopAudio(call: Call, completionHandler: @escaping (Error?) -> Void) {
-        call.mute { error in
-            if error == nil {
-                call.speaker(mute: true) { error in completionHandler(error) }
-            } else {
-                completionHandler(error)
-            }
-        }
+    private func stopAudio(call: Call) async throws {
+        try await call.mute()
+        try await call.speaker(mute: true)
     }
     
-    private func startAudio(call: Call, completionHandler: @escaping (Error?) -> Void) {
-        call.unmute { error in
-            if error == nil {
-                call.speaker(mute: false) { error in completionHandler(error) }
-            } else {
-                completionHandler(error)
-            }
-        }
+    private func startAudio(call: Call) async throws {
+        try await call.unmute()
+        try await call.speaker(mute: false)
     }
 
     func providerDidReset(_ provider: CXProvider) {
-        
+        // No-op
     }
     
     func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
@@ -126,22 +109,17 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 return
             }
             
-            if action.isOnHold {
-                stopAudio(call: activeCall) { error in
-                    if error == nil {
-                        activeCall.hold { error in
-                            error == nil ? action.fulfill() : action.fail()
-                        }
-                    } else {
-                        print("Failed to stop audio")
-                        action.fail()
-                    }
+            do {
+                if action.isOnHold {
+                    try await stopAudio(call: activeCall)
+                    try await activeCall.hold()
+                } else {
+                    // Dont resume the audio here, have to to wait for `didActivateAudioSession`
+                    try await activeCall.resume()
                 }
-            } else {
-                // Dont resume the audio here, have to to wait for `didActivateAudioSession`
-                activeCall.resume { error in
-                    error == nil ? action.fulfill() : action.fail()
-                }
+                action.fulfill()
+            } catch {
+                action.fail()
             }
         }
     }
@@ -152,15 +130,16 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 action.fail()
                 return
             }
-            
-            if action.isMuted {
-                activeCall.mute { error in
-                    error == nil ? action.fulfill() : action.fail()
+
+            do {
+                if action.isMuted {
+                    try await activeCall.mute()
+                } else {
+                    try await activeCall.unmute()
                 }
-            } else {
-                activeCall.unmute { error in
-                    error == nil ? action.fulfill() : action.fail()
-                }
+                action.fulfill()
+            } catch {
+                action.fail()
             }
         }
     }
@@ -224,11 +203,11 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 return
             }
 
-            let activCallInfo = await self.callKitHelper.getActiveCallInfo(transactionId: action.uuid.uuidString)
+            let activeCallInfo = await self.callKitHelper.getActiveCallInfo(transactionId: action.uuid.uuidString)
             activeCall.hangUp(options: nil) { error in
                 // Its ok if hangup fails because we maybe hanging up already hanged up call
                 action.fulfill()
-                activCallInfo?.completionHandler(error)
+                activeCallInfo?.completionHandler(error)
                 Task {
                     await self.callKitHelper.removeActiveCall(callId: activeCall.id)
                     await self.callKitHelper.removeActiveCallInfo(transactionId: action.uuid.uuidString)
@@ -244,13 +223,7 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 return
             }
 
-            startAudio(call: activeCall) { error in
-                if error == nil {
-                    print("Successfully started Audio")
-                } else {
-                    print("Failed to started Audio")
-                }
-            }
+            try await startAudio(call: activeCall)
         }
     }
 
@@ -353,7 +326,7 @@ class CallKitIncomingCallReporter {
                             callerDisplayName: String,
                             videoEnabled: Bool,
                             completionHandler: @escaping (Error?) -> Void) {
-        let handleType: CXHandle.HandleType = caller .isKind(of: PhoneNumberIdentifier.self) ? .phoneNumber : .generic
+        let handleType: CXHandle.HandleType = caller is PhoneNumberIdentifier ? .phoneNumber : .generic
         let handle = CXHandle(type: handleType, value: caller.rawId)
         let callUpdate = createCallUpdate(isVideoEnabled: videoEnabled, localizedCallerName: callerDisplayName, handle: handle)
         CallKitObjectManager.getOrCreateCXProvider().reportNewIncomingCall(with: UUID(uuidString: callId.uppercased())!, update: callUpdate) { error in
@@ -561,7 +534,7 @@ actor CallKitHelper {
         }
         #endif
         
-        if (compressedParticipant == "") {
+        guard !compressedParticipant.isEmpty else {
             completionHandler(nil, CallKitErrors.invalidParticipants)
             return
         }
