@@ -242,7 +242,7 @@ struct ContentView: View {
         let callKitRemoteInfo = CallKitRemoteInfo()
         callKitRemoteInfo.displayName = "CALL_TO_PHONENUMBER_BY_APP"
         callKitRemoteInfo.handle = CXHandle(type: .generic, value: "VALUE_TO_CXHANDLE")
-        return callKitRemoteInfo;
+        return callKitRemoteInfo
     }
 
     #endif
