@@ -17,7 +17,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		531EBFC3295E56B10094E62E /* AzureCommunicationCalling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AzureCommunicationCalling.framework; path = "../../../../Code/Skype/SpoolCallingStack/spool/staging.d/release/BETA/sdk/arm64-v8a/AzureCommunicationCalling.framework"; sourceTree = "<group>"; };
 		531EBFC7295E5D9A0094E62E /* CallKitHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallKitHelper.swift; sourceTree = "<group>"; };
 		969CB7C9039BDBF49E9893A3 /* Pods-iOSVideo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOSVideo.release.xcconfig"; path = "Target Support Files/Pods-iOSVideo/Pods-iOSVideo.release.xcconfig"; sourceTree = "<group>"; };
 		BDCD1EC9261672450039C6B5 /* iOSVideo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSVideo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -95,7 +94,6 @@
 		F499A30ADFEB054F6D2CC36F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				531EBFC3295E56B10094E62E /* AzureCommunicationCalling.framework */,
 				FBFF92893FE8B69E1D39B66B /* Pods_iOSVideo.framework */,
 			);
 			name = Frameworks;

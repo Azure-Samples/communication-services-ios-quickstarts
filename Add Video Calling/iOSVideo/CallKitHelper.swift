@@ -146,12 +146,10 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
 
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
         Task {
-            let error = configureAudioSession()
-            
             // this can be nil and its ok because this can also directly come from CallKit
             let outInCallInfo = await callKitHelper.getOutInCallInfo(transactionId: action.uuid)
             
-            if error != nil {
+            if let error = configureAudioSession() {
                 action.fail()
                 outInCallInfo?.completionHandler(nil, error)
                 return
