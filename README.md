@@ -23,5 +23,5 @@ Azure Communication Services enable developers to add communication capabilities
 2. [Using Chat SDK with React Native](https://learn.microsoft.com/en-us/azure/communication-services/quickstarts/chat/react-native)
 
 ### UI Libraries
-1. [Getting Started with Calling UI Libraries](https://learn.microsoft.com/en-us/azure/communication-services/quickstarts/ui-library/get-started-calling-ui-library?pivots=platform-ios)
+1. [Getting Started with Calling UI Libraries](https://learn.microsoft.com/en-us/azure/communication-services/quickstarts/ui-library/get-started-composites?pivots=platform-ios)
 2. [Getting Started with Chat UI Libraries](https://learn.microsoft.com/en-us/azure/communication-services/quickstarts/ui-library/get-started-chat-ui-library?pivots=platform-ios)
