@@ -148,15 +148,9 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
         Task {
             // this can be nil and its ok because this can also directly come from CallKit
             let outInCallInfo = await callKitHelper.getOutInCallInfo(transactionId: action.uuid)
-            
-            if let error = configureAudioSession() {
-                action.fail()
-                outInCallInfo?.completionHandler(nil, error)
-                return
-            }
 
             let completionBlock : ((Call?, Error?) -> Void) = { (call, error) in
-                
+
                 if error == nil {
                     action.fulfill()
                     Task {
@@ -166,13 +160,19 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 } else {
                     action.fail()
                 }
+
                 outInCallInfo?.completionHandler(call, error)
                 Task {
                     await self.callKitHelper.removeOutInCallInfo(transactionId: action.uuid)
                     await self.callKitHelper.removeIncomingCall(callId: action.callUUID.uuidString)
                 }
             }
-            
+
+            if let error = configureAudioSession() {
+                completionBlock(nil, error)
+                return
+            }
+
             let acceptCallOptions = outInCallInfo?.options as? AcceptCallOptions
 
             if let incomingCall = await callKitHelper.getIncomingCall(callId: action.callUUID) {
@@ -255,40 +255,39 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 return
             }
 
-            let error = configureAudioSession()
-
-            if error == nil {
-                // Start by muting both speaker and mic audio and unmute when
-                // didActivateAudioSession callback is recieved.
-                let mutedAudioOptions = AudioOptions()
-                mutedAudioOptions.speakerMuted = true
-                mutedAudioOptions.muted = true
-                
-                if let participants = outInCallInfo.participants {
-                    let copyStartCallOptions = StartCallOptions()
-                    if let startCallOptions = outInCallInfo.options as? StartCallOptions {
-                        copyStartCallOptions.videoOptions = startCallOptions.videoOptions
-                    }
-                    
-                    copyStartCallOptions.audioOptions = mutedAudioOptions
-                    callAgent.startCall(participants: participants,
-                                        options: copyStartCallOptions,
-                                        completionHandler: completionBlock)
-                } else if let meetingLocator = outInCallInfo.meetingLocator {
-                    let copyJoinCallOptions = JoinCallOptions()
-                    if let joinCallOptions = outInCallInfo.options as? JoinCallOptions {
-                        copyJoinCallOptions.videoOptions = joinCallOptions.videoOptions
-                    }
-                    
-                    copyJoinCallOptions.audioOptions = mutedAudioOptions
-                    callAgent.join(with: meetingLocator,
-                                   joinCallOptions: copyJoinCallOptions,
-                                   completionHandler: completionBlock)
-                } else {
-                    completionBlock(nil, CallKitErrors.unknownOutgoingCallType)
-                }
-            } else {
+            if let error = configureAudioSession() {
                 completionBlock(nil, error)
+                return
+            }
+
+            // Start by muting both speaker and mic audio and unmute when
+            // didActivateAudioSession callback is recieved.
+            let mutedAudioOptions = AudioOptions()
+            mutedAudioOptions.speakerMuted = true
+            mutedAudioOptions.muted = true
+            
+            if let participants = outInCallInfo.participants {
+                let copyStartCallOptions = StartCallOptions()
+                if let startCallOptions = outInCallInfo.options as? StartCallOptions {
+                    copyStartCallOptions.videoOptions = startCallOptions.videoOptions
+                }
+                
+                copyStartCallOptions.audioOptions = mutedAudioOptions
+                callAgent.startCall(participants: participants,
+                                    options: copyStartCallOptions,
+                                    completionHandler: completionBlock)
+            } else if let meetingLocator = outInCallInfo.meetingLocator {
+                let copyJoinCallOptions = JoinCallOptions()
+                if let joinCallOptions = outInCallInfo.options as? JoinCallOptions {
+                    copyJoinCallOptions.videoOptions = joinCallOptions.videoOptions
+                }
+                
+                copyJoinCallOptions.audioOptions = mutedAudioOptions
+                callAgent.join(with: meetingLocator,
+                               joinCallOptions: copyJoinCallOptions,
+                               completionHandler: completionBlock)
+            } else {
+                completionBlock(nil, CallKitErrors.unknownOutgoingCallType)
             }
         }
     }
