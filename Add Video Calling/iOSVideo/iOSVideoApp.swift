@@ -8,6 +8,7 @@
 import SwiftUI
 import PushKit
 import Combine
+import AzureCommunicationCalling
 
 @main
 struct iOSVideoApp: App {
@@ -49,7 +50,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     // Handle incoming pushes
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
-        appPubs.pushPayload = payload
+        let callNotification = PushNotificationInfo.fromDictionary(payload.dictionaryPayload)
+        let userDefaults: UserDefaults = .standard
+        let isCallKitInSDKEnabled = userDefaults.value(forKey: "isCallKitInSDKEnabled") as? Bool ?? false
+        if isCallKitInSDKEnabled {
+            #if BETA
+            let callKitOptions = CallKitOptions(with: CallKitObjectManager.createCXProvideConfiguration())
+            CallClient.reportIncomingCallFromKillState(with: callNotification, callKitOptions: callKitOptions) { error in
+                if error == nil {
+                    self.appPubs.pushPayload = payload
+                }
+            }
+            #endif
+        } else {
+            let incomingCallReporter = CallKitIncomingCallReporter()
+            incomingCallReporter.reportIncomingCall(callId: callNotification.callId.uuidString,
+                                                   caller: callNotification.from,
+                                                   callerDisplayName: callNotification.fromDisplayName,
+                                                    videoEnabled: callNotification.incomingWithVideo) { error in
+                if error == nil {
+                    self.appPubs.pushPayload = payload
+                }
+            }
+        }
     }
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
