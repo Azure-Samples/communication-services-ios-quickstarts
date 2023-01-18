@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import AzureCommunication
+import AzureCommunicationCommon
 import AzureCommunicationChat
 
 class ViewController: UIViewController {
