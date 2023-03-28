@@ -1,14 +1,14 @@
 PODS:
-  - AzureCommunicationChat (1.3.0):
+  - AzureCommunicationChat (1.3.1):
     - AzureCommunicationCommon (~> 1.0)
     - AzureCore (= 1.0.0-beta.15)
-    - Trouter (= 0.1.0)
-  - AzureCommunicationCommon (1.1.0)
+    - Trouter (= 0.2.0)
+  - AzureCommunicationCommon (1.1.1)
   - AzureCore (1.0.0-beta.15)
-  - Trouter (0.1.0)
+  - Trouter (0.2.0)
 
 DEPENDENCIES:
-  - AzureCommunicationChat (~> 1.3.0)
+  - AzureCommunicationChat (~> 1.3.1)
 
 SPEC REPOS:
   trunk:
@@ -18,11 +18,11 @@ SPEC REPOS:
     - Trouter
 
 SPEC CHECKSUMS:
-  AzureCommunicationChat: c3a67d67e85daba4d9d81874e50187c91f556f2d
-  AzureCommunicationCommon: feb813845d73fc5666ab1a87e0f7bb18fa5698d6
+  AzureCommunicationChat: 9be8209d32c2fc6259095ff9838ad30dcfc44f80
+  AzureCommunicationCommon: cc520a89f3f8db6d58de42ec4a70cfb79a1b76a3
   AzureCore: ebbf7cf4dfe72afc7584088c38d1c99f5a35d647
-  Trouter: 62f6db5519829c0897832d404338c3b78ea64fa2
+  Trouter: 7eab36954ad740e32db3ff9f6025b0dff92193d7
 
-PODFILE CHECKSUM: 78136c904b7252b52372cfb152176ecb8e4406cb
+PODFILE CHECKSUM: 8bf94df424a980405b6bce94728106772b11d251
 
 COCOAPODS: 1.11.3
