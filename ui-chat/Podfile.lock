@@ -51,33 +51,25 @@ PODS:
   - Trouter (0.2.0)
 
 DEPENDENCIES:
-  - AzureCommunicationUIChat (from `/Users/viktoriiahuseinova/Documents/projects/communication-ui-library-ios/AzureCommunicationUI/sdk/AzureCommunicationUIChat/AzureCommunicationUIChat.podspec`)
+  - AzureCommunicationUIChat (= 1.0.0-beta.3)
 
 SPEC REPOS:
   trunk:
     - AzureCommunicationChat
     - AzureCommunicationCommon
+    - AzureCommunicationUIChat
     - AzureCore
     - MicrosoftFluentUI
     - Trouter
 
-EXTERNAL SOURCES:
-  AzureCommunicationUIChat:
-    :podspec: "/Users/viktoriiahuseinova/Documents/projects/communication-ui-library-ios/AzureCommunicationUI/sdk/AzureCommunicationUIChat/AzureCommunicationUIChat.podspec"
-
-CHECKOUT OPTIONS:
-  AzureCommunicationUIChat:
-    :commit: 09448aa7581f2ca648520ae5cd50ff855507b6d3
-    :git: https://github.com/Azure/communication-ui-library-ios.git
-
 SPEC CHECKSUMS:
   AzureCommunicationChat: 9be8209d32c2fc6259095ff9838ad30dcfc44f80
   AzureCommunicationCommon: cc520a89f3f8db6d58de42ec4a70cfb79a1b76a3
-  AzureCommunicationUIChat: 442a1bcd9b9a3799bd881db2b65aa6d98dead8b0
+  AzureCommunicationUIChat: 3f048cb268157015c1189bce1bf8cb9d0b051edb
   AzureCore: ebbf7cf4dfe72afc7584088c38d1c99f5a35d647
   MicrosoftFluentUI: f6db695718efb93f4ca9bdc366c00b80a1f91dba
   Trouter: 7eab36954ad740e32db3ff9f6025b0dff92193d7
 
-PODFILE CHECKSUM: 7ba8ec1f7e06668a261c1c750c4e4daadb5ffa31
+PODFILE CHECKSUM: 870e0ac69807695d20616f89010ed6daa9e83dcf
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.0
