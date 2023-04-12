@@ -25,7 +25,7 @@ struct ContentView: View {
     }
 
     private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "ACSVideoSample")
-    private let token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEwNiIsIng1dCI6Im9QMWFxQnlfR3hZU3pSaXhuQ25zdE5PU2p2cyIsInR5cCI6IkpXVCJ9.eyJza3lwZWlkIjoiYWNzOmI2YWFkYTFmLTBiMWQtNDdhYy04NjZmLTkxYWFlMDBhMWQwMV8wMDAwMDAxOC0xMTM2LTNiMGYtMzVmMy0zNDNhMGQwMGJkODMiLCJzY3AiOjE3OTIsImNzaSI6IjE2ODEzMjE0MTUiLCJleHAiOjE2ODE0MDc4MTUsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6InZvaXAiLCJyZXNvdXJjZUlkIjoiYjZhYWRhMWYtMGIxZC00N2FjLTg2NmYtOTFhYWUwMGExZDAxIiwicmVzb3VyY2VMb2NhdGlvbiI6InVuaXRlZHN0YXRlcyIsImlhdCI6MTY4MTMyMTQxNX0.g8t8pcrJQZwy_5aBUHvSlkDU4wjG-mc5DoXcsE9oGlIFGAO06F90j-mpGIAGZ6Kdt8fWDroy-0YQmOTV-SzAZAjwaKwUL2-BPJo116PEosSBOoWbwdMNzgotxozPMi0UZXjj4LJk3K5F1iSm09VWuL4L0fGhqUF2MjkOlS8Hsh6cJSPIpLxmM_JTeZmwqy_IP3FMZPWqZ8cLwsT1GaARmWmd2AUyCt89RjnNJStUMgIi3lvSyIqikuNPXoapKZavJhawHrqivZ4QRKG0KGdeAKHR0O-u3EoqJRc4P-X97y4bpX4mTIw06ynCYx-Uhl8mNeqPUnvb_C4GELbTX05sxA"
+    private let token = "<USER_ACCESS_TOKEN>"
 
     @State var callee: String = "8:echo123"
     @State var callClient = CallClient()
