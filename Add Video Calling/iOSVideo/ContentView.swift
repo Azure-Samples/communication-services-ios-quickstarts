@@ -12,6 +12,7 @@ import AVFoundation
 import Foundation
 import PushKit
 import os.log
+import CallKit
 
 enum CreateCallAgentErrors: Error {
     case noToken
@@ -24,7 +25,7 @@ struct ContentView: View {
     }
 
     private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "ACSVideoSample")
-    private let token = "<USER_ACCESS_TOKEN>"
+    private let token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEwNiIsIng1dCI6Im9QMWFxQnlfR3hZU3pSaXhuQ25zdE5PU2p2cyIsInR5cCI6IkpXVCJ9.eyJza3lwZWlkIjoiYWNzOmI2YWFkYTFmLTBiMWQtNDdhYy04NjZmLTkxYWFlMDBhMWQwMV8wMDAwMDAxOC0xMTM2LTNiMGYtMzVmMy0zNDNhMGQwMGJkODMiLCJzY3AiOjE3OTIsImNzaSI6IjE2ODEzMjE0MTUiLCJleHAiOjE2ODE0MDc4MTUsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6InZvaXAiLCJyZXNvdXJjZUlkIjoiYjZhYWRhMWYtMGIxZC00N2FjLTg2NmYtOTFhYWUwMGExZDAxIiwicmVzb3VyY2VMb2NhdGlvbiI6InVuaXRlZHN0YXRlcyIsImlhdCI6MTY4MTMyMTQxNX0.g8t8pcrJQZwy_5aBUHvSlkDU4wjG-mc5DoXcsE9oGlIFGAO06F90j-mpGIAGZ6Kdt8fWDroy-0YQmOTV-SzAZAjwaKwUL2-BPJo116PEosSBOoWbwdMNzgotxozPMi0UZXjj4LJk3K5F1iSm09VWuL4L0fGhqUF2MjkOlS8Hsh6cJSPIpLxmM_JTeZmwqy_IP3FMZPWqZ8cLwsT1GaARmWmd2AUyCt89RjnNJStUMgIi3lvSyIqikuNPXoapKZavJhawHrqivZ4QRKG0KGdeAKHR0O-u3EoqJRc4P-X97y4bpX4mTIw06ynCYx-Uhl8mNeqPUnvb_C4GELbTX05sxA"
 
     @State var callee: String = "8:echo123"
     @State var callClient = CallClient()
@@ -49,12 +50,17 @@ struct ContentView: View {
     @State var userDefaults: UserDefaults = .standard
     @State var isCallKitInSDKEnabled = false
     @State var isSpeakerOn:Bool = false
-
+    @State var isMuted:Bool = false
+    @State var isHeld: Bool = false
+    
+    @State var callState: String = "None"
     @State var incomingCallHandler: IncomingCallHandler?
     @State var cxProvider: CXProvider?
     @State var callObserver:CallObserver?
     @State var remoteParticipantObserver:RemoteParticipantObserver?
     
+    private let callKitHelper: CallKitHelper? = CallKitObjectManager.getOrCreateCallKitHelper()
+
     @State var pushToken: Data?
 
     var appPubs: AppPubs
@@ -68,6 +74,12 @@ struct ContentView: View {
                         Button(action: startCall) {
                             Text("Start Call")
                         }.disabled(callAgent == nil)
+                        Button(action: holdCall) {
+                            Text(isHeld ? "Resume" : "Hold")
+                        }.disabled(call == nil)
+                        Button(action: switchMicrophone) {
+                            Text(isMuted ? "UnMute" : "Mute")
+                        }.disabled(call == nil)
                         Button(action: endCall) {
                             Text("End Call")
                         }.disabled(call == nil)
@@ -86,6 +98,8 @@ struct ContentView: View {
                             .onChange(of: isSpeakerOn) { _ in
                                 switchSpeaker()
                             }.disabled(call == nil)
+                        TextField("Call State", text: $callState)
+                            .foregroundColor(.red)
                     }
                 }
                 if (isIncomingCall) {
@@ -140,7 +154,6 @@ struct ContentView: View {
                                 }
                             }
                         }
-
                     }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                     VStack {
                         if(sendingVideo)
@@ -208,6 +221,58 @@ struct ContentView: View {
         .alert(isPresented: $showAlert) { () -> Alert in
             Alert(title: Text("ERROR"), message: Text(alertMessage), dismissButton: .default(Text("Dismiss")))
         }
+    }
+
+    func switchMicrophone() {
+        guard let call = self.call else {
+            return
+        }
+
+        if isCallKitInSDKEnabled {
+            #if BETA
+            call.updateOutgoingAudio(mute: !isMuted) { error in
+                if error == nil {
+                    isMuted = !isMuted
+                } else {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to unmute/mute audio"
+                }
+            }
+            #else
+            if self.isMuted {
+                call.unmute() { error in
+                    if error == nil {
+                        isMuted = false
+                    } else {
+                        self.showAlert = true
+                        self.alertMessage = "Failed to unmute audio"
+                    }
+                }
+            } else {
+                call.mute() { error in
+                    if error == nil {
+                        isMuted = true
+                    } else {
+                        self.showAlert = true
+                        self.alertMessage = "Failed to mute audio"
+                    }
+                }
+            }
+            #endif
+        } else {
+            Task {
+                await callKitHelper!.muteCall(callId:call.id, isMuted: !isMuted) { error in
+                    if error == nil {
+                        isMuted = !isMuted
+                    } else {
+                        self.showAlert = true
+                        self.alertMessage = "Failed to mute the call (without CallKit)"
+                    }
+                }
+            }
+        }
+        
+        userDefaults.set(isMuted, forKey: "isMuted")
     }
 
     func switchSpeaker() -> Void {
@@ -361,8 +426,20 @@ struct ContentView: View {
     }
 
     func declineIncomingCall() {
-        self.incomingCall?.reject { (error) in }
-        isIncomingCall = false
+        guard let incomingCall = self.incomingCall else {
+            self.showAlert = true
+            self.alertMessage = "No incoming call to reject"
+            return
+        }
+
+        incomingCall.reject { (error) in
+            guard let rejectError = error else {
+                return
+            }
+            self.showAlert = true
+            self.alertMessage = rejectError.localizedDescription
+            isIncomingCall = false
+        }
     }
 
     func showIncomingCallBanner(_ incomingCall: IncomingCall?) {
@@ -387,7 +464,11 @@ struct ContentView: View {
         {
             let camera = deviceManager.cameras.first
             localVideoStream.append(LocalVideoStream(camera: camera!))
+            #if BETA
+            let videoOptions = VideoOptions(outgoingVideoStreams: localVideoStream)
+            #else
             let videoOptions = VideoOptions(localVideoStreams: localVideoStream)
+            #endif
             options.videoOptions = videoOptions
         }
 
@@ -397,7 +478,7 @@ struct ContentView: View {
             }
         } else {
             Task {
-                await CallKitObjectManager.getOrCreateCallKitHelper().acceptCall(callId: incomingCall.id,
+                await callKitHelper!.acceptCall(callId: incomingCall.id,
                                                                            options: options) { call, error in
                     setCallAndObersever(call: call, error: error)
                 }
@@ -415,7 +496,7 @@ struct ContentView: View {
         self.previewRenderer?.dispose()
         sendingVideo = false
         Task {
-            await CallKitObjectManager.getOrCreateCallKitHelper().endCall(callId: call.id) { error in
+            await callKitHelper?.endCall(callId: call.id) { error in
             }
         }
     }
@@ -471,6 +552,60 @@ struct ContentView: View {
         }
     }
 
+    func holdCall() {
+        guard let call = self.call else {
+            self.showAlert = true
+            self.alertMessage = "No active call to hold/resume"
+            return
+        }
+        
+        if self.isHeld {
+            if isCallKitInSDKEnabled {
+                call.resume { error in
+                    if error == nil {
+                        self.isHeld = false
+                    }  else {
+                        self.showAlert = true
+                        self.alertMessage = "Failed to hold the call"
+                    }
+                }
+            } else {
+                Task {
+                    await callKitHelper!.holdCall(callId: call.id, onHold: false) { error in
+                        if error == nil {
+                            self.isHeld = false
+                        } else {
+                            self.showAlert = true
+                            self.alertMessage = "Failed to hold the call"
+                        }
+                    }
+                }
+            }
+        } else {
+            if isCallKitInSDKEnabled {
+                call.hold { error in
+                    if error == nil {
+                        self.isHeld = true
+                    } else {
+                        self.showAlert = true
+                        self.alertMessage = "Failed to resume the call"
+                    }
+                }
+            } else {
+                Task {
+                    await callKitHelper!.holdCall(callId: call.id, onHold: true) { error in
+                        if error == nil {
+                            self.isHeld = true
+                        } else {
+                            self.showAlert = true
+                            self.alertMessage = "Failed to resume the call"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     func startCall() {
         let startCallOptions = StartCallOptions()
         if(sendingVideo)
@@ -483,21 +618,16 @@ struct ContentView: View {
 
             localVideoStream.removeAll()
             localVideoStream.append(LocalVideoStream(camera: deviceManager.cameras.first!))
+            #if BETA
+            let videoOptions = VideoOptions(outgoingVideoStreams: localVideoStream)
+            #else
             let videoOptions = VideoOptions(localVideoStreams: localVideoStream)
+            #endif
             startCallOptions.videoOptions = videoOptions
         }
         let callees:[CommunicationIdentifier] = [CommunicationUserIdentifier(self.callee)]
         
-        if !self.isCallKitInSDKEnabled {
-            Task {
-                await CallKitObjectManager.getOrCreateCallKitHelper().placeCall(participants: callees,
-                                              callerDisplayName: "Alice",
-                                              meetingLocator: nil,
-                                              options: startCallOptions) { call, error in
-                    setCallAndObersever(call: call, error: error)
-                }
-            }
-        } else {
+        if self.isCallKitInSDKEnabled {
             guard let callAgent = self.callAgent else {
                 self.showAlert = true
                 self.alertMessage = "No CallAgent instance exists to place the call"
@@ -506,6 +636,15 @@ struct ContentView: View {
 
             callAgent.startCall(participants: callees, options: startCallOptions) { (call, error) in
                 setCallAndObersever(call: call, error: error)
+            }
+        } else {
+            Task {
+                await callKitHelper!.placeCall(participants: callees,
+                                              callerDisplayName: "Alice",
+                                              meetingLocator: nil,
+                                              options: startCallOptions) { call, error in
+                    setCallAndObersever(call: call, error: error)
+                }
             }
         }
     }
@@ -516,6 +655,7 @@ struct ContentView: View {
             self.callObserver = CallObserver(self)
             self.call!.delegate = self.callObserver
             self.remoteParticipantObserver = RemoteParticipantObserver(self)
+            switchSpeaker()
         } else {
             print("Failed to get call object")
         }
@@ -530,7 +670,7 @@ struct ContentView: View {
             }
         } else {
             Task {
-                await CallKitObjectManager.getOrCreateCallKitHelper().endCall(callId: self.call!.id) { error in
+                await callKitHelper!.endCall(callId: self.call!.id) { error in
                     if (error != nil) {
                         print("ERROR: It was not possible to hangup the call.")
                     }
@@ -580,6 +720,27 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
     }
 
     public func call(_ call: Call, didChangeState args: PropertyChangedEventArgs) {
+        switch call.state {
+        case .connected:
+            owner.callState = "Connected"
+        case .connecting:
+            owner.callState = "Connecting"
+        case .disconnected:
+            owner.callState = "Disconnected"
+        case .disconnecting:
+            owner.callState = "Disconnecting"
+        case .inLobby:
+            owner.callState = "InLobby"
+        case .localHold:
+            owner.callState = "LocalHold"
+        case .remoteHold:
+            owner.callState = "RemoteHold"
+        case .ringing:
+            owner.callState = "Ringing"
+        default:
+            owner.callState = "None"
+        }
+
         if(call.state == CallState.connected) {
             initialCallParticipant()
         }
@@ -588,6 +749,16 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
             await callKitHelper?.reportOutgoingCall(call: call)
         }
     }
+    
+    #if BETA
+    public func call(_ call: Call, didUpdateOutgoingAudioState args: PropertyChangedEventArgs) {
+        owner.isMuted = call.isOutgoingAudioMuted
+    }
+    #else
+    public func call(_ call: Call, didChangeMuteState args: PropertyChangedEventArgs) {
+        owner.isMuted = call.isMuted
+    }
+    #endif
 
     public func call(_ call: Call, didUpdateRemoteParticipant args: ParticipantsUpdatedEventArgs) {
         for participant in args.addedParticipants {

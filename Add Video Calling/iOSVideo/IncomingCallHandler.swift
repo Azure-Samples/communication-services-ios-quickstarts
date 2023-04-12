@@ -22,7 +22,7 @@ final class IncomingCallHandler: NSObject, CallAgentDelegate, IncomingCallDelega
         self.incomingCall!.delegate = self
         contentView?.showIncomingCallBanner(self.incomingCall!)
         Task {
-            await CallKitObjectManager.getOrCreateCallKitHelper().addIncomingCall(incomingCall: self.incomingCall!)
+            await CallKitObjectManager.getOrCreateCallKitHelper()?.addIncomingCall(incomingCall: self.incomingCall!)
         }
         let incomingCallReporter = CallKitIncomingCallReporter()
         incomingCallReporter.reportIncomingCall(callId: self.incomingCall!.id,
@@ -41,7 +41,7 @@ final class IncomingCallHandler: NSObject, CallAgentDelegate, IncomingCallDelega
         contentView?.isIncomingCall = false
         self.incomingCall = nil
         Task {
-            await CallKitObjectManager.getOrCreateCallKitHelper().removeIncomingCall(callId: incomingCall.id)
+            await CallKitObjectManager.getOrCreateCallKitHelper()?.removeIncomingCall(callId: incomingCall.id)
         }
     }
     
