@@ -8,7 +8,6 @@ enum CallKitErrors: String, Error {
     case invalidParticipants = "Invalid participants provided"
     case unknownOutgoingCallType = "Unknown outgoing call type"
     case noIncomingCallFound = "No incoming call found to accept"
-    case noActiveCallToEnd = "No active call found to end"
     case noCallAgent = "No CallAgent created"
 }
 
@@ -49,23 +48,25 @@ final class CallKitObjectManager {
 
         if cxProvider == nil {
             cxProvider = CXProvider(configuration: createCXProvideConfiguration())
-            cxProviderImpl = CxProviderDelegateImpl(with: getOrCreateCallKitHelper()!)
+            callKitHelper = CallKitHelper()
+            cxProviderImpl = CxProviderDelegateImpl(with: callKitHelper!)
             cxProvider!.setDelegate(self.cxProviderImpl, queue: nil)
         }
 
         return cxProvider!
     }
 
+    static func deInitCallKitInApp() {
+        callKitHelper = nil
+        cxProvider = nil
+        cxProviderImpl = nil
+    }
+
     static func getCXProviderImpl() -> CxProviderDelegateImpl {
         return cxProviderImpl!
     }
 
-    static func getOrCreateCallKitHelper() -> CallKitHelper? {
-
-        if callKitHelper == nil {
-            callKitHelper = CallKitHelper()
-        }
-
+    static func getCallKitHelper() -> CallKitHelper? {
         return callKitHelper
     }
 }

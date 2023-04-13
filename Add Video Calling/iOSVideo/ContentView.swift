@@ -58,9 +58,6 @@ struct ContentView: View {
     @State var cxProvider: CXProvider?
     @State var callObserver:CallObserver?
     @State var remoteParticipantObserver:RemoteParticipantObserver?
-    
-    private let callKitHelper: CallKitHelper? = CallKitObjectManager.getOrCreateCallKitHelper()
-
     @State var pushToken: Data?
 
     var appPubs: AppPubs
@@ -261,7 +258,7 @@ struct ContentView: View {
             #endif
         } else {
             Task {
-                await callKitHelper!.muteCall(callId:call.id, isMuted: !isMuted) { error in
+                await CallKitObjectManager.getCallKitHelper()!.muteCall(callId:call.id, isMuted: !isMuted) { error in
                     if error == nil {
                         isMuted = !isMuted
                     } else {
@@ -388,6 +385,7 @@ struct ContentView: View {
             self.callClient.createCallAgent(userCredential: userCredential,
                                             options: createCallAgentOptions()) { (agent, error) in
                 if error == nil {
+                    CallKitObjectManager.deInitCallKitInApp()
                     self.callAgent = agent
                     self.cxProvider = nil
                     print("Call agent successfully created.")
@@ -478,7 +476,7 @@ struct ContentView: View {
             }
         } else {
             Task {
-                await callKitHelper!.acceptCall(callId: incomingCall.id,
+                await CallKitObjectManager.getCallKitHelper()!.acceptCall(callId: incomingCall.id,
                                                                            options: options) { call, error in
                     setCallAndObersever(call: call, error: error)
                 }
@@ -496,7 +494,7 @@ struct ContentView: View {
         self.previewRenderer?.dispose()
         sendingVideo = false
         Task {
-            await callKitHelper?.endCall(callId: call.id) { error in
+            await CallKitObjectManager.getCallKitHelper()?.endCall(callId: call.id) { error in
             }
         }
     }
@@ -571,7 +569,7 @@ struct ContentView: View {
                 }
             } else {
                 Task {
-                    await callKitHelper!.holdCall(callId: call.id, onHold: false) { error in
+                    await CallKitObjectManager.getCallKitHelper()!.holdCall(callId: call.id, onHold: false) { error in
                         if error == nil {
                             self.isHeld = false
                         } else {
@@ -593,7 +591,7 @@ struct ContentView: View {
                 }
             } else {
                 Task {
-                    await callKitHelper!.holdCall(callId: call.id, onHold: true) { error in
+                    await CallKitObjectManager.getCallKitHelper()!.holdCall(callId: call.id, onHold: true) { error in
                         if error == nil {
                             self.isHeld = true
                         } else {
@@ -639,7 +637,7 @@ struct ContentView: View {
             }
         } else {
             Task {
-                await callKitHelper!.placeCall(participants: callees,
+                await CallKitObjectManager.getCallKitHelper()!.placeCall(participants: callees,
                                               callerDisplayName: "Alice",
                                               meetingLocator: nil,
                                               options: startCallOptions) { call, error in
@@ -670,7 +668,7 @@ struct ContentView: View {
             }
         } else {
             Task {
-                await callKitHelper!.endCall(callId: self.call!.id) { error in
+                await CallKitObjectManager.getCallKitHelper()!.endCall(callId: self.call!.id) { error in
                     if (error != nil) {
                         print("ERROR: It was not possible to hangup the call.")
                     }
@@ -737,8 +735,12 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
             owner.callState = "RemoteHold"
         case .ringing:
             owner.callState = "Ringing"
-        default:
+        case .earlyMedia:
+            owner.callState = "EarlyMedia"
+        case .none:
             owner.callState = "None"
+        default:
+            owner.callState = "Default"
         }
 
         if(call.state == CallState.connected) {
@@ -746,7 +748,7 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
         }
 
         Task {
-            await callKitHelper?.reportOutgoingCall(call: call)
+            await CallKitObjectManager.getCallKitHelper()?.reportOutgoingCall(call: call)
         }
     }
     
