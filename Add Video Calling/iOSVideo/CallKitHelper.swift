@@ -8,7 +8,6 @@ enum CallKitErrors: String, Error {
     case invalidParticipants = "Invalid participants provided"
     case unknownOutgoingCallType = "Unknown outgoing call type"
     case noIncomingCallFound = "No incoming call found to accept"
-    case noActiveCallToEnd = "No active call found to end"
     case noCallAgent = "No CallAgent created"
 }
 
@@ -31,6 +30,7 @@ final class CallKitObjectManager {
     private static var callKitHelper: CallKitHelper?
     private static var cxProvider: CXProvider?
     private static var cxProviderImpl: CxProviderDelegateImpl?
+    private static var userDefaults: UserDefaults = .standard
 
     static func createCXProvideConfiguration() -> CXProviderConfiguration {
         let providerConfig = CXProviderConfiguration()
@@ -41,25 +41,33 @@ final class CallKitObjectManager {
         return providerConfig
     }
 
-    static func getOrCreateCXProvider() -> CXProvider {
+    static func getOrCreateCXProvider() -> CXProvider? {
+        if userDefaults.value(forKey: "isCallKitInSDKEnabled") as? Bool ?? false {
+            return nil
+        }
+
         if cxProvider == nil {
             cxProvider = CXProvider(configuration: createCXProvideConfiguration())
-            cxProviderImpl = CxProviderDelegateImpl(with: getOrCreateCallKitHelper())
+            callKitHelper = CallKitHelper()
+            cxProviderImpl = CxProviderDelegateImpl(with: callKitHelper!)
             cxProvider!.setDelegate(self.cxProviderImpl, queue: nil)
         }
 
         return cxProvider!
     }
 
+    static func deInitCallKitInApp() {
+        callKitHelper = nil
+        cxProvider = nil
+        cxProviderImpl = nil
+    }
+
     static func getCXProviderImpl() -> CxProviderDelegateImpl {
         return cxProviderImpl!
     }
 
-    static func getOrCreateCallKitHelper() -> CallKitHelper {
-        if callKitHelper == nil {
-            callKitHelper = CallKitHelper()
-        }
-        return callKitHelper!
+    static func getCallKitHelper() -> CallKitHelper? {
+        return callKitHelper
     }
 }
 
@@ -89,13 +97,20 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
     }
 
     private func stopAudio(call: Call) async throws {
-        try await call.mute()
-        try await call.speaker(mute: true)
+        #if BETA
+        try await call.stopAudio(direction: .incoming)
+        try await call.stopAudio(direction: .outgoing)
+        #endif
     }
     
     private func startAudio(call: Call) async throws {
-        try await call.unmute()
-        try await call.speaker(mute: false)
+        #if BETA
+        try await call.startAudio(stream: LocalAudioStream())
+        try await call.startAudio(stream: RemoteAudioStream())
+        // TODO: Check if mute was user initiated or not
+        try await call.updateOutgoingAudio(mute: false)
+        try await call.updateIncomingAudio(mute: false)
+        #endif
     }
 
     func providerDidReset(_ provider: CXProvider) {
@@ -109,18 +124,23 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 return
             }
             
+            let activeCallInfo = await self.callKitHelper.getActiveCallInfo(transactionId: action.uuid.uuidString)
+
             do {
                 if action.isOnHold {
-                    try await stopAudio(call: activeCall)
                     try await activeCall.hold()
                 } else {
                     // Dont resume the audio here, have to to wait for `didActivateAudioSession`
                     try await activeCall.resume()
                 }
                 action.fulfill()
+                activeCallInfo?.completionHandler(nil)
             } catch {
                 action.fail()
+                activeCallInfo?.completionHandler(error)
             }
+            
+            await self.callKitHelper.removeActiveCallInfo(transactionId: action.uuid.uuidString)
         }
     }
     
@@ -131,16 +151,26 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 return
             }
 
+            let activeCallInfo = await self.callKitHelper.getActiveCallInfo(transactionId: action.uuid.uuidString)
+
             do {
+                #if BETA
+                try await activeCall.updateOutgoingAudio(mute: action.isMuted)
+                #else
                 if action.isMuted {
                     try await activeCall.mute()
                 } else {
                     try await activeCall.unmute()
                 }
+                #endif
                 action.fulfill()
+                activeCallInfo?.completionHandler(nil)
             } catch {
                 action.fail()
+                activeCallInfo?.completionHandler(error)
             }
+            
+            await self.callKitHelper.removeActiveCallInfo(transactionId: action.uuid.uuidString)
         }
     }
 
@@ -175,17 +205,46 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
 
             let acceptCallOptions = outInCallInfo?.options as? AcceptCallOptions
 
-            if let incomingCall = await callKitHelper.getIncomingCall(callId: action.callUUID) {
-                incomingCall.accept(options: acceptCallOptions ?? AcceptCallOptions(), completionHandler: completionBlock)
+            if (await callKitHelper.getIncomingCall(callId: action.callUUID.uuidString)) != nil {
+                Task {
+                    if let incomingCall = await self.callKitHelper.getIncomingCall(callId: action.callUUID.uuidString) {
+                        do {
+                            let mutedAudioOptions = AudioOptions()
+                            #if BETA
+                            mutedAudioOptions.incomingAudioMuted = true
+                            mutedAudioOptions.outgoingAudioMuted = true
+                            #endif
+                            
+                            let copyAcceptCallOptions = AcceptCallOptions()
+                            let outInCallInfo = await callKitHelper.getOutInCallInfo(transactionId: action.uuid)
+                            if let copyAcceptCallOptions = outInCallInfo?.options as? AcceptCallOptions {
+                                copyAcceptCallOptions.videoOptions = copyAcceptCallOptions.videoOptions
+                            }
+                            
+                            #if BETA
+                            copyAcceptCallOptions.audioOptions = mutedAudioOptions
+                            #endif
+                            let call = try await incomingCall.accept(options: copyAcceptCallOptions)
+                            completionBlock(call, nil)
+                        } catch {
+                            completionBlock(nil, error)
+                        }
+                    }
+                }
                 return
             }
-            
+
             let dispatchSemaphore = await self.callKitHelper.setAndGetSemaphore()
             DispatchQueue.global().async {
                 _ = dispatchSemaphore.wait(timeout: DispatchTime(uptimeNanoseconds: 10 * NSEC_PER_SEC))
                 Task {
-                    if let incomingCall = await self.callKitHelper.getIncomingCall(callId: action.callUUID) {
-                        incomingCall.accept(options: acceptCallOptions ?? AcceptCallOptions(), completionHandler: completionBlock)
+                    if let incomingCall = await self.callKitHelper.getIncomingCall(callId: action.callUUID.uuidString) {
+                        do {
+                            let call = try await incomingCall.accept(options: acceptCallOptions ?? AcceptCallOptions())
+                            completionBlock(call, nil)
+                        } catch {
+                            completionBlock(nil, error)
+                        }
                     } else {
                         completionBlock(nil, CallKitErrors.noIncomingCallFound)
                     }
@@ -196,19 +255,25 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
 
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         Task {
-            guard let activeCall = await self.callKitHelper.getActiveCall(callId: action.callUUID.uuidString) else {
-                action.fail()
-                return
-            }
-
-            let activeCallInfo = await self.callKitHelper.getActiveCallInfo(transactionId: action.uuid.uuidString)
-            activeCall.hangUp(options: nil) { error in
-                // Its ok if hangup fails because we maybe hanging up already hanged up call
-                action.fulfill()
-                activeCallInfo?.completionHandler(error)
-                Task {
+            if let activeCall = await self.callKitHelper.getActiveCall(callId: action.callUUID.uuidString) {
+                let activeCallInfo = await self.callKitHelper.getActiveCallInfo(transactionId: action.uuid.uuidString)
+                do {
+                    try await activeCall.hangUp(options: nil)
+                    activeCallInfo?.completionHandler(nil)
+                    action.fulfill()
                     await self.callKitHelper.removeActiveCall(callId: activeCall.id)
                     await self.callKitHelper.removeActiveCallInfo(transactionId: action.uuid.uuidString)
+                } catch {
+                    action.fail()
+                    activeCallInfo?.completionHandler(error)
+                }
+            } else if let incomingCall = await self.callKitHelper.getIncomingCall(callId: action.callUUID.uuidString) {
+                do {
+                    try await incomingCall.reject()
+                    action.fulfill()
+                    await self.callKitHelper.removeIncomingCall(callId: action.callUUID.uuidString)
+                } catch {
+                    action.fail()
                 }
             }
         }
@@ -217,11 +282,22 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
     func provider(_ provider: CXProvider, didActivate audioSession: AVAudioSession) {
         Task {
             guard let activeCall = await self.callKitHelper.getActiveCall() else {
-                print("No active calls found !!")
+                print("No active calls found when activating audio session !!")
                 return
             }
 
             try await startAudio(call: activeCall)
+        }
+    }
+
+    func provider(_ provider: CXProvider, didDeactivate audioSession: AVAudioSession) {
+        Task {
+            guard let activeCall = await self.callKitHelper.getActiveCall() else {
+                print("No active calls found when deactivating audio session !!")
+                return
+            }
+
+            try await stopAudio(call: activeCall)
         }
     }
 
@@ -263,8 +339,10 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
             // Start by muting both speaker and mic audio and unmute when
             // didActivateAudioSession callback is recieved.
             let mutedAudioOptions = AudioOptions()
-            mutedAudioOptions.speakerMuted = true
-            mutedAudioOptions.muted = true
+            #if BETA
+            mutedAudioOptions.incomingAudioMuted = true
+            mutedAudioOptions.outgoingAudioMuted = true
+            #endif
             
             if let participants = outInCallInfo.participants {
                 let copyStartCallOptions = StartCallOptions()
@@ -273,19 +351,27 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 }
                 
                 copyStartCallOptions.audioOptions = mutedAudioOptions
-                callAgent.startCall(participants: participants,
-                                    options: copyStartCallOptions,
-                                    completionHandler: completionBlock)
+                do {
+                    let call = try await callAgent.startCall(participants: participants, options: copyStartCallOptions)
+                    completionBlock(call, nil)
+                } catch {
+                    completionBlock(nil, error)
+                }
             } else if let meetingLocator = outInCallInfo.meetingLocator {
                 let copyJoinCallOptions = JoinCallOptions()
                 if let joinCallOptions = outInCallInfo.options as? JoinCallOptions {
                     copyJoinCallOptions.videoOptions = joinCallOptions.videoOptions
                 }
-                
+
                 copyJoinCallOptions.audioOptions = mutedAudioOptions
-                callAgent.join(with: meetingLocator,
-                               joinCallOptions: copyJoinCallOptions,
-                               completionHandler: completionBlock)
+
+                do {
+                    let call = try await callAgent.join(with: meetingLocator,
+                                              joinCallOptions: copyJoinCallOptions)
+                    completionBlock(call, nil)
+                } catch {
+                    completionBlock(nil, error)
+                }
             } else {
                 completionBlock(nil, CallKitErrors.unknownOutgoingCallType)
             }
@@ -326,7 +412,7 @@ class CallKitIncomingCallReporter {
         let handleType: CXHandle.HandleType = caller is PhoneNumberIdentifier ? .phoneNumber : .generic
         let handle = CXHandle(type: handleType, value: caller.rawId)
         let callUpdate = createCallUpdate(isVideoEnabled: videoEnabled, localizedCallerName: callerDisplayName, handle: handle)
-        CallKitObjectManager.getOrCreateCXProvider().reportNewIncomingCall(with: UUID(uuidString: callId.uppercased())!, update: callUpdate) { error in
+        CallKitObjectManager.getOrCreateCXProvider()?.reportNewIncomingCall(with: UUID(uuidString: callId.uppercased())!, update: callUpdate) { error in
             completionHandler(error)
         }
     }
@@ -380,8 +466,8 @@ actor CallKitHelper {
         self.incomingCallSemaphore?.signal()
     }
     
-    func getIncomingCall(callId: UUID) -> IncomingCall? {
-        return incomingCallMap[callId.uuidString.uppercased()]
+    func getIncomingCall(callId: String) -> IncomingCall? {
+        return incomingCallMap[callId.uppercased()]
     }
 
     func addActiveCall(callId: String, call: Call) {
@@ -484,9 +570,9 @@ actor CallKitHelper {
         let finalCallId = getReportedCallIdToCallKit(callId: call.id)
         print("Report outgoing call for: \(finalCallId)")
         if call.state == .connected {
-            CallKitObjectManager.getOrCreateCXProvider().reportOutgoingCall(with: UUID(uuidString: finalCallId)! , connectedAt: nil)
+            CallKitObjectManager.getOrCreateCXProvider()?.reportOutgoingCall(with: UUID(uuidString: finalCallId)! , connectedAt: nil)
         } else if call.state != .connecting {
-            CallKitObjectManager.getOrCreateCXProvider().reportOutgoingCall(with: UUID(uuidString: finalCallId)! , startedConnectingAt: nil)
+            CallKitObjectManager.getOrCreateCXProvider()?.reportOutgoingCall(with: UUID(uuidString: finalCallId)! , startedConnectingAt: nil)
         }
     }
 
@@ -494,6 +580,18 @@ actor CallKitHelper {
         let finalCallId = getReportedCallIdToCallKit(callId: callId)
         let endCallAction = CXEndCallAction(call: UUID(uuidString: finalCallId)!)
         transactWithCallKit(action: endCallAction, activeCallInfo: ActiveCallInfo(completionHandler: completionHandler))
+    }
+
+    func holdCall(callId: String, onHold: Bool, completionHandler: @escaping (Error?) -> Void) {
+        let finalCallId = getReportedCallIdToCallKit(callId: callId)
+        let setHeldCallAction = CXSetHeldCallAction(call: UUID(uuidString: finalCallId)!, onHold: onHold)
+        transactWithCallKit(action: setHeldCallAction, activeCallInfo: ActiveCallInfo(completionHandler: completionHandler))
+    }
+
+    func muteCall(callId: String, isMuted: Bool, completionHandler: @escaping (Error?) -> Void) {
+        let finalCallId = getReportedCallIdToCallKit(callId: callId)
+        let setMutedCallAction = CXSetMutedCallAction(call: UUID(uuidString: finalCallId)!, muted: isMuted)
+        transactWithCallKit(action: setMutedCallAction, activeCallInfo: ActiveCallInfo(completionHandler: completionHandler))
     }
 
     func placeCall(participants: [CommunicationIdentifier]?,
