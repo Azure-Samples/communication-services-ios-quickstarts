@@ -108,8 +108,8 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
         try await call.startAudio(stream: LocalAudioStream())
         try await call.startAudio(stream: RemoteAudioStream())
         // TODO: Check if mute was user initiated or not
-        try await call.updateOutgoingAudio(mute: false)
-        try await call.updateIncomingAudio(mute: false)
+        //try await call.updateOutgoingAudio(mute: false)
+        //try await call.updateIncomingAudio(mute: false)
         #endif
     }
 
@@ -155,7 +155,7 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
 
             do {
                 #if BETA
-                try await activeCall.updateOutgoingAudio(mute: action.isMuted)
+                //try await activeCall.updateOutgoingAudio(mute: action.isMuted)
                 #else
                 if action.isMuted {
                     try await activeCall.mute()
@@ -211,8 +211,8 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                         do {
                             let mutedAudioOptions = AudioOptions()
                             #if BETA
-                            mutedAudioOptions.incomingAudioMuted = true
-                            mutedAudioOptions.outgoingAudioMuted = true
+                            //mutedAudioOptions.incomingAudioMuted = true
+                            //mutedAudioOptions.outgoingAudioMuted = true
                             #endif
                             
                             let copyAcceptCallOptions = AcceptCallOptions()
@@ -340,8 +340,8 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
             // didActivateAudioSession callback is recieved.
             let mutedAudioOptions = AudioOptions()
             #if BETA
-            mutedAudioOptions.incomingAudioMuted = true
-            mutedAudioOptions.outgoingAudioMuted = true
+            //mutedAudioOptions.incomingAudioMuted = true
+            //mutedAudioOptions.outgoingAudioMuted = true
             #endif
             
             if let participants = outInCallInfo.participants {

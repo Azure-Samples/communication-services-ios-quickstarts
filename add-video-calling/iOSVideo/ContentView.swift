@@ -25,7 +25,7 @@ struct ContentView: View {
     }
 
     private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "ACSVideoSample")
-    private let token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjEwMyIsIng1dCI6Ikc5WVVVTFMwdlpLQTJUNjFGM1dzYWdCdmFMbyIsInR5cCI6IkpXVCJ9.eyJza3lwZWlkIjoiYWNzOjcxZWM1OTBiLWNiYWQtNDkwYy05OWM1LWI1NzhiZGFjZGU1NF8wMDAwMDAwZS04ODg3LTFiOWUtYjViYi1hNDNhMGQwMGFlMDMiLCJzY3AiOjE3OTIsImNzaSI6IjE2NDAyODU2OTgiLCJleHAiOjE2NDAzNzIwOTgsImFjc1Njb3BlIjoidm9pcCIsInJlc291cmNlSWQiOiI3MWVjNTkwYi1jYmFkLTQ5MGMtOTljNS1iNTc4YmRhY2RlNTQiLCJpYXQiOjE2NDAyODU2OTh9.OA-gSsUpnrNFWPLPOgmtEaBt4_-pSLNEdUnswQpgbVdN1Qsj_F0AiIvoniHJUsV1JoMBFYqXG5D-HdvUURLan1hVgDaayWqZVT1rFv_f6FwRs5tDZdNoMFrY-mxQ9ZZQ2dXPAsmcHP1IK-ufrAhst15uuxUU7fBG0Yz7MPznGTiS-Ds4LYxc8GjyjiS7kEHzF8WQzjCTza1YrF3CQV6ISjXpcmwTYxtCLj_rxtlB4hfB0ruk51txZNZEitFFlEhxA4wBs-x8RfbdquNqe2csacWcKoNIQTHWhatE1G6jK5a5_NHEnpfAsZwvDk5wjWZrDmra_ki0Z_mnBoUCw7Oq4w"
+    private let token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVFODQ4MjE0Qzc3MDczQUU1QzJCREU1Q0NENTQ0ODlEREYyQzRDODQiLCJ4NXQiOiJYb1NDRk1kd2M2NWNLOTVjelZSSW5kOHNUSVEiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmI2YWFkYTFmLTBiMWQtNDdhYy04NjZmLTkxYWFlMDBhMWQwMV8wMDAwMDAxOC1lNGVlLWU1MzEtOTljNi01OTNhMGQwMGU1NjAiLCJzY3AiOjE3OTIsImNzaSI6IjE2ODQ3ODU2NzYiLCJleHAiOjE2ODQ4NzIwNzYsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6InZvaXAiLCJyZXNvdXJjZUlkIjoiYjZhYWRhMWYtMGIxZC00N2FjLTg2NmYtOTFhYWUwMGExZDAxIiwicmVzb3VyY2VMb2NhdGlvbiI6InVuaXRlZHN0YXRlcyIsImlhdCI6MTY4NDc4NTY3Nn0.H-B2A1kYNL68Vtt_aTjVUNUyY5NavsbeISpyWLVfNtZAbbXynFSvXpYj9N9DA5WGFeVvYbANR_nas4C1jBiyto_Qj4SUBmDm92t2Kr6772AHVaDQT1Li896nBofwD9UnsCnMZcdw8H8R66SzjpWKI27aSZ-8N3k7RInZfJB6WXqSb6K265VWN7cEjCnpf58Wc4MMu_kn-z-1jUqNaFRzXn-ugCQflzQm1_fCP0mB3sH-tU6K1EZxJhCng-x9c5z_yyXiAFY35WenbKLvGMaW5GGhPhaihhLU3_UC8htsHo1xb4STwH9acs6BH22TK_LzQIDddka8UJkSWCIAgTvL1g"
 
     @State var callee: String = "8:echo123"
     @State var callClient = CallClient()
@@ -194,7 +194,7 @@ struct ContentView: View {
                 }
             }
 
-            if deviceManager == nil {
+             if deviceManager == nil {
                 self.callClient.getDeviceManager { (deviceManager, error) in
                     if (error == nil) {
                         print("Got device manager instance")
@@ -212,8 +212,8 @@ struct ContentView: View {
              }
 
              if callAgent == nil {
-                createCallAgent(completionHandler: nil)
-            }
+                 createCallAgent(completionHandler: nil)
+             }
         }
         .alert(isPresented: $showAlert) { () -> Alert in
             Alert(title: Text("ERROR"), message: Text(alertMessage), dismissButton: .default(Text("Dismiss")))
@@ -227,6 +227,7 @@ struct ContentView: View {
 
         if isCallKitInSDKEnabled {
             #if BETA
+            /*
             call.updateOutgoingAudio(mute: !isMuted) { error in
                 if error == nil {
                     isMuted = !isMuted
@@ -235,6 +236,7 @@ struct ContentView: View {
                     self.alertMessage = "Failed to unmute/mute audio"
                 }
             }
+            */
             #else
             if self.isMuted {
                 call.unmute() { error in
@@ -754,7 +756,7 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
     
     #if BETA
     public func call(_ call: Call, didUpdateOutgoingAudioState args: PropertyChangedEventArgs) {
-        owner.isMuted = call.isOutgoingAudioMuted
+        owner.isMuted = call.isMuted
     }
     #else
     public func call(_ call: Call, didChangeMuteState args: PropertyChangedEventArgs) {
