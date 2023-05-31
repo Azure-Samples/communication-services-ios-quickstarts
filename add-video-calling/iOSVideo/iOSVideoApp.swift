@@ -54,14 +54,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let userDefaults: UserDefaults = .standard
         let isCallKitInSDKEnabled = userDefaults.value(forKey: "isCallKitInSDKEnabled") as? Bool ?? false
         if isCallKitInSDKEnabled {
-            #if BETA
             let callKitOptions = CallKitOptions(with: CallKitObjectManager.createCXProvideConfiguration())
-            CallClient.reportIncomingCallFromKillState(with: callNotification, callKitOptions: callKitOptions) { error in
+            CallClient.reportIncomingCall(with: callNotification, callKitOptions: callKitOptions) { error in
                 if error == nil {
                     self.appPubs.pushPayload = payload
                 }
             }
-            #endif
         } else {
             let incomingCallReporter = CallKitIncomingCallReporter()
             incomingCallReporter.reportIncomingCall(callId: callNotification.callId.uuidString,

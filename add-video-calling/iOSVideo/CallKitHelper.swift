@@ -154,15 +154,11 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
             let activeCallInfo = await self.callKitHelper.getActiveCallInfo(transactionId: action.uuid.uuidString)
 
             do {
-                #if BETA
-                //try await activeCall.updateOutgoingAudio(mute: action.isMuted)
-                #else
                 if action.isMuted {
-                    try await activeCall.mute()
+                    try await activeCall.muteOutgoingAudio()
                 } else {
-                    try await activeCall.unmute()
+                    try await activeCall.unmuteOutgoingAudio()
                 }
-                #endif
                 action.fulfill()
                 activeCallInfo?.completionHandler(nil)
             } catch {
@@ -172,6 +168,16 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
             
             await self.callKitHelper.removeActiveCallInfo(transactionId: action.uuid.uuidString)
         }
+    }
+
+    func setMutedAudioOptions(callOptions: inout CallOptions) {
+        let outgoingAudioOptions = OutgoingAudioOptions()
+        outgoingAudioOptions.muted = true
+        callOptions.outgoingAudioOptions = outgoingAudioOptions
+        
+        let incomingAudioOptions = IncomingAudioOptions()
+        incomingAudioOptions.muted = true
+        callOptions.incomingAudioOptions = incomingAudioOptions
     }
 
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
@@ -209,22 +215,15 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 Task {
                     if let incomingCall = await self.callKitHelper.getIncomingCall(callId: action.callUUID.uuidString) {
                         do {
-                            let mutedAudioOptions = AudioOptions()
-                            #if BETA
-                            //mutedAudioOptions.incomingAudioMuted = true
-                            //mutedAudioOptions.outgoingAudioMuted = true
-                            #endif
-                            
-                            let copyAcceptCallOptions = AcceptCallOptions()
+                            var copyAcceptCallOptions: CallOptions = AcceptCallOptions()
                             let outInCallInfo = await callKitHelper.getOutInCallInfo(transactionId: action.uuid)
                             if let copyAcceptCallOptions = outInCallInfo?.options as? AcceptCallOptions {
-                                copyAcceptCallOptions.videoOptions = copyAcceptCallOptions.videoOptions
+                                copyAcceptCallOptions.outgoingVideoOptions = copyAcceptCallOptions.outgoingVideoOptions
                             }
-                            
-                            #if BETA
-                            copyAcceptCallOptions.audioOptions = mutedAudioOptions
-                            #endif
-                            let call = try await incomingCall.accept(options: copyAcceptCallOptions)
+
+                            setMutedAudioOptions(callOptions: &copyAcceptCallOptions)
+
+                            let call = try await incomingCall.accept(options: copyAcceptCallOptions as! AcceptCallOptions)
                             completionBlock(call, nil)
                         } catch {
                             completionBlock(nil, error)
@@ -335,39 +334,33 @@ final class CxProviderDelegateImpl : NSObject, CXProviderDelegate {
                 completionBlock(nil, error)
                 return
             }
-
-            // Start by muting both speaker and mic audio and unmute when
-            // didActivateAudioSession callback is recieved.
-            let mutedAudioOptions = AudioOptions()
-            #if BETA
-            //mutedAudioOptions.incomingAudioMuted = true
-            //mutedAudioOptions.outgoingAudioMuted = true
-            #endif
             
             if let participants = outInCallInfo.participants {
-                let copyStartCallOptions = StartCallOptions()
+                var copyStartCallOptions: CallOptions = StartCallOptions()
                 if let startCallOptions = outInCallInfo.options as? StartCallOptions {
-                    copyStartCallOptions.videoOptions = startCallOptions.videoOptions
+                    copyStartCallOptions.outgoingVideoOptions = startCallOptions.outgoingVideoOptions
                 }
-                
-                copyStartCallOptions.audioOptions = mutedAudioOptions
+
+                setMutedAudioOptions(callOptions: &copyStartCallOptions)
+
                 do {
-                    let call = try await callAgent.startCall(participants: participants, options: copyStartCallOptions)
+                    let call = try await callAgent.startCall(participants: participants,
+                                                                  options: (copyStartCallOptions as! StartCallOptions))
                     completionBlock(call, nil)
                 } catch {
                     completionBlock(nil, error)
                 }
             } else if let meetingLocator = outInCallInfo.meetingLocator {
-                let copyJoinCallOptions = JoinCallOptions()
+                var copyJoinCallOptions: CallOptions = JoinCallOptions()
                 if let joinCallOptions = outInCallInfo.options as? JoinCallOptions {
-                    copyJoinCallOptions.videoOptions = joinCallOptions.videoOptions
+                    copyJoinCallOptions.outgoingVideoOptions = joinCallOptions.outgoingVideoOptions
                 }
 
-                copyJoinCallOptions.audioOptions = mutedAudioOptions
+                setMutedAudioOptions(callOptions: &copyJoinCallOptions)
 
                 do {
                     let call = try await callAgent.join(with: meetingLocator,
-                                              joinCallOptions: copyJoinCallOptions)
+                                             joinCallOptions: (copyJoinCallOptions as! JoinCallOptions))
                     completionBlock(call, nil)
                 } catch {
                     completionBlock(nil, error)
@@ -504,20 +497,20 @@ actor CallKitHelper {
             return false
         }
         
-        var videoOptions: VideoOptions?
+        var videoOptions: OutgoingVideoOptions?
         if let joinOptions = optionsUnwrapped as? JoinCallOptions {
-            videoOptions = joinOptions.videoOptions
+            videoOptions = joinOptions.outgoingVideoOptions
         } else if let acceptOptions = optionsUnwrapped as? AcceptCallOptions {
-            videoOptions = acceptOptions.videoOptions
+            videoOptions = acceptOptions.outgoingVideoOptions
         } else if let startOptions = optionsUnwrapped as? StartCallOptions {
-            videoOptions = startOptions.videoOptions
+            videoOptions = startOptions.outgoingVideoOptions
         }
         
         guard let videoOptionsUnwrapped = videoOptions else {
             return false
         }
         
-        return videoOptionsUnwrapped.localVideoStreams.count > 0
+        return videoOptionsUnwrapped.streams.count > 0
     }
 
     private func transactOutInCallWithCallKit(action: CXAction, outInCallInfo: OutInCallInfo) {
@@ -597,7 +590,7 @@ actor CallKitHelper {
     func placeCall(participants: [CommunicationIdentifier]?,
                    callerDisplayName: String,
                    meetingLocator: JoinMeetingLocator?,
-                   options: Any?,
+                   options: CallOptions?,
                    completionHandler: @escaping (Call?, Error?) -> Void)
     {
         let callId = UUID()
