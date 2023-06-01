@@ -30,7 +30,7 @@ struct ContentView: View {
     }
 
     private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "ACSVideoSample")
-    private let token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVFODQ4MjE0Qzc3MDczQUU1QzJCREU1Q0NENTQ0ODlEREYyQzRDODQiLCJ4NXQiOiJYb1NDRk1kd2M2NWNLOTVjelZSSW5kOHNUSVEiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmI2YWFkYTFmLTBiMWQtNDdhYy04NjZmLTkxYWFlMDBhMWQwMV8wMDAwMDAxOS0wZGJiLTk4MGYtMmM4YS0wODQ4MjIwMDIxODgiLCJzY3AiOjE3OTIsImNzaSI6IjE2ODU1NjMwNjYiLCJleHAiOjE2ODU2NDk0NjYsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6InZvaXAiLCJyZXNvdXJjZUlkIjoiYjZhYWRhMWYtMGIxZC00N2FjLTg2NmYtOTFhYWUwMGExZDAxIiwicmVzb3VyY2VMb2NhdGlvbiI6InVuaXRlZHN0YXRlcyIsImlhdCI6MTY4NTU2MzA2Nn0.lU5XXMiPckxhW59puHhIs2Hta0ldOuFFOjt2pnPpTh7IeaMVm41CyhD_5YQZL-58hE_uwZI5eCOUYL8Eb9k0TJWAEsteuRUG1C_xCM1wk3G8DJ3_W5kOVuiksOLVxWtPkifpZUTR7f8AuaHgV2QMULx4fk6UUe4-8A0q-enDh4che14tI8MezFDktOWQBGhpNi03W30sn4oG0gjqxKNG22_NzFt-5JaWI8BTj_1UOiVow4zecGajISbYFUIs3nDIybL2XUEeelh9-04AF3Tbi7otaqVC6OuJxTXzxut7cDAVRmmtS7m4v8D6dfIKZm4N60IVKWcY6AMB0RgxhuG2vg"
+    private let token = "<USER_ACCESS_TOKEN>"
 
     @State var callee: String = "29228d3e-040e-4656-a70e-890ab4e173e4"
     @State var callClient = CallClient()
@@ -234,13 +234,12 @@ struct ContentView: View {
             }
         } else {
             Task {
-                await CallKitObjectManager.getCallKitHelper()!.muteCall(callId:call.id, isMuted: !isMuted) { error in
-                    if error == nil {
-                        isMuted = !isMuted
-                    } else {
-                        self.showAlert = true
-                        self.alertMessage = "Failed to mute the call (without CallKit)"
-                    }
+                do {
+                    try await CallKitObjectManager.getCallKitHelper()!.muteCall(callId:call.id, isMuted: !isMuted)
+                    isMuted = !isMuted
+                } catch {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to mute the call (without CallKit)"
                 }
             }
         }
@@ -480,8 +479,9 @@ struct ContentView: View {
         remoteVideoStreamData.removeAll()
         sendingVideo = false
         Task {
-            await CallKitObjectManager.getCallKitHelper()?.endCall(callId: call.id) { error in
-            }
+            do {
+                try await CallKitObjectManager.getCallKitHelper()?.endCall(callId: call.id)
+            } catch {}
         }
     }
 
@@ -555,13 +555,12 @@ struct ContentView: View {
                 }
             } else {
                 Task {
-                    await CallKitObjectManager.getCallKitHelper()!.holdCall(callId: call.id, onHold: false) { error in
-                        if error == nil {
-                            self.isHeld = false
-                        } else {
-                            self.showAlert = true
-                            self.alertMessage = "Failed to hold the call"
-                        }
+                    do {
+                        try await CallKitObjectManager.getCallKitHelper()!.holdCall(callId: call.id, onHold: false)
+                        self.isHeld = false
+                    } catch {
+                        self.showAlert = true
+                        self.alertMessage = "Failed to hold the call"
                     }
                 }
             }
@@ -577,13 +576,12 @@ struct ContentView: View {
                 }
             } else {
                 Task {
-                    await CallKitObjectManager.getCallKitHelper()!.holdCall(callId: call.id, onHold: true) { error in
-                        if error == nil {
-                            self.isHeld = true
-                        } else {
-                            self.showAlert = true
-                            self.alertMessage = "Failed to resume the call"
-                        }
+                    do {
+                        try await CallKitObjectManager.getCallKitHelper()!.holdCall(callId: call.id, onHold: true)
+                        self.isHeld = true
+                    } catch {
+                        self.showAlert = true
+                        self.alertMessage = "Failed to resume the call"
                     }
                 }
             }
@@ -682,10 +680,11 @@ struct ContentView: View {
             }
         } else {
             Task {
-                await CallKitObjectManager.getCallKitHelper()!.endCall(callId: self.call!.id) { error in
-                    if (error != nil) {
-                        print("ERROR: It was not possible to hangup the call.")
-                    }
+                do {
+                    try await CallKitObjectManager.getCallKitHelper()!.endCall(callId: self.call!.id)
+                } catch {
+                    self.showAlert = true
+                    self.alertMessage = "ERROR: It was not possible to hangup the call \(error.localizedDescription)"
                 }
             }
         }
@@ -735,34 +734,47 @@ public class CallObserver: NSObject, CallDelegate, IncomingCallDelegate {
         switch call.state {
         case .connected:
             owner.callState = "Connected"
+            Task {
+                await CallKitObjectManager.getCallKitHelper()?.reportOutgoingCall(call: call)
+            }
+            break
         case .connecting:
             owner.callState = "Connecting"
+            Task {
+                await CallKitObjectManager.getCallKitHelper()?.reportOutgoingCall(call: call)
+            }
+            break
         case .disconnected:
             owner.callState = "Disconnected"
+            break
         case .disconnecting:
             owner.callState = "Disconnecting"
+            break
         case .inLobby:
             owner.callState = "InLobby"
+            break
         case .localHold:
             owner.callState = "LocalHold"
+            break
         case .remoteHold:
             owner.callState = "RemoteHold"
+            break
         case .ringing:
             owner.callState = "Ringing"
+            break
         case .earlyMedia:
             owner.callState = "EarlyMedia"
+            break
         case .none:
             owner.callState = "None"
+            break
         default:
             owner.callState = "Default"
+            break
         }
 
         if(call.state == CallState.connected) {
             initialCallParticipant()
-        }
-
-        Task {
-            await CallKitObjectManager.getCallKitHelper()?.reportOutgoingCall(call: call)
         }
     }
     
