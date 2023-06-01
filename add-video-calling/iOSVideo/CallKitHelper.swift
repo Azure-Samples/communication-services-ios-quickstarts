@@ -471,6 +471,7 @@ actor CallKitHelper {
     func removeActiveCall(callId: String) {
         let finalCallId = getReportedCallIdToCallKit(callId: callId)
         activeCalls.removeValue(forKey: finalCallId)
+        updatedCallIdMap.removeAll()
     }
 
     func getActiveCall(callId: String) -> Call? {
@@ -534,14 +535,14 @@ actor CallKitHelper {
     }
 
     private func getReportedCallIdToCallKit(callId: String) -> String {
-        var finalCallId : String
         if let newCallId = self.updatedCallIdMap[callId.uppercased()] {
-            finalCallId = newCallId
+            return newCallId
         } else {
-            finalCallId = callId.uppercased()
+            guard let finalCallId = self.updatedCallIdMap.first?.value else {
+                return callId.uppercased()
+            }
+            return finalCallId
         }
-        
-        return finalCallId
     }
 
     func acceptCall(callId: String,
