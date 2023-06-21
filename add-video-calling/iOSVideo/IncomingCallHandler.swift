@@ -21,8 +21,12 @@ final class IncomingCallHandler: NSObject, CallAgentDelegate, IncomingCallDelega
         self.incomingCall = incomingCall
         self.incomingCall!.delegate = self
         contentView?.showIncomingCallBanner(self.incomingCall!)
+        // If there is no CallKitHelper exit
+        guard let callKitHelper =  CallKitObjectManager.getCallKitHelper() else {
+            return
+        }
         Task {
-            await CallKitObjectManager.getCallKitHelper()?.addIncomingCall(incomingCall: self.incomingCall!)
+            await callKitHelper.addIncomingCall(incomingCall: self.incomingCall!)
         }
         let incomingCallReporter = CallKitIncomingCallReporter()
         incomingCallReporter.reportIncomingCall(callId: self.incomingCall!.id,
