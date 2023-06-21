@@ -214,7 +214,7 @@ struct ContentView: View {
 
         if isCallKitInSDKEnabled {
             if self.isMuted {
-                call.muteOutgoingAudio() { error in
+                call.unmuteOutgoingAudio() { error in
                     if error == nil {
                         isMuted = false
                     } else {
@@ -223,7 +223,7 @@ struct ContentView: View {
                     }
                 }
             } else {
-                call.unmuteOutgoingAudio() { error in
+                call.muteOutgoingAudio() { error in
                     if error == nil {
                         isMuted = true
                     } else {

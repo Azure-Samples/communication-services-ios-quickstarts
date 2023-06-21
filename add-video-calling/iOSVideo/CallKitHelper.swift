@@ -411,6 +411,7 @@ actor CallKitHelper {
     private var incomingCallMap: [String: IncomingCall] = [:]
     private var incomingCallSemaphore: DispatchSemaphore?
     private var activeCalls: [String : Call] = [:]
+    private var updatedCallIdMap: [String:String] = [:]
     private var activeCallInfos: [String: ActiveCallInfo] = [:]
     private var callKitReportedCallId: String = ""
 
