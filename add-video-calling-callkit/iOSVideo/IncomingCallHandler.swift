@@ -16,9 +16,34 @@ class IncomingCallHandlerBase : NSObject {
     init(contentView: ContentView?) {
         self.contentView = contentView
     }
+
+    func onIncomingCall(callAgentBase: CallAgentBase, incomingCallBase: IncomingCallBase) {
+        // If there is no CallKitHelper exit
+        guard let callKitHelper =  CallKitObjectManager.getCallKitHelper() else {
+            return
+        }
+
+        Task {
+            await callKitHelper.addIncomingCall(incomingCall: incomingCallBase)
+        }
+        let incomingCallReporter = CallKitIncomingCallReporter()
+        incomingCallReporter.reportIncomingCall(callId: incomingCallBase.id,
+                                               callerInfo: incomingCallBase.callerInfo,
+                                               videoEnabled: incomingCallBase.isVideoEnabled,
+                                               completionHandler: { error in
+            if error == nil {
+                print("Incoming call was reported successfully")
+            } else {
+                print("Incoming call was not reported successfully")
+            }
+        })
+    }
     
     func onIncomingCallEnded(incomingCallBase: IncomingCallBase) {
         contentView?.isIncomingCall = false
+        Task {
+            await CallKitObjectManager.getCallKitHelper()?.removeIncomingCall(callId: incomingCallBase.id)
+        }
     }
     
 }
@@ -35,6 +60,7 @@ final class IncomingCallHandler: IncomingCallHandlerBase, CallAgentDelegate, Inc
         self.incomingCall = incomingCall
         self.incomingCall!.delegate = self
         contentView?.showIncomingCallBanner(self.incomingCall!)
+        onIncomingCall(callAgentBase: callAgent, incomingCallBase: incomingCall)
     }
 
     func incomingCall(_ incomingCall: IncomingCall, didEnd args: PropertyChangedEventArgs) {
@@ -71,6 +97,7 @@ final class TeamsIncomingCallHandler: IncomingCallHandlerBase, TeamsCallAgentDel
         self.teamsIncomingCall = incomingCall
         self.teamsIncomingCall!.delegate = self
         contentView?.showIncomingCallBanner(self.teamsIncomingCall!)
+        onIncomingCall(callAgentBase: teamsCallAgent, incomingCallBase: incomingCall)
     }
 
     func teamsIncomingCall(_ teamsIncomingCall: TeamsIncomingCall, didEnd args: PropertyChangedEventArgs) {

@@ -52,10 +52,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
         let callNotification = PushNotificationInfo.fromDictionary(payload.dictionaryPayload)
         let userDefaults: UserDefaults = .standard
-        let callKitOptions = CallKitOptions(with: CallKitHelper.createCXProvideConfiguration())
-        CallClient.reportIncomingCall(with: callNotification, callKitOptions: callKitOptions) { error in
-            if error == nil {
-                self.appPubs.pushPayload = payload
+        let isCallKitInSDKEnabled = userDefaults.value(forKey: "isCallKitInSDKEnabled") as? Bool ?? false
+        if isCallKitInSDKEnabled {
+            let callKitOptions = CallKitOptions(with: CallKitObjectManager.createCXProvideConfiguration())
+            CallClient.reportIncomingCall(with: callNotification, callKitOptions: callKitOptions) { error in
+                if error == nil {
+                    self.appPubs.pushPayload = payload
+                }
+            }
+        } else {
+            let incomingCallReporter = CallKitIncomingCallReporter()
+            incomingCallReporter.reportIncomingCall(callId: callNotification.callId.uuidString,
+                                                   caller: callNotification.from,
+                                                   callerDisplayName: callNotification.fromDisplayName,
+                                                    videoEnabled: callNotification.incomingWithVideo) { error in
+                if error == nil {
+                    self.appPubs.pushPayload = payload
+                }
             }
         }
     }
