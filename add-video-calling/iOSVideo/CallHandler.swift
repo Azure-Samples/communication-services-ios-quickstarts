@@ -135,15 +135,15 @@ public final class TeamsCallHandler: CallHandlerBase, TeamsCallDelegate, TeamsIn
         super.init(view)
     }
     
-    public func call(_ teamsCall: TeamsCall, didChangeState args: PropertyChangedEventArgs) {
+    public func teamsCall(_ teamsCall: TeamsCall, didChangeState args: PropertyChangedEventArgs) {
         onStateChanged(call: teamsCall, args: args)
     }
     
-    public func call(_ teamsCall: TeamsCall, didUpdateOutgoingAudioState args: PropertyChangedEventArgs) {
+    public func teamsCall(_ teamsCall: TeamsCall, didUpdateOutgoingAudioState args: PropertyChangedEventArgs) {
         onOutgoingAudioStateChanged(call: teamsCall)
     }
     
-    public func call(_ teamsCall: TeamsCall, didUpdateRemoteParticipant args: ParticipantsUpdatedEventArgs) {
+    public func teamsCall(_ teamsCall: TeamsCall, didUpdateRemoteParticipant args: ParticipantsUpdatedEventArgs) {
         onRemoteParticipantUpdated(call: teamsCall, args: args)
     }
 }

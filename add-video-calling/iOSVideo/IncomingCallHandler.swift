@@ -78,7 +78,7 @@ final class TeamsIncomingCallHandler: IncomingCallHandlerBase, TeamsCallAgentDel
         onIncomingCallEnded(incomingCallBase: teamsIncomingCall)
     }
     
-    func callAgent(_ callAgent: CallAgent, didUpdateCalls args: CallsUpdatedEventArgs) {
+    func teamsCallAgent(_ teamsCallAgent: TeamsCallAgent, didUpdateCalls args: TeamsCallsUpdatedEventArgs) {
         if let removedCall = args.removedCalls.first {
             contentView?.callRemoved(removedCall)
             self.teamsIncomingCall = nil
@@ -89,7 +89,7 @@ final class TeamsIncomingCallHandler: IncomingCallHandlerBase, TeamsCallAgentDel
             // We need to set the call instances and auto-navigate to call in progress screen.
             if addedCall.direction == .incoming {
                 contentView?.isIncomingCall = false
-                contentView?.setCallAndObersever(call: addedCall, error: nil)
+                contentView?.setTeamsCallAndObserver(teamsCall: addedCall, error: nil)
             }
         }
     }
