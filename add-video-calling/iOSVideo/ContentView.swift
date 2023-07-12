@@ -32,9 +32,11 @@ struct ContentView: View {
     private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "ACSVideoSample")
     private let token = "<USER_ACCESS_TOKEN>"
     private let cteToken = "<CTE_USER_ACCESS_TOKEN>"
-    @State var callee: String = "29228d3e-040e-4656-a70e-890ab4e173e4"
-    @State var teamsThreadId: String = "19:meeting_YjU4ZmQzYTctNTI0YS00MzVkLTgwOWMtOTEyNDUyOWRhNzIx@thread.v2"
-    @State var mri: String = "8:orgid:b6f15079-054a-40c0-a3b5-76e4918cb5f5"
+    @State var callee: String = "8:orgid:64ea9b11-9302-4615-b768-2e28add84973"
+    //@State var callee: String = "4:+15553640457"
+    //@State var callee: String = "8:orgid:64ea9b11-9302-4615-b768-2e28add84973;8:orgid:b6f15079-054a-40c0-a3b5-76e4918cb5f5"
+    @State var teamsThreadId: String = "19:22484c21-14d5-422f-b969-dd2c5bcb45e4@thread.v2"
+    @State var mri: String = ""
 
     @State var callClient = CallClient()
     @State var callAgent: CallAgent?
@@ -87,6 +89,9 @@ struct ContentView: View {
                     Button(action: startCall) {
                         Text("Start Call")
                     }.disabled(callAgent == nil && teamsCallAgent == nil)
+                    Button(action: addParticipant) {
+                        Text("Add Participant")
+                    }.disabled(call == nil && teamsCall == nil)
                     Button(action: holdCall) {
                         Text(isHeld ? "Resume" : "Hold")
                     }.disabled(call == nil && teamsCall == nil)
@@ -218,7 +223,7 @@ struct ContentView: View {
         }
     }
 
-    func switchMicrophone() {
+    private func getCallBase() -> CallBase? {
         var callBase: CallBase?
         
         if let call = self.call {
@@ -227,7 +232,75 @@ struct ContentView: View {
             callBase = teamsCall
         }
 
-        guard let callBase = callBase else {
+       return callBase
+    }
+
+    private func getCallAgentBase() -> CallAgentBase? {
+        var callAgentBase: CallAgentBase?
+
+        if let callAgent = self.callAgent {
+            callAgentBase = callAgent
+        } else if let teamsCallAgent = self.teamsCallAgent {
+            callAgentBase = teamsCallAgent
+        }
+        
+        return callAgentBase
+    }
+
+    func addParticipant() {
+        let allCallees = self.callee.components(separatedBy: ";")
+        
+        var callees = allCallees.filter({ (e) -> Bool in (e.starts(with: "8:") )})
+            .map { (e) -> CommunicationIdentifier in CommunicationUserIdentifier(e)}
+        
+        let pstnCallees = allCallees.filter({ (e) -> Bool in !e.starts(with: "8:")})
+                                    .map { (e) -> CommunicationIdentifier in PhoneNumberIdentifier(phoneNumber: e.replacingOccurrences(of: "4:", with: "")) }
+                
+        if let call = call {
+            let phoneNumberOptions = AddPhoneNumberOptions()
+            phoneNumberOptions.alternateCallerId = PhoneNumberIdentifier(phoneNumber: "+12133947338")
+            for pstnCallee in pstnCallees {
+                do {
+                    try call.add(participant: pstnCallee as! PhoneNumberIdentifier, options: phoneNumberOptions)
+                } catch {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to add phone number \(pstnCallee.rawId)"
+                }
+            }
+
+            for callee in callees {
+                do {
+                    try call.add(participant: callee as! CommunicationUserIdentifier)
+                } catch {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to add participant \(callee.rawId)"
+                }
+            }
+        } else if let teamsCall = teamsCall {
+            let addTeamsParticipantOptions = AddTeamsParticipantOptions(threadId: teamsThreadId)
+            for pstnCallee in pstnCallees {
+                do {
+                    try teamsCall.add(phoneNumber: pstnCallee as! PhoneNumberIdentifier, options: addTeamsParticipantOptions)
+                } catch {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to add phone number \(pstnCallee.rawId) in teams call"
+                }
+            }
+
+            for callee in callees {
+                do {
+                    try teamsCall.add(participant: callee, options: addTeamsParticipantOptions)
+                } catch {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to add participant \(callee.rawId) in teams call"
+                }
+            }
+        }
+    }
+
+    func switchMicrophone() {
+
+        guard let callBase = getCallBase() else {
             self.showAlert = true
             self.alertMessage = "Failed to mute microphone, no call object"
             return
@@ -318,15 +391,12 @@ struct ContentView: View {
         let callNotification = PushNotificationInfo.fromDictionary(pushPayload.dictionaryPayload)
 
         let handlePush : (() -> Void) = {
-            var callAgentBase: CallAgentBase?
-            
-            if let callAgent = self.callAgent {
-                callAgentBase = callAgent
-            } else if let teamsCallAgent = self.teamsCallAgent {
-                callAgentBase = teamsCallAgent
+            guard let callAgentBase = getCallAgentBase() else {
+                return
             }
+            
             // CallAgent is created normally handle the push
-            callAgentBase!.handlePush(notification: callNotification) { (error) in
+            callAgentBase.handlePush(notification: callNotification) { (error) in
                 if error == nil {
                     os_log("SDK handle push notification normal mode: passed", log:self.log)
                 } else {
@@ -341,15 +411,8 @@ struct ContentView: View {
     }
 
     private func registerForPushNotification() {
-        var callAgentBase: CallAgentBase?
-        
-        if let callAgent = self.callAgent {
-            callAgentBase = callAgent
-        } else if let teamsCallAgent = self.teamsCallAgent {
-            callAgentBase = teamsCallAgent
-        }
-        
-        if let callAgentBase = callAgentBase,
+
+        if let callAgentBase = getCallAgentBase(),
            let pushToken = self.pushToken {
             callAgentBase.registerPushNotifications(deviceToken: pushToken) { error in
                 if error != nil {
@@ -569,15 +632,8 @@ struct ContentView: View {
     }
 
     func toggleLocalVideo() {
-        var callBase : CallBase?
-        
-        if call != nil {
-            callBase = call
-        } else if teamsCall != nil {
-            callBase = teamsCall
-        }
 
-        guard let callBase = callBase else {
+        guard let callBase = getCallBase() else {
             if(!sendingVideo) {
                 _ = createLocalVideoPreview()
             } else {
@@ -612,15 +668,8 @@ struct ContentView: View {
     }
 
     func holdCall() {
-        var callBase : CallBase?
-        
-        if call != nil {
-            callBase = call
-        } else if teamsCall != nil {
-            callBase = teamsCall
-        }
 
-        guard let callBase = callBase else {
+        guard let callBase = getCallBase() else {
             self.showAlert = true
             self.alertMessage = "No active call to hold/resume"
             return
@@ -653,7 +702,7 @@ struct ContentView: View {
             var meetingLocator: JoinMeetingLocator?
             var callees:[CommunicationIdentifier] = []
             
-            if (self.callee.starts(with: "8:")) {
+            if self.callee.starts(with: "8:") {
                 let calleesRaw = self.callee.split(separator: ";")
                 for calleeRaw in calleesRaw {
                     callees.append(CommunicationUserIdentifier(String(calleeRaw)))
@@ -668,6 +717,23 @@ struct ContentView: View {
                     }
                 } else {
                     callOptions = StartCallOptions()
+                }
+            } else if self.callee.starts(with: "4:") {
+                if isCte {
+                    let calleesRaw = self.callee.split(separator: ";")
+                    for calleeRaw in calleesRaw {
+                        callees.append(PhoneNumberIdentifier(phoneNumber: String(calleeRaw.replacingOccurrences(of: "4:", with: ""))))
+                    }
+
+                    if callees.count == 1 {
+                        callOptions = StartTeamsCallOptions()
+                    } else if callees.count > 1 {
+                        // When starting a call with multiple participants , need to pass a thread ID
+                        callOptions = StartTeamsGroupCallOptions(threadId: teamsThreadId)
+                    }
+                } else {
+                    var startCallOptions = StartCallOptions()
+                    startCallOptions.alternateCallerId = PhoneNumberIdentifier(phoneNumber: "+12133947338")
                 }
             } else if let groupId = UUID(uuidString: self.callee) {
                 if isCte {
@@ -711,7 +777,7 @@ struct ContentView: View {
                 
                 do {
                     var teamsCall: TeamsCall?
-                    if callee.count == 1 && self.callee.starts(with: "https:") {
+                    if self.callee.starts(with: "https:") {
                         teamsCall = try await teamsCallAgent.join(teamsMeetingLinkLocator: meetingLocator! as! TeamsMeetingLinkLocator, joinCallOptions: callOptions! as! JoinCallOptions)
                     } else {
                         if callees.count == 1 {
@@ -757,6 +823,7 @@ struct ContentView: View {
         }
 
         self.call = call
+        print("ACS CallId: \(call.id)")
         self.callHandler = CallHandler(self)
         self.call!.delegate = self.callHandler
         self.remoteParticipantObserver = RemoteParticipantObserver(self)
@@ -771,6 +838,7 @@ struct ContentView: View {
         }
 
         self.teamsCall = teamsCall
+        print("Teams CallId: \(teamsCall.id)")
         self.teamsCallHandler = TeamsCallHandler(self)
         self.teamsCall!.delegate = self.teamsCallHandler
         self.remoteParticipantObserver = RemoteParticipantObserver(self)
@@ -780,13 +848,11 @@ struct ContentView: View {
     func endCall() {
         var callBase: CallBase?
         
-        if let acsCall = self.call {
-            callBase = acsCall
-        } else if let teamsCall = self.teamsCall {
-            callBase = teamsCall
+        guard let callBase = getCallBase() else {
+            return
         }
 
-        callBase?.hangUp(options: HangUpOptions()) { (error) in
+        callBase.hangUp(options: HangUpOptions()) { (error) in
             if (error != nil) {
                 print("ERROR: It was not possible to hangup the call.")
             }
