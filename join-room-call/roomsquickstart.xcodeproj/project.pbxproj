@@ -1,0 +1,438 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7DC7C05D09F2D082AFC77175 /* Pods_roomsquickstart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DDB3CE2070432F355B4FE42E /* Pods_roomsquickstart.framework */; };
+		99BD6BFD2819EED60012BC27 /* ParticipantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99BD6BFC2819EED50012BC27 /* ParticipantView.swift */; };
+		99E8A5922819443900B5C43D /* roomsquickstartApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99E8A5912819443900B5C43D /* roomsquickstartApp.swift */; };
+		99E8A5942819443900B5C43D /* HomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99E8A5932819443900B5C43D /* HomePageView.swift */; };
+		99E8A5962819443C00B5C43D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99E8A5952819443C00B5C43D /* Assets.xcassets */; };
+		99E8A5992819443C00B5C43D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 99E8A5982819443C00B5C43D /* Preview Assets.xcassets */; };
+		99E8A5A4281953A400B5C43D /* CallHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99E8A5A3281953A400B5C43D /* CallHandler.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		32250D82E8563E4EC03CD713 /* Pods-roomsquickstart.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-roomsquickstart.release.xcconfig"; path = "Target Support Files/Pods-roomsquickstart/Pods-roomsquickstart.release.xcconfig"; sourceTree = "<group>"; };
+		99BD6BFC2819EED50012BC27 /* ParticipantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantView.swift; sourceTree = "<group>"; };
+		99BDE812281A494D00917780 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		99E8A58E2819443900B5C43D /* roomsquickstart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = roomsquickstart.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		99E8A5912819443900B5C43D /* roomsquickstartApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = roomsquickstartApp.swift; sourceTree = "<group>"; };
+		99E8A5932819443900B5C43D /* HomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageView.swift; sourceTree = "<group>"; };
+		99E8A5952819443C00B5C43D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		99E8A5982819443C00B5C43D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		99E8A5A1281948EC00B5C43D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		99E8A5A3281953A400B5C43D /* CallHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallHandler.swift; sourceTree = "<group>"; };
+		DDB3CE2070432F355B4FE42E /* Pods_roomsquickstart.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_roomsquickstart.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F352ABD43B719E52DC056CAA /* Pods-roomsquickstart.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-roomsquickstart.debug.xcconfig"; path = "Target Support Files/Pods-roomsquickstart/Pods-roomsquickstart.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		99E8A58B2819443900B5C43D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7DC7C05D09F2D082AFC77175 /* Pods_roomsquickstart.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		99E8A5852819443900B5C43D = {
+			isa = PBXGroup;
+			children = (
+				99BDE812281A494D00917780 /* README.md */,
+				99E8A5902819443900B5C43D /* roomsquickstart */,
+				99E8A58F2819443900B5C43D /* Products */,
+				E82E6C82282EAB34F5DFB608 /* Pods */,
+				AED4845C8771CB9E1D2D796C /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		99E8A58F2819443900B5C43D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				99E8A58E2819443900B5C43D /* roomsquickstart.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		99E8A5902819443900B5C43D /* roomsquickstart */ = {
+			isa = PBXGroup;
+			children = (
+				99E8A5A228194EDF00B5C43D /* Views */,
+				99E8A5A1281948EC00B5C43D /* Info.plist */,
+				99E8A5912819443900B5C43D /* roomsquickstartApp.swift */,
+				99E8A5952819443C00B5C43D /* Assets.xcassets */,
+				99E8A5972819443C00B5C43D /* Preview Content */,
+				99E8A5A3281953A400B5C43D /* CallHandler.swift */,
+			);
+			path = roomsquickstart;
+			sourceTree = "<group>";
+		};
+		99E8A5972819443C00B5C43D /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				99E8A5982819443C00B5C43D /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		99E8A5A228194EDF00B5C43D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				99E8A5932819443900B5C43D /* HomePageView.swift */,
+				99BD6BFC2819EED50012BC27 /* ParticipantView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AED4845C8771CB9E1D2D796C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DDB3CE2070432F355B4FE42E /* Pods_roomsquickstart.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E82E6C82282EAB34F5DFB608 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				F352ABD43B719E52DC056CAA /* Pods-roomsquickstart.debug.xcconfig */,
+				32250D82E8563E4EC03CD713 /* Pods-roomsquickstart.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		99E8A58D2819443900B5C43D /* roomsquickstart */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 99E8A59C2819443C00B5C43D /* Build configuration list for PBXNativeTarget "roomsquickstart" */;
+			buildPhases = (
+				A4F272BB24D4D15F9E1FDC1B /* [CP] Check Pods Manifest.lock */,
+				99E8A58A2819443900B5C43D /* Sources */,
+				99E8A58B2819443900B5C43D /* Frameworks */,
+				99E8A58C2819443900B5C43D /* Resources */,
+				7CB68F436C3BD5F81EE76E85 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = roomsquickstart;
+			productName = roomsquickstart;
+			productReference = 99E8A58E2819443900B5C43D /* roomsquickstart.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		99E8A5862819443900B5C43D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1330;
+				LastUpgradeCheck = 1330;
+				TargetAttributes = {
+					99E8A58D2819443900B5C43D = {
+						CreatedOnToolsVersion = 13.3;
+					};
+				};
+			};
+			buildConfigurationList = 99E8A5892819443900B5C43D /* Build configuration list for PBXProject "roomsquickstart" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 99E8A5852819443900B5C43D;
+			productRefGroup = 99E8A58F2819443900B5C43D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				99E8A58D2819443900B5C43D /* roomsquickstart */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		99E8A58C2819443900B5C43D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				99E8A5992819443C00B5C43D /* Preview Assets.xcassets in Resources */,
+				99E8A5962819443C00B5C43D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		7CB68F436C3BD5F81EE76E85 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-roomsquickstart/Pods-roomsquickstart-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-roomsquickstart/Pods-roomsquickstart-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-roomsquickstart/Pods-roomsquickstart-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A4F272BB24D4D15F9E1FDC1B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-roomsquickstart-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		99E8A58A2819443900B5C43D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				99E8A5942819443900B5C43D /* HomePageView.swift in Sources */,
+				99E8A5A4281953A400B5C43D /* CallHandler.swift in Sources */,
+				99BD6BFD2819EED60012BC27 /* ParticipantView.swift in Sources */,
+				99E8A5922819443900B5C43D /* roomsquickstartApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		99E8A59A2819443C00B5C43D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		99E8A59B2819443C00B5C43D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		99E8A59D2819443C00B5C43D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F352ABD43B719E52DC056CAA /* Pods-roomsquickstart.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"roomsquickstart/Preview Content\"";
+				DEVELOPMENT_TEAM = UBF8T346G9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = roomsquickstart/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.microsoft.roomsquickstart;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		99E8A59E2819443C00B5C43D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 32250D82E8563E4EC03CD713 /* Pods-roomsquickstart.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"roomsquickstart/Preview Content\"";
+				DEVELOPMENT_TEAM = UBF8T346G9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = roomsquickstart/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.microsoft.roomsquickstart;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		99E8A5892819443900B5C43D /* Build configuration list for PBXProject "roomsquickstart" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				99E8A59A2819443C00B5C43D /* Debug */,
+				99E8A59B2819443C00B5C43D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		99E8A59C2819443C00B5C43D /* Build configuration list for PBXNativeTarget "roomsquickstart" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				99E8A59D2819443C00B5C43D /* Debug */,
+				99E8A59E2819443C00B5C43D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 99E8A5862819443900B5C43D /* Project object */;
+}
