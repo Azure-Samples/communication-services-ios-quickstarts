@@ -1,0 +1,16 @@
+PODS:
+  - AzureCommunicationCommon (1.1.1)
+
+DEPENDENCIES:
+  - AzureCommunicationCommon
+
+SPEC REPOS:
+  trunk:
+    - AzureCommunicationCommon
+
+SPEC CHECKSUMS:
+  AzureCommunicationCommon: cc520a89f3f8db6d58de42ec4a70cfb79a1b76a3
+
+PODFILE CHECKSUM: 7fc73583b6903712b2213e652ed63a64f869c500
+
+COCOAPODS: 1.12.1
