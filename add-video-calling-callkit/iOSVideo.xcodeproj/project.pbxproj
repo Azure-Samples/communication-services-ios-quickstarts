@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		531EBFC8295E5D9A0094E62E /* CallKitHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531EBFC7295E5D9A0094E62E /* CallKitHelper.swift */; };
 		53E25D682A4BB4C40094B97C /* AzureCommunicationCalling.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53E25D672A4BB4C40094B97C /* AzureCommunicationCalling.framework */; };
 		53E25D692A4BB4C40094B97C /* AzureCommunicationCalling.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 53E25D672A4BB4C40094B97C /* AzureCommunicationCalling.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		53E25D6C2A4D45930094B97C /* CallHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E25D6B2A4D45930094B97C /* CallHandler.swift */; };
-		53E25D6E2A4D61F70094B97C /* CallKitHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E25D6D2A4D61F70094B97C /* CallKitHelper.swift */; };
 		BDCD1ECD261672450039C6B5 /* iOSVideoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD1ECC261672450039C6B5 /* iOSVideoApp.swift */; };
 		BDCD1ECF261672450039C6B5 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD1ECE261672450039C6B5 /* ContentView.swift */; };
 		BDCD1ED1261672470039C6B5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BDCD1ED0261672470039C6B5 /* Assets.xcassets */; };
@@ -34,9 +34,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		531EBFC7295E5D9A0094E62E /* CallKitHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallKitHelper.swift; sourceTree = "<group>"; };
 		53E25D672A4BB4C40094B97C /* AzureCommunicationCalling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AzureCommunicationCalling.framework; path = "../../../../Code/Skype3/SpoolCallingStack/spool/staging.d/release/ALPHA/sdk/arm64-v8a/AzureCommunicationCalling.framework"; sourceTree = "<group>"; };
 		53E25D6B2A4D45930094B97C /* CallHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallHandler.swift; sourceTree = "<group>"; };
-		53E25D6D2A4D61F70094B97C /* CallKitHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallKitHelper.swift; sourceTree = "<group>"; };
 		969CB7C9039BDBF49E9893A3 /* Pods-iOSVideo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOSVideo.release.xcconfig"; path = "Target Support Files/Pods-iOSVideo/Pods-iOSVideo.release.xcconfig"; sourceTree = "<group>"; };
 		BDCD1EC9261672450039C6B5 /* iOSVideo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSVideo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BDCD1ECC261672450039C6B5 /* iOSVideoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSVideoApp.swift; sourceTree = "<group>"; };
@@ -93,9 +93,9 @@
 			isa = PBXGroup;
 			children = (
 				BDCD1EE1261673850039C6B5 /* IncomingCallHandler.swift */,
-				53E25D6D2A4D61F70094B97C /* CallKitHelper.swift */,
 				BDCD1ECC261672450039C6B5 /* iOSVideoApp.swift */,
 				BDCD1ECE261672450039C6B5 /* ContentView.swift */,
+				531EBFC7295E5D9A0094E62E /* CallKitHelper.swift */,
 				53E25D6B2A4D45930094B97C /* CallHandler.swift */,
 				BDCD1ED0261672470039C6B5 /* Assets.xcassets */,
 				BDCD1ED5261672470039C6B5 /* Info.plist */,
@@ -236,10 +236,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				BDCD1ECF261672450039C6B5 /* ContentView.swift in Sources */,
-				53E25D6E2A4D61F70094B97C /* CallKitHelper.swift in Sources */,
 				BDCD1EE2261673850039C6B5 /* IncomingCallHandler.swift in Sources */,
 				BDCD1ECD261672450039C6B5 /* iOSVideoApp.swift in Sources */,
 				53E25D6C2A4D45930094B97C /* CallHandler.swift in Sources */,
+				531EBFC8295E5D9A0094E62E /* CallKitHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
