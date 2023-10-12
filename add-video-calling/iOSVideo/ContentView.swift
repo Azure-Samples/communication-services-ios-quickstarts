@@ -30,13 +30,12 @@ struct ContentView: View {
     }
 
     private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "ACSVideoSample")
-    private let token = "<USER_ACCESS_TOKEN>"
+    private let acsToken = "<ACS_USER_ACCESS_TOKEN>"
     private let cteToken = "<CTE_USER_ACCESS_TOKEN>"
-    @State var callee: String = "8:orgid:64ea9b11-9302-4615-b768-2e28add84973"
-    //@State var callee: String = "4:+15553640457"
-    //@State var callee: String = "8:orgid:64ea9b11-9302-4615-b768-2e28add84973;8:orgid:b6f15079-054a-40c0-a3b5-76e4918cb5f5"
+    
+    @State var callee: String = "MRI of the callee"
     @State var teamsThreadId: String = "19:22484c21-14d5-422f-b969-dd2c5bcb45e4@thread.v2"
-    @State var mri: String = ""
+    @State var currentMri: String = "<CTE_MRI>"
 
     @State var callClient = CallClient()
     @State var callAgent: CallAgent?
@@ -114,7 +113,7 @@ struct ContentView: View {
                             }.disabled(call == nil && teamsCall == nil)
                         TextField("Call State", text: $callState)
                             .foregroundColor(.red)
-                        TextField("MRI", text: $mri)
+                        TextField("MRI", text: $currentMri)
                             .foregroundColor(.blue)
                         TextField("CallAgent Type", text: $callAgentType)
                             .foregroundColor(.green)
@@ -250,7 +249,7 @@ struct ContentView: View {
     func addParticipant() {
         let allCallees = self.callee.components(separatedBy: ";")
         
-        var callees = allCallees.filter({ (e) -> Bool in (e.starts(with: "8:") )})
+        let callees = allCallees.filter({ (e) -> Bool in (e.starts(with: "8:") )})
             .map { (e) -> CommunicationIdentifier in CommunicationUserIdentifier(e)}
         
         let pstnCallees = allCallees.filter({ (e) -> Bool in !e.starts(with: "8:")})
@@ -365,7 +364,24 @@ struct ContentView: View {
     private func createCallKitOptions() -> CallKitOptions {
         let callKitOptions = CallKitOptions(with: CallKitHelper.createCXProvideConfiguration())
         callKitOptions.provideRemoteInfo = self.provideCallKitRemoteInfo
+        callKitOptions.configureAudioSession = self.configureAudioSession
         return callKitOptions
+    }
+    
+    private func configureAudioSession() -> Error? {
+        let audioSession: AVAudioSession = AVAudioSession.sharedInstance()
+        //let audioSessionMode: AVAudioSession.Mode = .default
+        //let options: AVAudioSession.CategoryOptions = .allowBluetooth
+        var configError: Error?
+        do {
+            try audioSession.setCategory(.playAndRecord)
+            os_log("==> configureAudioSession done", log:self.log)
+        } catch {
+            os_log("==> configureAudioSession failed", log:self.log)
+            configError = error
+        }
+
+        return configError
     }
     
     func provideCallKitRemoteInfo(callerInfo: CallerInfo) -> CallKitRemoteInfo
@@ -494,7 +510,7 @@ struct ContentView: View {
 
                 var userCredential: CommunicationTokenCredential
                 do {
-                    userCredential = try CommunicationTokenCredential(token: token)
+                    userCredential = try CommunicationTokenCredential(token: acsToken)
                 } catch {
                     self.showAlert = true
                     self.alertMessage = "Failed to create CommunicationTokenCredential"
@@ -502,7 +518,7 @@ struct ContentView: View {
                     return
                 }
 
-                mri = getMri(recvdToken: token)
+                currentMri = getMri(recvdToken: acsToken)
 
                 self.callClient.createCallAgent(userCredential: userCredential,
                                                 options: createCallAgentOptions()) { (agent, error) in
@@ -732,7 +748,7 @@ struct ContentView: View {
                         callOptions = StartTeamsGroupCallOptions(threadId: teamsThreadId)
                     }
                 } else {
-                    var startCallOptions = StartCallOptions()
+                    let startCallOptions = StartCallOptions()
                     startCallOptions.alternateCallerId = PhoneNumberIdentifier(phoneNumber: "+12133947338")
                 }
             } else if let groupId = UUID(uuidString: self.callee) {
@@ -846,8 +862,6 @@ struct ContentView: View {
     }
 
     func endCall() {
-        var callBase: CallBase?
-        
         guard let callBase = getCallBase() else {
             return
         }
@@ -914,6 +928,19 @@ public class RemoteParticipantObserver : NSObject, RemoteParticipantDelegate {
     }
 
     
+    private func cleanupRemoteVideo(args: VideoStreamStateChangedEventArgs) {
+        if let remoteVideoStream = args.stream as? RemoteVideoStream {
+            var i = 0
+            for data in owner.remoteVideoStreamData {
+                if data.stream.id == remoteVideoStream.id {
+                    data.renderer?.dispose()
+                    owner.remoteVideoStreamData.remove(at: i)
+                }
+                i += 1
+            }
+        }
+    }
+    
     public func remoteParticipant(_ remoteParticipant: RemoteParticipant, didChangeVideoStreamState args: VideoStreamStateChangedEventArgs) {
         print("Remote Video Stream state for videoId: \(args.stream.id) is \(args.stream.state)")
         switch args.stream.state {
@@ -923,17 +950,12 @@ public class RemoteParticipantObserver : NSObject, RemoteParticipantDelegate {
             }
             break
 
+        case .notAvailable:
+            cleanupRemoteVideo(args: args)
+            break
+
         case .stopping:
-            if let remoteVideoStream = args.stream as? RemoteVideoStream {
-                var i = 0
-                for data in owner.remoteVideoStreamData {
-                    if data.stream.id == remoteVideoStream.id {
-                        data.renderer?.dispose()
-                        owner.remoteVideoStreamData.remove(at: i)
-                    }
-                    i += 1
-                }
-            }
+            cleanupRemoteVideo(args: args)
             break
 
         default:
