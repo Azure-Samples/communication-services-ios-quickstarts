@@ -3,12 +3,10 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		53E25D682A4BB4C40094B97C /* AzureCommunicationCalling.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53E25D672A4BB4C40094B97C /* AzureCommunicationCalling.framework */; };
-		53E25D692A4BB4C40094B97C /* AzureCommunicationCalling.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 53E25D672A4BB4C40094B97C /* AzureCommunicationCalling.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		53E25D6C2A4D45930094B97C /* CallHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E25D6B2A4D45930094B97C /* CallHandler.swift */; };
 		53E25D6E2A4D61F70094B97C /* CallKitHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E25D6D2A4D61F70094B97C /* CallKitHelper.swift */; };
 		BDCD1ECD261672450039C6B5 /* iOSVideoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD1ECC261672450039C6B5 /* iOSVideoApp.swift */; };
@@ -18,20 +16,6 @@
 		BDCD1EE2261673850039C6B5 /* IncomingCallHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD1EE1261673850039C6B5 /* IncomingCallHandler.swift */; };
 		E561CA315D50CE792EEAD11F /* Pods_iOSVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBFF92893FE8B69E1D39B66B /* Pods_iOSVideo.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		53E25D6A2A4BB4C40094B97C /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				53E25D692A4BB4C40094B97C /* AzureCommunicationCalling.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		53E25D672A4BB4C40094B97C /* AzureCommunicationCalling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AzureCommunicationCalling.framework; path = "../../../../Code/Skype3/SpoolCallingStack/spool/staging.d/release/ALPHA/sdk/arm64-v8a/AzureCommunicationCalling.framework"; sourceTree = "<group>"; };
@@ -54,7 +38,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				53E25D682A4BB4C40094B97C /* AzureCommunicationCalling.framework in Frameworks */,
 				E561CA315D50CE792EEAD11F /* Pods_iOSVideo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -133,7 +116,6 @@
 				BDCD1EC6261672450039C6B5 /* Frameworks */,
 				BDCD1EC7261672450039C6B5 /* Resources */,
 				B4D9B8D74A9011BDAEC72EF9 /* [CP] Embed Pods Frameworks */,
-				53E25D6A2A4BB4C40094B97C /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -378,7 +360,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_CONFIGURATION_BUILD_DIR}/AzureCommunicationCommon\"",
-					"/Users/sanathrao/Code/Skype3/SpoolCallingStack/spool/staging.d/release/ALPHA/sdk/arm64-v8a",
 				);
 				INFOPLIST_FILE = iOSVideo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -388,7 +369,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"${DT_TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}\"",
+					"\"${TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}\"",
 					/usr/lib/swift,
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D BETA";
@@ -423,7 +404,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"${DT_TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}\"",
+					"\"${TOOLCHAIN_DIR}/usr/lib/swift/${PLATFORM_NAME}\"",
 					/usr/lib/swift,
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D BETA";

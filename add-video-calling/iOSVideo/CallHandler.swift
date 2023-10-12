@@ -127,6 +127,10 @@ public final class CallHandler: CallHandlerBase, CallDelegate, IncomingCallDeleg
     public func call(_ call: Call, didUpdateRemoteParticipant args: ParticipantsUpdatedEventArgs) {
         onRemoteParticipantUpdated(call: call, args: args)
     }
+    
+    public func call(_ call: Call, didChangeId args: PropertyChangedEventArgs) {
+        print("ACSCall New CallId: \(call.id)")
+    }
 }
 
 public final class TeamsCallHandler: CallHandlerBase, TeamsCallDelegate, TeamsIncomingCallDelegate {
@@ -145,5 +149,9 @@ public final class TeamsCallHandler: CallHandlerBase, TeamsCallDelegate, TeamsIn
     
     public func teamsCall(_ teamsCall: TeamsCall, didUpdateRemoteParticipant args: ParticipantsUpdatedEventArgs) {
         onRemoteParticipantUpdated(call: teamsCall, args: args)
+    }
+    
+    public func teamsCall(_ teamsCall: TeamsCall, didChangeId args: PropertyChangedEventArgs) {
+        print("TeamsCall New CallId: \(teamsCall.id)")
     }
 }
