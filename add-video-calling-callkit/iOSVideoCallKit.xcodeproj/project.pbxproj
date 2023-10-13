@@ -3,13 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		531EBFC8295E5D9A0094E62E /* CallKitHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531EBFC7295E5D9A0094E62E /* CallKitHelper.swift */; };
-		53E25D682A4BB4C40094B97C /* AzureCommunicationCalling.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53E25D672A4BB4C40094B97C /* AzureCommunicationCalling.framework */; };
-		53E25D692A4BB4C40094B97C /* AzureCommunicationCalling.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 53E25D672A4BB4C40094B97C /* AzureCommunicationCalling.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		53E25D6C2A4D45930094B97C /* CallHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E25D6B2A4D45930094B97C /* CallHandler.swift */; };
 		BDCD1ECD261672450039C6B5 /* iOSVideoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD1ECC261672450039C6B5 /* iOSVideoApp.swift */; };
 		BDCD1ECF261672450039C6B5 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDCD1ECE261672450039C6B5 /* ContentView.swift */; };
@@ -19,26 +17,12 @@
 		E561CA315D50CE792EEAD11F /* Pods_iOSVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBFF92893FE8B69E1D39B66B /* Pods_iOSVideo.framework */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		53E25D6A2A4BB4C40094B97C /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				53E25D692A4BB4C40094B97C /* AzureCommunicationCalling.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		531EBFC7295E5D9A0094E62E /* CallKitHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallKitHelper.swift; sourceTree = "<group>"; };
 		53E25D672A4BB4C40094B97C /* AzureCommunicationCalling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AzureCommunicationCalling.framework; path = "../../../../Code/Skype3/SpoolCallingStack/spool/staging.d/release/ALPHA/sdk/arm64-v8a/AzureCommunicationCalling.framework"; sourceTree = "<group>"; };
 		53E25D6B2A4D45930094B97C /* CallHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallHandler.swift; sourceTree = "<group>"; };
 		969CB7C9039BDBF49E9893A3 /* Pods-iOSVideo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOSVideo.release.xcconfig"; path = "Target Support Files/Pods-iOSVideo/Pods-iOSVideo.release.xcconfig"; sourceTree = "<group>"; };
-		BDCD1EC9261672450039C6B5 /* iOSVideo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSVideo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BDCD1EC9261672450039C6B5 /* iOSVideoCallKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSVideoCallKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BDCD1ECC261672450039C6B5 /* iOSVideoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSVideoApp.swift; sourceTree = "<group>"; };
 		BDCD1ECE261672450039C6B5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BDCD1ED0261672470039C6B5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -54,7 +38,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				53E25D682A4BB4C40094B97C /* AzureCommunicationCalling.framework in Frameworks */,
 				E561CA315D50CE792EEAD11F /* Pods_iOSVideo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -84,7 +67,7 @@
 		BDCD1ECA261672450039C6B5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BDCD1EC9261672450039C6B5 /* iOSVideo.app */,
+				BDCD1EC9261672450039C6B5 /* iOSVideoCallKit.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -124,24 +107,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		BDCD1EC8261672450039C6B5 /* iOSVideo */ = {
+		BDCD1EC8261672450039C6B5 /* iOSVideoCallKit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BDCD1ED8261672470039C6B5 /* Build configuration list for PBXNativeTarget "iOSVideo" */;
+			buildConfigurationList = BDCD1ED8261672470039C6B5 /* Build configuration list for PBXNativeTarget "iOSVideoCallKit" */;
 			buildPhases = (
 				6492F9E3FD079D93B0E0DAD3 /* [CP] Check Pods Manifest.lock */,
 				BDCD1EC5261672450039C6B5 /* Sources */,
 				BDCD1EC6261672450039C6B5 /* Frameworks */,
 				BDCD1EC7261672450039C6B5 /* Resources */,
 				B4D9B8D74A9011BDAEC72EF9 /* [CP] Embed Pods Frameworks */,
-				53E25D6A2A4BB4C40094B97C /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = iOSVideo;
+			name = iOSVideoCallKit;
 			productName = iOSVideo;
-			productReference = BDCD1EC9261672450039C6B5 /* iOSVideo.app */;
+			productReference = BDCD1EC9261672450039C6B5 /* iOSVideoCallKit.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -158,7 +140,7 @@
 					};
 				};
 			};
-			buildConfigurationList = BDCD1EC4261672450039C6B5 /* Build configuration list for PBXProject "iOSVideo" */;
+			buildConfigurationList = BDCD1EC4261672450039C6B5 /* Build configuration list for PBXProject "iOSVideoCallKit" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -171,7 +153,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				BDCD1EC8261672450039C6B5 /* iOSVideo */,
+				BDCD1EC8261672450039C6B5 /* iOSVideoCallKit */,
 			);
 		};
 /* End PBXProject section */
@@ -373,12 +355,11 @@
 				CODE_SIGN_ENTITLEMENTS = iOSVideo/iOSVideo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iOSVideo/Preview Content\"";
-				DEVELOPMENT_TEAM = UBF8T346G9;
+				DEVELOPMENT_TEAM = 9KBH5RKYEW;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_CONFIGURATION_BUILD_DIR}/AzureCommunicationCommon\"",
-					"/Users/sanathrao/Code/Skype3/SpoolCallingStack/spool/staging.d/release/ALPHA/sdk/arm64-v8a",
 				);
 				INFOPLIST_FILE = iOSVideo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -392,7 +373,7 @@
 					/usr/lib/swift,
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D BETA";
-				PRODUCT_BUNDLE_IDENTIFIER = com.microsoft.iOSVideo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.microsoft.iOSVideoCallKit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -409,7 +390,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSVideo/iOSVideo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iOSVideo/Preview Content\"";
-				DEVELOPMENT_TEAM = UBF8T346G9;
+				DEVELOPMENT_TEAM = 9KBH5RKYEW;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -427,7 +408,7 @@
 					/usr/lib/swift,
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D BETA";
-				PRODUCT_BUNDLE_IDENTIFIER = com.microsoft.iOSVideo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.microsoft.iOSVideoCallKit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -437,7 +418,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		BDCD1EC4261672450039C6B5 /* Build configuration list for PBXProject "iOSVideo" */ = {
+		BDCD1EC4261672450039C6B5 /* Build configuration list for PBXProject "iOSVideoCallKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BDCD1ED6261672470039C6B5 /* Debug */,
@@ -446,7 +427,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BDCD1ED8261672470039C6B5 /* Build configuration list for PBXNativeTarget "iOSVideo" */ = {
+		BDCD1ED8261672470039C6B5 /* Build configuration list for PBXNativeTarget "iOSVideoCallKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BDCD1ED9261672470039C6B5 /* Debug */,

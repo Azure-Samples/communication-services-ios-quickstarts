@@ -40,10 +40,6 @@ struct ContentView: View {
     @State var call: Call?
     @State var incomingCall: IncomingCall?
 
-    @State var teamsCallAgent : TeamsCallAgent?
-    @State var teamsCall: TeamsCall?
-    @State var teamsIncomingCall: TeamsIncomingCall?
-
     @State var deviceManager: DeviceManager?
     @State var localVideoStream = [LocalVideoStream]()
     @State var sendingVideo:Bool = false
@@ -282,12 +278,6 @@ struct ContentView: View {
         return options
     }
 
-    private func createTeamsCallAgentOptions() -> TeamsCallAgentOptions {
-        let options = TeamsCallAgentOptions()
-        options.callKitOptions = createCallKitOptions()
-        return options
-    }
-
     private func createCallKitOptions() -> CallKitOptions {
         let callKitOptions = CallKitOptions(with: CallKitObjectManager.createCXProvideConfiguration())
         callKitOptions.provideRemoteInfo = self.provideCallKitRemoteInfo
@@ -377,7 +367,6 @@ struct ContentView: View {
     private func createCallAgent(completionHandler: ((Error?) -> Void)?) {
         DispatchQueue.main.async {
             if isCte {
-                #if BETA
                 var userCredential: CommunicationTokenCredential
                 do {
                     userCredential = try CommunicationTokenCredential(token: cteToken)
@@ -387,30 +376,6 @@ struct ContentView: View {
                     completionHandler?(CreateCallAgentErrors.noToken)
                     return
                 }
-                
-                callClient.createTeamsCallAgent(userCredential: userCredential,
-                                                options: createTeamsCallAgentOptions()) { (agent, error) in
-                    if error == nil {
-                        CallKitObjectManager.deInitCallKitInApp()
-                        self.teamsCallAgent = agent
-                        self.cxProvider = nil
-                        print("Teams Call agent successfully created.")
-                        incomingCallHandler = IncomingCallHandler(contentView: self)
-                        self.teamsCallAgent!.delegate = incomingCallHandler
-                        registerForPushNotification()
-                    } else {
-                        self.showAlert = true
-                        self.alertMessage = "Failed to create CallAgent (with CallKit) : \(error?.localizedDescription ?? "Empty Description")"
-                    }
-                    completionHandler?(error)
-                }
-                
-                #else
-                self.showAlert = true
-                self.alertMessage = "Cannot create CTE CallAgent in GA"
-                completionHandler?(CreateCallAgentErrors.noToken)
-                return
-                #endif
             } else {
                 var userCredential: CommunicationTokenCredential
                 do {
@@ -485,13 +450,8 @@ struct ContentView: View {
         }
     }
 
-    func showIncomingCallBanner(_ incomingCall: IncomingCallBase) {
-        isIncomingCall = true
-        if incomingCall as? IncomingCall {
-            self.inccomingCall = incomingCall as IncomingCall
-        } else if incomingCall as? TeamsIncomingCall {
-            self.teamsIncomingCall = incomingCall as TeamsIncomingCall
-        }        
+    func showIncomingCallBanner(_ incomingCall: IncomingCall?) {
+        self.incomingCall = incomingCall
     }
 
     func answerIncomingCall() {
@@ -529,7 +489,7 @@ struct ContentView: View {
         }
     }
 
-    func callRemoved(_ call: CallBase) {
+    func callRemoved(_ call: Call) {
         self.call = nil
         self.incomingCall = nil
         for data in remoteVideoStreamData {
@@ -719,15 +679,7 @@ struct ContentView: View {
         }
     }
 
-    func setCallAndObersever(call: CallBase?, error:Error?) {
-
-        guard let callBase = call else {
-            return
-        }
-
-        if call is? Call {
-            
-        }
+    func setCallAndObersever(call: Call?, error:Error?) {
         if (error == nil) {
             self.call = call
             self.callObserver = CallHandler(self)

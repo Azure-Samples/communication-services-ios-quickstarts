@@ -408,7 +408,7 @@ class CallKitIncomingCallReporter {
 actor CallKitHelper {
     private var callController = CXCallController()
     private var outInCallInfoMap: [String: OutInCallInfo] = [:]
-    private var incomingCallMap: [String: IncomingCallBase] = [:]
+    private var incomingCallMap: [String: IncomingCall] = [:]
     private var incomingCallSemaphore: DispatchSemaphore?
     private var activeCalls: [String : Call] = [:]
     private var updatedCallIdMap: [String:String] = [:]
@@ -432,7 +432,7 @@ actor CallKitHelper {
         self.incomingCallSemaphore = semaphore
     }
 
-    func addIncomingCall(incomingCall: IncomingCallBase) {
+    func addIncomingCall(incomingCall: IncomingCall) {
         incomingCallMap[incomingCall.id.uppercased()] = incomingCall
         self.incomingCallSemaphore?.signal()
     }
@@ -442,7 +442,7 @@ actor CallKitHelper {
         self.incomingCallSemaphore?.signal()
     }
 
-    func getIncomingCall(callId: String) -> IncomingCallBase? {
+    func getIncomingCall(callId: String) -> IncomingCall? {
         return incomingCallMap[callId.uppercased()]
     }
 
@@ -532,7 +532,7 @@ actor CallKitHelper {
         transactOutInCallWithCallKit(action: answerCallAction, outInCallInfo: outInCallInfo)
     }
 
-    func reportOutgoingCall(call: CallBase) {
+    func reportOutgoingCall(call: Call) {
         if call.direction != .outgoing {
             return
         }

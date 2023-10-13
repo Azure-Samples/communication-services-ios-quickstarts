@@ -16,7 +16,7 @@ public class CallHandlerBase: NSObject {
         owner = view
     }
 
-    public func onStateChanged(call: CallBase, args: PropertyChangedEventArgs) {
+    public func onStateChanged(call: Call, args: PropertyChangedEventArgs) {
         switch call.state {
         case .connected:
             owner.callState = "Connected"
@@ -64,7 +64,7 @@ public class CallHandlerBase: NSObject {
         }
     }
 
-    public func onRemoteParticipantUpdated(call: CallBase, args: ParticipantsUpdatedEventArgs) {
+    public func onRemoteParticipantUpdated(call: Call, args: ParticipantsUpdatedEventArgs) {
         for participant in args.addedParticipants {
             participant.delegate = owner.remoteParticipantObserver
             for stream in participant.videoStreams {
@@ -82,7 +82,7 @@ public class CallHandlerBase: NSObject {
         }
     }
     
-    public func onOutgoingAudioStateChanged(call: CallBase) {
+    public func onOutgoingAudioStateChanged(call: Call) {
         owner.isMuted = call.isOutgoingAudioMuted
     }
 
@@ -125,24 +125,5 @@ public final class CallHandler: CallHandlerBase, CallDelegate, IncomingCallDeleg
 
     public func call(_ call: Call, didUpdateRemoteParticipant args: ParticipantsUpdatedEventArgs) {
         onRemoteParticipantUpdated(call: call, args: args)
-    }
-}
-
-public final class TeamsCallHandler: CallHandlerBase, TeamsCallDelegate, TeamsIncomingCallDelegate {
-    
-    override init(_ view:ContentView) {
-        super.init(view)
-    }
-    
-    public func call(_ teamsCall: TeamsCall, didChangeState args: PropertyChangedEventArgs) {
-        onStateChanged(call: teamsCall, args: args)
-    }
-    
-    public func call(_ teamsCall: TeamsCall, didUpdateOutgoingAudioState args: PropertyChangedEventArgs) {
-        onOutgoingAudioStateChanged(call: teamsCall)
-    }
-    
-    public func call(_ teamsCall: TeamsCall, didUpdateRemoteParticipant args: ParticipantsUpdatedEventArgs) {
-        onRemoteParticipantUpdated(call: teamsCall, args: args)
     }
 }
