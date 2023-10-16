@@ -17,9 +17,15 @@ class IncomingCallHandlerBase : NSObject {
         self.contentView = contentView
     }
     
+    #if BETA
     func onIncomingCallEnded(incomingCallBase: IncomingCallBase) {
         contentView?.isIncomingCall = false
     }
+    #else
+    func onIncomingCallEnded(incomingCallBase: IncomingCall) {
+        contentView?.isIncomingCall = false
+    }
+    #endif
     
 }
 
@@ -59,6 +65,7 @@ final class IncomingCallHandler: IncomingCallHandlerBase, CallAgentDelegate, Inc
     }
 }
 
+#if BETA
 final class TeamsIncomingCallHandler: IncomingCallHandlerBase, TeamsCallAgentDelegate, TeamsIncomingCallDelegate {
     private var teamsIncomingCall: TeamsIncomingCall?
 
@@ -94,3 +101,4 @@ final class TeamsIncomingCallHandler: IncomingCallHandlerBase, TeamsCallAgentDel
         }
     }
 }
+#endif

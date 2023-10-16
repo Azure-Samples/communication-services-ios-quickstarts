@@ -33,7 +33,7 @@ struct ContentView: View {
     private let acsToken = "<ACS_USER_ACCESS_TOKEN>"
     private let cteToken = "<CTE_USER_ACCESS_TOKEN>"
     
-    @State var callee: String = "MRI of the callee"
+    @State var callee: String = "29228d3e-040e-4656-a70e-890ab4e173e4"
     @State var teamsThreadId: String = "19:22484c21-14d5-422f-b969-dd2c5bcb45e4@thread.v2"
     @State var currentMri: String = "<CTE_MRI>"
 
@@ -44,11 +44,19 @@ struct ContentView: View {
     @State var incomingCallHandler: IncomingCallHandler?
     @State var callHandler:CallHandler?
 
+    #if BETA
     @State var teamsCallAgent : TeamsCallAgent?
     @State var teamsCall: TeamsCall?
     @State var teamsIncomingCall: TeamsIncomingCall?
     @State var teamsIncomingCallHandler: TeamsIncomingCallHandler?
     @State var teamsCallHandler:TeamsCallHandler?
+    #else
+    @State var teamsCallAgent : Any?
+    @State var teamsCall: Any?
+    @State var teamsIncomingCall: Any?
+    @State var teamsIncomingCallHandler: Any?
+    @State var teamsCallHandler:Any?
+    #endif
 
     @State var deviceManager: DeviceManager?
     @State var localVideoStream = [LocalVideoStream]()
@@ -222,6 +230,7 @@ struct ContentView: View {
         }
     }
 
+    #if BETA
     private func getCallBase() -> CallBase? {
         var callBase: CallBase?
         
@@ -245,6 +254,127 @@ struct ContentView: View {
         
         return callAgentBase
     }
+    
+    private func createTeamsCallAgentOptions() -> TeamsCallAgentOptions {
+        let options = TeamsCallAgentOptions()
+        options.callKitOptions = createCallKitOptions()
+        return options
+    }
+    
+    func declineIncomingCall() {
+        var incomingCallBase: IncomingCallBase?
+
+        if incomingCall != nil {
+            incomingCallBase = incomingCall
+        } else if teamsIncomingCall != nil {
+            incomingCallBase = teamsIncomingCall
+        }
+
+        guard let incomingCallBase = incomingCallBase else {
+            self.showAlert = true
+            self.alertMessage = "No incoming call to reject"
+            return
+        }
+
+        incomingCallBase.reject { (error) in
+            guard let rejectError = error else {
+                return
+            }
+            self.showAlert = true
+            self.alertMessage = rejectError.localizedDescription
+            isIncomingCall = false
+        }
+    }
+
+    func showIncomingCallBanner(_ incomingCall: IncomingCallBase?) {
+        guard let incomingCallBase = incomingCall else {
+            return
+        }
+        isIncomingCall = true
+        if incomingCallBase is IncomingCall {
+            self.incomingCall = (incomingCallBase as! IncomingCall)
+        } else if incomingCall is TeamsIncomingCall {
+            self.teamsIncomingCall = (incomingCall as! TeamsIncomingCall)
+        }
+    }
+    
+    func callRemoved(_ call: CallBase) {
+        self.call = nil
+        self.teamsCall = nil
+        self.incomingCall = nil
+        self.teamsIncomingCall = nil
+
+        for data in remoteVideoStreamData {
+            data.renderer?.dispose()
+        }
+        self.previewRenderer?.dispose()
+        remoteVideoStreamData.removeAll()
+        sendingVideo = false
+    }
+    
+    func setTeamsCallAndObserver(teamsCall: TeamsCall? , error: Error?) {
+        guard let teamsCall = teamsCall else {
+            self.showAlert = true
+            self.alertMessage = "Failed to get Teams Call"
+            return
+        }
+
+        self.teamsCall = teamsCall
+        print("Teams CallId: \(teamsCall.id)")
+        self.teamsCallHandler = TeamsCallHandler(self)
+        self.teamsCall!.delegate = self.teamsCallHandler
+        self.remoteParticipantObserver = RemoteParticipantObserver(self)
+        switchSpeaker(nil)
+    }
+    #else
+    private func getCallBase() -> Call? {
+        return self.call
+    }
+
+    private func getCallAgentBase() -> CallAgent? {
+        return callAgent
+    }
+    
+    func declineIncomingCall() {
+
+        guard let incomingCall = incomingCall else {
+            self.showAlert = true
+            self.alertMessage = "No incoming call to reject"
+            return
+        }
+
+        incomingCall.reject { (error) in
+            guard let rejectError = error else {
+                return
+            }
+            self.showAlert = true
+            self.alertMessage = rejectError.localizedDescription
+            isIncomingCall = false
+        }
+    }
+
+    func showIncomingCallBanner(_ incomingCall: IncomingCall?) {
+        guard let incomingCall = incomingCall else {
+            return
+        }
+        isIncomingCall = true
+        self.incomingCall = incomingCall
+    }
+    
+    func callRemoved(_ call: Call) {
+        self.call = nil
+        self.teamsCall = nil
+        self.incomingCall = nil
+        self.teamsIncomingCall = nil
+
+        for data in remoteVideoStreamData {
+            data.renderer?.dispose()
+        }
+        self.previewRenderer?.dispose()
+        remoteVideoStreamData.removeAll()
+        sendingVideo = false
+    }
+    #endif
 
     func addParticipant() {
         let allCallees = self.callee.components(separatedBy: ";")
@@ -275,7 +405,9 @@ struct ContentView: View {
                     self.alertMessage = "Failed to add participant \(callee.rawId)"
                 }
             }
-        } else if let teamsCall = teamsCall {
+        }
+        #if BETA
+        if let teamsCall = teamsCall {
             let addTeamsParticipantOptions = AddTeamsParticipantOptions(threadId: teamsThreadId)
             for pstnCallee in pstnCallees {
                 do {
@@ -295,6 +427,7 @@ struct ContentView: View {
                 }
             }
         }
+        #endif
     }
 
     func switchMicrophone() {
@@ -351,12 +484,6 @@ struct ContentView: View {
 
     private func createCallAgentOptions() -> CallAgentOptions {
         let options = CallAgentOptions()
-        options.callKitOptions = createCallKitOptions()
-        return options
-    }
-
-    private func createTeamsCallAgentOptions() -> TeamsCallAgentOptions {
-        let options = TeamsCallAgentOptions()
         options.callKitOptions = createCallKitOptions()
         return options
     }
@@ -530,7 +657,9 @@ struct ContentView: View {
                         self.callAgent!.delegate = incomingCallHandler
                         registerForPushNotification()
                         callAgentType = "ACS CallAgent"
+                        #if BETA
                         teamsCallAgent?.dispose()
+                        #endif
                     } else {
                         self.showAlert = true
                         self.alertMessage = "Failed to create CallAgent (with CallKit) : \(error?.localizedDescription ?? "Empty Description")"
@@ -541,42 +670,7 @@ struct ContentView: View {
         }
     }
 
-    func declineIncomingCall() {
-        var incomingCallBase: IncomingCallBase?
-
-        if incomingCall != nil {
-            incomingCallBase = incomingCall
-        } else if teamsIncomingCall != nil {
-            incomingCallBase = teamsIncomingCall
-        }
-
-        guard let incomingCallBase = incomingCallBase else {
-            self.showAlert = true
-            self.alertMessage = "No incoming call to reject"
-            return
-        }
-
-        incomingCallBase.reject { (error) in
-            guard let rejectError = error else {
-                return
-            }
-            self.showAlert = true
-            self.alertMessage = rejectError.localizedDescription
-            isIncomingCall = false
-        }
-    }
-
-    func showIncomingCallBanner(_ incomingCall: IncomingCallBase?) {
-        guard let incomingCallBase = incomingCall else {
-            return
-        }
-        isIncomingCall = true
-        if incomingCallBase is IncomingCall {
-            self.incomingCall = (incomingCallBase as! IncomingCall)
-        } else if incomingCall is TeamsIncomingCall {
-            self.teamsIncomingCall = (incomingCall as! TeamsIncomingCall)
-        }        
-    }
+    
 
     func answerIncomingCall() {
         isIncomingCall = false
@@ -597,6 +691,7 @@ struct ContentView: View {
         }
 
         if isCte {
+            #if BETA
             guard let teamsIncomingCall = self.teamsIncomingCall else {
                 self.showAlert = true
                 self.alertMessage = "No teams incoming call to reject"
@@ -606,6 +701,11 @@ struct ContentView: View {
             teamsIncomingCall.accept(options: options) { teamsCall, error in
                 setTeamsCallAndObserver(teamsCall: teamsCall, error: error)
             }
+            #else
+            self.showAlert = true
+            self.alertMessage = "CTE is only supported in BETA"
+            return
+            #endif
         } else {
             guard let incomingCall = self.incomingCall else {
                 return
@@ -615,20 +715,6 @@ struct ContentView: View {
                 setCallAndObersever(call: call, error: error)
             }
         }
-    }
-
-    func callRemoved(_ call: CallBase) {
-        self.call = nil
-        self.teamsCall = nil
-        self.incomingCall = nil
-        self.teamsIncomingCall = nil
-
-        for data in remoteVideoStreamData {
-            data.renderer?.dispose()
-        }
-        self.previewRenderer?.dispose()
-        remoteVideoStreamData.removeAll()
-        sendingVideo = false
     }
 
     private func createLocalVideoPreview() -> Bool {
@@ -725,17 +811,23 @@ struct ContentView: View {
                 }
 
                 if isCte {
+                    #if BETA
                     if callees.count == 1 {
                         callOptions = StartTeamsCallOptions()
                     } else if callees.count > 1 {
                         // When starting a call with multiple participants , need to pass a thread ID
                         callOptions = StartTeamsGroupCallOptions(threadId: teamsThreadId)
                     }
+                    #else
+                    self.showAlert = true
+                    self.alertMessage = "CTE is only supported in BETA"
+                    #endif
                 } else {
                     callOptions = StartCallOptions()
                 }
             } else if self.callee.starts(with: "4:") {
                 if isCte {
+                    #if BETA
                     let calleesRaw = self.callee.split(separator: ";")
                     for calleeRaw in calleesRaw {
                         callees.append(PhoneNumberIdentifier(phoneNumber: String(calleeRaw.replacingOccurrences(of: "4:", with: ""))))
@@ -747,6 +839,10 @@ struct ContentView: View {
                         // When starting a call with multiple participants , need to pass a thread ID
                         callOptions = StartTeamsGroupCallOptions(threadId: teamsThreadId)
                     }
+                    #else
+                    self.showAlert = true
+                    self.alertMessage = "CTE is only supported in BETA"
+                    #endif
                 } else {
                     let startCallOptions = StartCallOptions()
                     startCallOptions.alternateCallerId = PhoneNumberIdentifier(phoneNumber: "+12133947338")
@@ -785,6 +881,7 @@ struct ContentView: View {
             callOptions!.outgoingVideoOptions = outgoingVideoOptions
 
             if isCte {
+                #if BETA
                 guard let teamsCallAgent = self.teamsCallAgent else {
                     self.showAlert = true
                     self.alertMessage = "No Teams CallAgent instance exists to place the call"
@@ -806,6 +903,10 @@ struct ContentView: View {
                 } catch {
                     setTeamsCallAndObserver(teamsCall: nil, error: error)
                 }
+                #else
+                self.showAlert = true
+                self.alertMessage = "CTE is only supported in BETA"
+                #endif
             } else {
                 guard let callAgent = self.callAgent else {
                     self.showAlert = true
@@ -842,21 +943,6 @@ struct ContentView: View {
         print("ACS CallId: \(call.id)")
         self.callHandler = CallHandler(self)
         self.call!.delegate = self.callHandler
-        self.remoteParticipantObserver = RemoteParticipantObserver(self)
-        switchSpeaker(nil)
-    }
-    
-    func setTeamsCallAndObserver(teamsCall: TeamsCall? , error: Error?) {
-        guard let teamsCall = teamsCall else {
-            self.showAlert = true
-            self.alertMessage = "Failed to get Teams Call"
-            return
-        }
-
-        self.teamsCall = teamsCall
-        print("Teams CallId: \(teamsCall.id)")
-        self.teamsCallHandler = TeamsCallHandler(self)
-        self.teamsCall!.delegate = self.teamsCallHandler
         self.remoteParticipantObserver = RemoteParticipantObserver(self)
         switchSpeaker(nil)
     }
