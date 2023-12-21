@@ -105,6 +105,9 @@ struct ContentView: View {
                     Button(action: switchMicrophone) {
                         Text(isMuted ? "UnMute" : "Mute")
                     }.disabled(call == nil && teamsCall == nil)
+                    Button(action: muteOtherParticipants) {
+                        Text("muteOthers")
+                    }.disabled(call == nil && teamsCall == nil)
                     Button(action: endCall) {
                         Text("End Call")
                     }.disabled(call == nil && teamsCall == nil)
@@ -428,6 +431,18 @@ struct ContentView: View {
             }
         }
         #endif
+    }
+    
+    func muteOtherParticipants() {
+        call?.muteAllRemoteParticipants { error in
+            if error == nil {
+                print("Successfully muted all participants.")
+            }
+            else {
+                self.alertMessage = "Failed to mute participants"
+                self.showAlert = true
+            }
+        }
     }
 
     func switchMicrophone() {
@@ -1071,3 +1086,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView(appPubs: AppPubs())
     }
 }
+
