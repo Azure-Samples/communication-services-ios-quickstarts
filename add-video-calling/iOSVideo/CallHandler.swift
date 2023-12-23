@@ -17,7 +17,7 @@ public class CallHandlerBase: NSObject {
     }
     
     #if BETA
-    public func onStateChanged(call: CallBase, args: PropertyChangedEventArgs) {
+    public func onStateChanged(call: CommonCall, args: PropertyChangedEventArgs) {
         switch call.state {
         case .connected:
             owner.callState = "Connected"
@@ -54,12 +54,12 @@ public class CallHandlerBase: NSObject {
             break
         }
 
-        if(call.state == CallState.connected) {
+        if call.state == CallState.connected {
             initialCallParticipant()
         }
     }
 
-    public func onRemoteParticipantUpdated(call: CallBase, args: ParticipantsUpdatedEventArgs) {
+    public func onRemoteParticipantUpdated(call: CommonCall, args: ParticipantsUpdatedEventArgs) {
         for participant in args.addedParticipants {
             participant.delegate = owner.remoteParticipantObserver
             for stream in participant.videoStreams {
@@ -77,7 +77,7 @@ public class CallHandlerBase: NSObject {
         }
     }
     
-    public func onOutgoingAudioStateChanged(call: CallBase) {
+    public func onOutgoingAudioStateChanged(call: CommonCall) {
         owner.isMuted = call.isOutgoingAudioMuted
     }
 
@@ -94,14 +94,18 @@ public class CallHandlerBase: NSObject {
     }
 
     private func initialCallParticipant() {
-        var callBase: CallBase?
+        var callBase: CommonCall?
         if let call = owner.call {
-            callBase = owner.call
+            callBase = call
         } else if let call = owner.teamsCall {
-            callBase = owner.teamsCall
+            callBase = call
         }
         
-        for participant in callBase!.remoteParticipants {
+        guard let callBase = callBase else {
+            return
+        }
+        
+        for participant in callBase.remoteParticipants {
             participant.delegate = owner.remoteParticipantObserver
             for stream in participant.videoStreams {
                 renderRemoteStream(stream)

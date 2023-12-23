@@ -18,7 +18,7 @@ class IncomingCallHandlerBase : NSObject {
     }
     
     #if BETA
-    func onIncomingCallEnded(incomingCallBase: IncomingCallBase) {
+    func onIncomingCallEnded(incomingCallBase: CommonIncomingCall) {
         contentView?.isIncomingCall = false
     }
     #else

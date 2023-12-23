@@ -51,7 +51,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // Handle incoming pushes
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
         let callNotification = PushNotificationInfo.fromDictionary(payload.dictionaryPayload)
-        let userDefaults: UserDefaults = .standard
         let callKitOptions = CallKitOptions(with: CallKitHelper.createCXProvideConfiguration())
         CallClient.reportIncomingCall(with: callNotification, callKitOptions: callKitOptions) { error in
             if error == nil {
