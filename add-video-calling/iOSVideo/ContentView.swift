@@ -327,13 +327,9 @@ struct ContentView: View {
         switchSpeaker(nil)
     }
     #else
-    private func getCallBase() -> Call? {
-        return self.call
-    }
 
-    private func getCallAgentBase() -> CallAgent? {
-        return callAgent
-    }
+    private var callBase: Call? { self.call }
+    private var callAgentBase: CallAgent? { self.callAgent }
     
     func declineIncomingCall() {
 
