@@ -127,8 +127,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                     switch result {
                     case .success:
                         //TODO: Add the code to do things when you succeeded to start Push Notifications.
+                        print("startPushNotifications success")
                     case let .failure(error):
                         //TODO: Add the code to do things when you failed to start Push Notifications.
+                        print("startPushNotifications error \(error)")
                     }
                     semaphore.signal()
                 }
