@@ -9,6 +9,10 @@ Azure Communication Services enable developers to add communication capabilities
 - A deployed Communication Services resource. [Create a Communication Services resource](https://docs.microsoft.com/en-us/azure/communication-services/quickstarts/create-communication-resource).
 - Run `pod install` and open `AzureCommunicationCallingSample.xcworkspace` to run and build the project.
 
+## ❤️ Feedback
+
+We appreciate your feedback and energy helping us improve our services. [If you've tried the service, please give us feedback through this survey](https://microsoft.qualtrics.com/jfe/form/SV_9WTOR2ItSo0oFee). 
+
 ## Quickstarts
 
 ### Calling SDK Quickstarts
