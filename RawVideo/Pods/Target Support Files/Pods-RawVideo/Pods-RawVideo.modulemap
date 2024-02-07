@@ -1,0 +1,6 @@
+framework module Pods_RawVideo {
+  umbrella header "Pods-RawVideo-umbrella.h"
+
+  export *
+  module * { export * }
+}
