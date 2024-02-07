@@ -11,7 +11,7 @@ import AzureCommunicationCalling
 class CaptureService : NSObject
 {
     var rawOutgoingVideoStream: RawOutgoingVideoStream;
-    var delegate: ((RawVideoFrameBuffer, StreamDirection) -> Void)?
+    var delegate: ((RawVideoFrameBuffer) -> Void)?
     
     init(rawOutgoingVideoStream: RawOutgoingVideoStream)
     {
@@ -28,7 +28,7 @@ class CaptureService : NSObject
             
             if (delegate != nil)
             {
-                delegate!(rawVideoFrameBuffer, .outgoing)
+                delegate!(rawVideoFrameBuffer)
             }
         }
     }

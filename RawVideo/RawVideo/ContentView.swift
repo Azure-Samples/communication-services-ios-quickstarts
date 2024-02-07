@@ -137,14 +137,7 @@ struct ContentView : View
                             }
                             Button(action: {
                                 Task {
-                                    if (!token.isEmpty && token != "ACS token")
-                                    {
-                                        await GetPermissions()
-                                    }
-                                    else
-                                    {
-                                        await ShowMessage(message: "Invalid token")
-                                    }
+                                    await GetPermissions()
                                 }
                             })
                             {
@@ -342,7 +335,7 @@ struct ContentView : View
         screenShareRawOutgoingVideoStreamObserver = ScreenShareRawOutgoingVideoStreamObserver(view: self)
         remoteVideoStreamObserver = RemoteVideoStreamObserver(view: self)
         rawIncomingVideoStreamObserver = RawIncomingVideoStreamObserver(view: self)
-        rawIncomingVideoStreamObserver?.delegate = OnRawVideoFrameCaptured
+        rawIncomingVideoStreamObserver?.delegate = OnRawVideoFrameArrived
         remoteParticipantObserver = RemoteParticipantObserver(view: self)
         callObserver = CallObserver(view: self, remoteParticipantObserver: remoteParticipantObserver!)
         
@@ -386,6 +379,12 @@ struct ContentView : View
     
     private func GetPermissions() async -> Void
     {
+        if (token.isEmpty || token == "ACS token")
+        {
+            await ShowMessage(message: "Invalid token")
+            return
+        }
+        
         let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
         let microphoneAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .audio)
 
@@ -693,19 +692,14 @@ struct ContentView : View
         }
     }
     
-    func OnRawVideoFrameCaptured(rawVideoFrameBuffer: RawVideoFrameBuffer, direction: StreamDirection) -> Void
+    func OnRawVideoFrameArrived(rawVideoFrameBuffer: RawVideoFrameBuffer) -> Void
     {
-        switch (direction)
-        {
-            case .outgoing:
-                outgoingPixelBuffer = rawVideoFrameBuffer.buffer
-                break
-            case .incoming:
-                incomingPixelBuffer = rawVideoFrameBuffer.buffer
-                break
-            default:
-                break
-        }
+        incomingPixelBuffer = rawVideoFrameBuffer.buffer
+    }
+    
+    func OnRawVideoFrameCaptured(rawVideoFrameBuffer: RawVideoFrameBuffer) -> Void
+    {
+        outgoingPixelBuffer = rawVideoFrameBuffer.buffer
     }
     
     private func StartRemotePreview() -> Void
@@ -816,6 +810,7 @@ struct ContentView : View
                 remoteVideoStream = nil
                 rawIncomingVideoStream = nil
                 
+                StopLocalPreview()
                 StopCameraCaptureService()
                 StopScreenCaptureService()
                 
@@ -962,7 +957,7 @@ class RemoteVideoStreamObserver: NSObject, RemoteVideoStreamDelegate
 class RawIncomingVideoStreamObserver: NSObject, RawIncomingVideoStreamDelegate
 {
     private var view: ContentView
-    var delegate: ((RawVideoFrameBuffer, StreamDirection) -> Void)?
+    var delegate: ((RawVideoFrameBuffer) -> Void)?
 
     init(view: ContentView)
     {
@@ -978,7 +973,7 @@ class RawIncomingVideoStreamObserver: NSObject, RawIncomingVideoStreamDelegate
     {
         let rawVideoFrameBuffer = args.frame as! RawVideoFrameBuffer
         
-        delegate!(rawVideoFrameBuffer, .incoming)
+        delegate!(rawVideoFrameBuffer)
     }
 }
 
