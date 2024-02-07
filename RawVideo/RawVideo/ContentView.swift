@@ -814,6 +814,24 @@ struct ContentView : View
                 StopCameraCaptureService()
                 StopScreenCaptureService()
                 
+                if (localVideoStream != nil)
+                {
+                    localVideoStream!.delegate = nil
+                    localVideoStream = nil;
+                }
+                
+                if (virtualOutgoingVideoStream != nil)
+                {
+                    virtualOutgoingVideoStream!.delegate = nil
+                    virtualOutgoingVideoStream = nil
+                }
+
+                if (screenShareOutgoingVideoStream != nil)
+                {
+                    screenShareOutgoingVideoStream!.delegate = nil
+                    screenShareOutgoingVideoStream = nil;
+                }
+                
                 localVideoStream = nil
                 virtualOutgoingVideoStream = nil
                 screenShareOutgoingVideoStream = nil
