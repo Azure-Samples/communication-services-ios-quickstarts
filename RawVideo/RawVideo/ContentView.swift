@@ -431,9 +431,7 @@ struct ContentView : View
         catch let ex
         {
             await ShowMessage(message: "Failed to create call agent")
-            
-            let msg = ex.localizedDescription
-            print(msg)
+            print(ex.localizedDescription)
         }
     }
 
@@ -461,17 +459,15 @@ struct ContentView : View
         joinCallOptions.outgoingVideoOptions = outgoingVideoOptions
         
         let locator = TeamsMeetingLinkLocator(meetingLink: meetingLink)
-
+        
+        loading = true
         do
         {
-            loading = true
             
             call = try await callAgent!.join(with: locator, joinCallOptions: joinCallOptions)
             
             try await call!.muteOutgoingAudio()
             try await call!.muteIncomingAudio()
-            
-            loading = false
             
             let defaults = UserDefaults.standard
             defaults.set(meetingLink, forKey: "MeetingLink")
@@ -480,29 +476,27 @@ struct ContentView : View
         {
             callInProgress = false
             
-            loading = false
             await ShowMessage(message: "Failed to start")
-            
-            let msg = ex.localizedDescription
-            print(msg)
+            print(ex.localizedDescription)
         }
+        
+        loading = false
 
         if (call != nil)
         {
-            AddRemoteParticipantList(remoteParticipantList: call!.remoteParticipants)
-            
             call!.delegate = callObserver!
+            
+            AddRemoteParticipantList(remoteParticipantList: call!.remoteParticipants)
         }
     }
     
     func AddRemoteParticipantList(remoteParticipantList: [RemoteParticipant]) -> Void
     {
         remoteParticipantList.forEach { remoteParticipant in
+            remoteParticipant.delegate = remoteParticipantObserver
             remoteParticipant.incomingVideoStreams.forEach { incomingVideoStream in
                 OnIncomingVideoStreamStateChanged(stream: incomingVideoStream)
             }
-            
-            remoteParticipant.delegate = remoteParticipantObserver
         }
     }
 
@@ -804,14 +798,23 @@ struct ContentView : View
         {
             return
         }
-
+        
+        loading = true
         do
         {
-            loading = true
-            
             if (call != nil)
             {
+                call!.remoteParticipants.forEach { remoteParticipant in
+                    remoteParticipant.delegate = nil
+                }
+                
                 call!.delegate = nil
+                
+                StopRemotePreview()
+                
+                incomingVideoStream = nil
+                remoteVideoStream = nil
+                rawIncomingVideoStream = nil
                 
                 StopCameraCaptureService()
                 StopScreenCaptureService()
@@ -831,16 +834,14 @@ struct ContentView : View
             }
 
             callInProgress = false
-            loading = false
         }
         catch let ex
         {
-            loading = false
             await ShowMessage(message: "Failed to stopped")
-            
-            let msg = ex.localizedDescription
-            print(msg)
+            print(ex.localizedDescription)
         }
+        
+        loading = false
     }
     
     private func GetDisplaySize() -> Void
@@ -866,7 +867,7 @@ struct ContentView : View
     
     private func ValidateCallSettings() async -> Bool
     {
-        if (meetingLink.isEmpty || !meetingLink.starts(with: "https://") || meetingLink == "Teams meeting link")
+        if (meetingLink.isEmpty || !meetingLink.starts(with: "https://"))
         {
             await ShowMessage(message: "Invalid teams meeting link")
             return false;

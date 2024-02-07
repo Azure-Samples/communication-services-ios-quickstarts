@@ -31,8 +31,7 @@ class CameraCaptureService : CaptureService, AVCaptureVideoDataOutputSampleBuffe
         }
         catch let ex
         {
-            let msg = ex.localizedDescription
-            print(msg)
+            print(ex.localizedDescription)
             
             return
         }
