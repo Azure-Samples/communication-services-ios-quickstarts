@@ -21,7 +21,6 @@ struct ContentView : View
     @FocusState private var isFocused: Bool
     
     // App
-    @State private var incomingVideoStreamDictionary: [Int32: IncomingVideoStream]?
     @State private var videoDeviceInfoList: [VideoDeviceInfo] = []
     @State private var cameraList: [AVCaptureDevice] = []
     @State private var callClient: CallClient?
@@ -37,14 +36,17 @@ struct ContentView : View
     @State private var remoteParticipantObserver: RemoteParticipantObserver?
     @State private var screenCaptureService: ScreenCaptureService?
     @State private var cameraCaptureService: CameraCaptureService?
+    @State private var incomingVideoStream: IncomingVideoStream?
+    @State private var remoteVideoStream: RemoteVideoStream?
+    @State private var rawIncomingVideoStream: RawIncomingVideoStream?
     @State private var outgoingVideoStream: OutgoingVideoStream?
     @State private var localVideoStream: LocalVideoStream?
     @State private var virtualOutgoingVideoStream: VirtualOutgoingVideoStream?
     @State private var screenShareOutgoingVideoStream: ScreenShareOutgoingVideoStream?
-    @State private var outoingVideoStreamRenderer: VideoStreamRenderer? = nil
-    @State private var outgoingVideoStreamRendererView: RendererView? = nil
-    @State private var incomingVideoStreamRenderer: VideoStreamRenderer? = nil
-    @State private var incomingVideoStreamRendererView: RendererView? = nil
+    @State private var outoingVideoStreamRenderer: VideoStreamRenderer?
+    @State private var outgoingVideoStreamRendererView: RendererView?
+    @State private var incomingVideoStreamRenderer: VideoStreamRenderer?
+    @State private var incomingVideoStreamRendererView: RendererView?
     @State private var outgoingPixelBuffer: CVPixelBuffer?
     @State private var incomingPixelBuffer: CVPixelBuffer?
     @State private var w: Double = 0.0
@@ -55,6 +57,7 @@ struct ContentView : View
     @State private var token: String = "ACS token"
     @State private var meetingLink: String = "Teams meeting link"
     @State private var callInProgress: Bool = false
+    @State private var showCallSettings: Bool = false
     @State private var loading: Bool = false
     
     struct CameraItem : Hashable
@@ -116,9 +119,10 @@ struct ContentView : View
                 }
                 
                 VStack {
-                    if (!callInProgress)
+                    if (!showCallSettings)
                     {
-                        TextEditor(text: $token)
+                        VStack {
+                            TextEditor(text: $token)
                             .frame(width: 250, height: 30)
                             .padding(10)
                             .overlay(RoundedRectangle(cornerRadius: 5)
@@ -131,7 +135,35 @@ struct ContentView : View
                                     isFocused = false
                                 }
                             }
-                        TextEditor(text: $meetingLink)
+                            Button(action: {
+                                Task {
+                                    if (!token.isEmpty && token != "ACS token")
+                                    {
+                                        await GetPermissions()
+                                    }
+                                    else
+                                    {
+                                        await ShowMessage(message: "Invalid token")
+                                    }
+                                }
+                            })
+                            {
+                                HStack {
+                                    Text("Init Resources")
+                                        .accentColor(.white)
+                                }
+                                .frame(width: 120, height: 30)
+                                .padding(10)
+                                .background(Color(.blue))
+                                .cornerRadius(5)
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!callInProgress)
+                        {
+                            TextEditor(text: $meetingLink)
                             .frame(width: 250, height: 30)
                             .padding(10)
                             .overlay(RoundedRectangle(cornerRadius: 5)
@@ -144,31 +176,9 @@ struct ContentView : View
                                     isFocused = false
                                 }
                             }
-                        Picker("", selection: $incomingVideoStreamType) {
-                            ForEach (IncomingVideoStreamTypeItem.allCases, id: \.self) { videoStreamType in
-                                Text(videoStreamType.rawValue).tag(videoStreamType.ToVideoStreamType())
-                            }
-                        }
-                        .accentColor(.black)
-                        .frame(width: 250, height: 30)
-                        .padding(10)
-                        .overlay(RoundedRectangle(cornerRadius: 5)
-                            .stroke(Color.black, lineWidth: 2))
-                        Picker("", selection: $outgoingVideoStreamType) {
-                            ForEach (OutgoingVideoStreamTypeItem.allCases, id: \.self) { videoStreamType in
-                                Text(videoStreamType.rawValue).tag(videoStreamType.ToVideoStreamType())
-                            }
-                        }
-                        .accentColor(.black)
-                        .frame(width: 250, height: 30)
-                        .padding(10)
-                        .overlay(RoundedRectangle(cornerRadius: 5)
-                            .stroke(Color.black, lineWidth: 2))
-                        if (outgoingVideoStreamType == VideoStreamType.localOutgoing)
-                        {
-                            Picker("", selection: $selectedVideoDeviceInfoIndex) {
-                                ForEach (videoDeviceInfoItemList, id: \.self) { videoDeviceInfoItem in
-                                    Text(videoDeviceInfoItem.name).tag(videoDeviceInfoItem.id)
+                            Picker("", selection: $incomingVideoStreamType) {
+                                ForEach (IncomingVideoStreamTypeItem.allCases, id: \.self) { videoStreamType in
+                                    Text(videoStreamType.rawValue).tag(videoStreamType.ToVideoStreamType())
                                 }
                             }
                             .accentColor(.black)
@@ -176,12 +186,9 @@ struct ContentView : View
                             .padding(10)
                             .overlay(RoundedRectangle(cornerRadius: 5)
                                 .stroke(Color.black, lineWidth: 2))
-                        }
-                        if (outgoingVideoStreamType == VideoStreamType.virtualOutgoing)
-                        {
-                            Picker("", selection: $selectedCameraIndex) {
-                                ForEach (cameraItemList, id: \.self) { cameraItem in
-                                    Text(cameraItem.name).tag(cameraItem.id)
+                            Picker("", selection: $outgoingVideoStreamType) {
+                                ForEach (OutgoingVideoStreamTypeItem.allCases, id: \.self) { videoStreamType in
+                                    Text(videoStreamType.rawValue).tag(videoStreamType.ToVideoStreamType())
                                 }
                             }
                             .accentColor(.black)
@@ -189,86 +196,123 @@ struct ContentView : View
                             .padding(10)
                             .overlay(RoundedRectangle(cornerRadius: 5)
                                 .stroke(Color.black, lineWidth: 2))
+                            if (outgoingVideoStreamType == VideoStreamType.localOutgoing)
+                            {
+                                Picker("", selection: $selectedVideoDeviceInfoIndex) {
+                                    ForEach (videoDeviceInfoItemList, id: \.self) { videoDeviceInfoItem in
+                                        Text(videoDeviceInfoItem.name).tag(videoDeviceInfoItem.id)
+                                    }
+                                }
+                                .accentColor(.black)
+                                .frame(width: 250, height: 30)
+                                .padding(10)
+                                .overlay(RoundedRectangle(cornerRadius: 5)
+                                    .stroke(Color.black, lineWidth: 2))
+                            }
+                            if (outgoingVideoStreamType == VideoStreamType.virtualOutgoing)
+                            {
+                                Picker("", selection: $selectedCameraIndex) {
+                                    ForEach (cameraItemList, id: \.self) { cameraItem in
+                                        Text(cameraItem.name).tag(cameraItem.id)
+                                    }
+                                }
+                                .accentColor(.black)
+                                .frame(width: 250, height: 30)
+                                .padding(10)
+                                .overlay(RoundedRectangle(cornerRadius: 5)
+                                    .stroke(Color.black, lineWidth: 2))
+                            }
                         }
-                    }
-                    if (callInProgress)
-                    {
-                        ZStack(alignment: .topLeading) {
-                            VStack {
-                                if (outgoingVideoStreamType != VideoStreamType.localOutgoing)
-                                {
-                                    RawVideoFrameView(cvPixelBuffer: $outgoingPixelBuffer)
-                                        .overlay(RoundedRectangle(cornerRadius: 5)
-                                            .stroke(Color.black, lineWidth: 2))
-                                        .background(Color.black)
-                                }
-                                else
-                                {
-                                    VideoStreamView(view: $outgoingVideoStreamRendererView)
-                                        .overlay(RoundedRectangle(cornerRadius: 5)
-                                            .stroke(Color.black, lineWidth: 2))
-                                        .background(Color.black)
-                                }
-                            }
-                            .frame(width: 120, height: 67.5)
-                            .zIndex(1)
-                            .offset(x: 5, y: 5)
-                            
-                            VStack {
-                                if (incomingVideoStreamType != VideoStreamType.remoteIncoming)
-                                {
-                                    RawVideoFrameView(cvPixelBuffer: $incomingPixelBuffer)
-                                }
-                                else
-                                {
-                                    VideoStreamView(view: $incomingVideoStreamRendererView)
-                                }
-                            }
-                            .frame(width: 320, height: 180)
-                            .zIndex(0)
-                            .overlay(RoundedRectangle(cornerRadius: 5)
-                                .stroke(Color.black, lineWidth: 2))
-                        }
-                        .frame(width: geometryReader.size.width - 30, height: 180)
-                    }
-                    HStack {
-                        Button(action: {
-                            Task {
-                                await StartCall()
-                            }
-                        })
+                        else
                         {
-                            HStack {
-                                Text("Start Call")
-                                    .accentColor(.black)
+                            ZStack(alignment: .topLeading) {
+                                VStack {
+                                    if (outgoingVideoStream != nil)
+                                    {
+                                        if (outgoingVideoStreamType != VideoStreamType.localOutgoing)
+                                        {
+                                            RawVideoFrameView(cvPixelBuffer: $outgoingPixelBuffer)
+                                                .overlay(RoundedRectangle(cornerRadius: 5)
+                                                .stroke(Color.black, lineWidth: 2))
+                                                .background(Color.black)
+                                        }
+                                        else
+                                        {
+                                            VideoStreamView(view: $outgoingVideoStreamRendererView)
+                                                .overlay(RoundedRectangle(cornerRadius: 5)
+                                                .stroke(Color.black, lineWidth: 2))
+                                                .background(Color.black)
+                                        }
+                                    }
+                                }
+                                .frame(width: 120, height: 67.5)
+                                .zIndex(1)
+                                .offset(x: 5, y: 5)
+
+                                VStack {
+                                    if (incomingVideoStream != nil)
+                                    {
+                                        if (incomingVideoStreamType != VideoStreamType.remoteIncoming)
+                                        {
+                                            RawVideoFrameView(cvPixelBuffer: $incomingPixelBuffer)
+                                                .background(Color.black)
+                                        }
+                                        else
+                                        {
+                                            VideoStreamView(view: $incomingVideoStreamRendererView)
+                                                .background(Color.black)
+                                        }
+                                    }
+                                }
+                                .frame(width: 320, height: 180)
+                                .zIndex(0)
+                                .overlay(RoundedRectangle(cornerRadius: 5)
+                                    .stroke(Color.black, lineWidth: 2))
                             }
-                            .frame(width: 120, height: 30)
-                            .padding(10)
-                            .background(Color(.green))
-                            .cornerRadius(5)
+                            .frame(width: geometryReader.size.width - 30, height: 180)
                         }
-                        Button(action: {
-                            Task {
-                                await EndCall()
+                        HStack {
+                            Button(action: {
+                                Task {
+                                    await StartCall()
+                                }
+                            })
+                            {
+                                HStack {
+                                    Text("Start Call")
+                                        .accentColor(.black)
+                                }
+                                .frame(width: 120, height: 30)
+                                .padding(10)
+                                .background(Color(.green))
+                                .cornerRadius(5)
                             }
-                        })
-                        {
-                            HStack {
-                                Text("End Call")
-                                    .accentColor(.black)
+                            Button(action: {
+                                Task {
+                                    await EndCall()
+                                }
+                            })
+                            {
+                                HStack {
+                                    Text("End Call")
+                                        .accentColor(.black)
+                                }
+                                .frame(width: 120, height: 30)
+                                .padding(10)
+                                .background(Color(.red))
+                                .cornerRadius(5)
                             }
-                            .frame(width: 120, height: 30)
-                            .padding(10)
-                            .background(Color(.red))
-                            .cornerRadius(5)
                         }
                     }
                 }
                 .frame(width: geometryReader.size.width, height: geometryReader.size.height)
                 .onAppear(perform: {
-                    Task {
-                        await GetPermissions()
-                        await InitializeTestCase()
+                    let defaults = UserDefaults.standard
+                    let savedToken = defaults.value(forKey: "Token")
+                    
+                    if (savedToken != nil)
+                    {
+                        token = savedToken as! String
                     }
                 })
                 .onTapGesture {
@@ -291,10 +335,8 @@ struct ContentView : View
         }
     }
     
-    private func InitializeTestCase() async -> Void
+    private func InitResources() async -> Void
     {
-        incomingVideoStreamDictionary = [Int32: IncomingVideoStream]()
-        
         localVideoStreamObserver = LocalVideoStreamObserver(view: self)
         virtualRawOutgoingVideoStreamObserver = VirtualRawOutgoingVideoStreamObserver(view: self)
         screenShareRawOutgoingVideoStreamObserver = ScreenShareRawOutgoingVideoStreamObserver(view: self)
@@ -305,6 +347,11 @@ struct ContentView : View
         callObserver = CallObserver(view: self, remoteParticipantObserver: remoteParticipantObserver!)
         
         await CreateAgent()
+        
+        if (deviceManager == nil)
+        {
+            return
+        }
         
         videoDeviceInfoList = deviceManager?.cameras ?? []
         videoDeviceInfoItemList = [VideoDeviceInfoItem]();
@@ -324,6 +371,16 @@ struct ContentView : View
         {
             let cameraItem = CameraItem(id: i, name: cameraList[i].localizedName)
             cameraItemList.append(cameraItem)
+        }
+        
+        showCallSettings = true
+        
+        let defaults = UserDefaults.standard
+        let savedMeetingLink = defaults.value(forKey: "MeetingLink")
+        
+        if (savedMeetingLink != nil)
+        {
+            meetingLink = savedMeetingLink as! String
         }
     }
     
@@ -345,16 +402,18 @@ struct ContentView : View
                 
             })
         }
+        
+        if (cameraAuthorizationStatus != .authorized || microphoneAuthorizationStatus != .authorized)
+        {
+            await ShowMessage(message: "you need to provide the camera and microphone permissions")
+            return
+        }
+        
+        await InitResources()
     }
 
     private func CreateAgent() async -> Void
     {
-        if (token.isEmpty)
-        {
-            await ShowMessage(message: "Token is not valid")
-            return
-        }
-        
         do
         {
             let credential = try CommunicationTokenCredential(token: token)
@@ -365,9 +424,14 @@ struct ContentView : View
             callAgent = try await callClient!.createCallAgent(userCredential: credential, options: callAgentOptions)
 
             deviceManager = try await callClient!.getDeviceManager()
+            
+            let defaults = UserDefaults.standard
+            defaults.set(token, forKey: "Token")
         }
         catch let ex
         {
+            await ShowMessage(message: "Failed to create call agent")
+            
             let msg = ex.localizedDescription
             print(msg)
         }
@@ -380,7 +444,7 @@ struct ContentView : View
             return;
         }
         
-        if (!ValidateCallSettings())
+        if (!(await ValidateCallSettings()))
         {
             return;
         }
@@ -408,6 +472,9 @@ struct ContentView : View
             try await call!.muteIncomingAudio()
             
             loading = false
+            
+            let defaults = UserDefaults.standard
+            defaults.set(meetingLink, forKey: "MeetingLink")
         }
         catch let ex
         {
@@ -577,52 +644,55 @@ struct ContentView : View
     
     public func OnIncomingVideoStreamStateChanged(stream: IncomingVideoStream) -> Void
     {
+        if (incomingVideoStream != nil && incomingVideoStream != stream)
+        {
+            if (stream.state == .available)
+            {
+                Task
+                {
+                    await ShowMessage(message: "This app only support 1 incoming video stream from 1 remote participant")
+                }
+            }
+            
+            return
+        }
+        
         switch (stream.state)
         {
             case .available:
-                if (!incomingVideoStreamDictionary!.keys.contains(stream.id))
+                switch (stream.type)
                 {
-                    switch (stream.type)
-                    {
-                        case .remoteIncoming:
-                            StartRemotePreview(remoteVideoStream: stream as! RemoteVideoStream)
-                            break
-                        case .rawIncoming:
-                            let rawIncomingVideoStream = stream as! RawIncomingVideoStream
-                            rawIncomingVideoStream.delegate = rawIncomingVideoStreamObserver
-                            rawIncomingVideoStream.start()
-
-                            break
-                        default:
-                            break
-                    }
+                case .remoteIncoming:
+                    remoteVideoStream = stream as? RemoteVideoStream
+                    StartRemotePreview()
                     
-                    incomingVideoStreamDictionary![stream.id] = stream
+                    break
+                case .rawIncoming:
+                    rawIncomingVideoStream = stream as? RawIncomingVideoStream
+                    rawIncomingVideoStream!.delegate = rawIncomingVideoStreamObserver
+                    rawIncomingVideoStream!.start()
+                    
+                    break
+                default:
+                    break
                 }
-
+                
+                incomingVideoStream = stream;
                 break
             case .stopped:
-                if (incomingVideoStreamDictionary!.keys.contains(stream.id))
+                if (incomingVideoStreamType == .remoteIncoming)
                 {
-                    if (incomingVideoStreamType == .remoteIncoming)
-                    {
-                        StopRemotePreview()
-                    }
+                    StopRemotePreview()
                 }
             
                 break
             case .notAvailable:
-                if (incomingVideoStreamDictionary!.keys.contains(stream.id))
+                if (incomingVideoStreamType == .rawIncoming)
                 {
-                    if (incomingVideoStreamType == .rawIncoming)
-                    {
-                        let rawIncomingVideoStream = incomingVideoStreamDictionary![stream.id] as! RawIncomingVideoStream
-                        rawIncomingVideoStream.delegate = nil
-                    }
-                    
-                    incomingVideoStreamDictionary!.removeValue(forKey: stream.id)
+                    rawIncomingVideoStream!.delegate = nil
                 }
-
+                
+                incomingVideoStream = nil
                 break
             default:
                 break
@@ -644,11 +714,11 @@ struct ContentView : View
         }
     }
     
-    private func StartRemotePreview(remoteVideoStream: RemoteVideoStream) -> Void
+    private func StartRemotePreview() -> Void
     {
         if (incomingVideoStreamRendererView == nil)
         {
-            incomingVideoStreamRenderer = try! VideoStreamRenderer(remoteVideoStream: remoteVideoStream)
+            incomingVideoStreamRenderer = try! VideoStreamRenderer(remoteVideoStream: remoteVideoStream!)
             let options = CreateViewOptions.init(scalingMode: ScalingMode.fit)
             incomingVideoStreamRendererView = try! incomingVideoStreamRenderer?.createView(withOptions: options)
         }
@@ -761,8 +831,6 @@ struct ContentView : View
             }
 
             callInProgress = false
-            incomingVideoStreamDictionary!.removeAll()
-            
             loading = false
         }
         catch let ex
@@ -783,21 +851,27 @@ struct ContentView : View
         
         if (h > maxHeight)
         {
-            var percentage = abs((maxHeight / h) - 1);
+            let percentage = abs((maxHeight / h) - 1);
             w = ceil((w * percentage));
             h = maxHeight;
         }
 
         if (w > maxWidth)
         {
-            var percentage = abs((maxWidth / w) - 1);
+            let percentage = abs((maxWidth / w) - 1);
             h = ceil((h * percentage));
             w = maxWidth;
         }
     }
     
-    private func ValidateCallSettings() -> Bool
+    private func ValidateCallSettings() async -> Bool
     {
+        if (meetingLink.isEmpty || !meetingLink.starts(with: "https://") || meetingLink == "Teams meeting link")
+        {
+            await ShowMessage(message: "Invalid teams meeting link")
+            return false;
+        }
+        
         var isValid = true;
         switch (outgoingVideoStreamType)
         {
@@ -816,7 +890,7 @@ struct ContentView : View
     
     private func ShowMessage(message: String) async -> Void
     {
-        let alert = await UIAlertController(title: "Call", message: message, preferredStyle: .alert)
+        let alert = await UIAlertController(title: "ACS", message: message, preferredStyle: .alert)
         let cancelAction = await UIAlertAction(title: "Ok", style: .cancel, handler: nil)
         await alert.addAction(cancelAction)
         let window = await UIApplication.shared.keyWindow
