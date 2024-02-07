@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/bisteni/Downloads/Microsoft/Repos/iOS/communication-services-ios-quickstarts/RawVideo/RawVideo.xcodeproj">
+      location = "group:/Users/bisteni/Downloads/Microsoft/Repos/iOS/communication-services-ios-quickstarts/raw-video/RawVideo.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
