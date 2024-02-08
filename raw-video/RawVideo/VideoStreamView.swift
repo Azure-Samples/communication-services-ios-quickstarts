@@ -25,7 +25,7 @@ struct VideoStreamView : UIViewRepresentable
             view.removeFromSuperview()
         }
         
-        if (view != nil)
+        if let view = view
         {
             uiView.addSubview(view)
         }

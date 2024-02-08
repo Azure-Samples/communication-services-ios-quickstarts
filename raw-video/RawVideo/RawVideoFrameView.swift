@@ -21,7 +21,9 @@ struct RawVideoFrameView : UIViewRepresentable
 
     func updateUIView(_ uiView: UIImageView, context: Context)
     {
-        guard let pixelBuffer = cvPixelBuffer else { return }
+        guard let pixelBuffer = cvPixelBuffer else {
+            return
+        }
         
         var ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         

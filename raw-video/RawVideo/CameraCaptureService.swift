@@ -14,14 +14,13 @@ import AzureCommunicationCalling
 
 class CameraCaptureService : CaptureService, AVCaptureVideoDataOutputSampleBufferDelegate
 {
-    var camera: AVCaptureDevice!
-    var captureSession: AVCaptureSession!
-    var previewLayer: AVCaptureVideoPreviewLayer!
+    var camera: AVCaptureDevice?
+    var captureSession: AVCaptureSession = AVCaptureSession()
+    var previewLayer: AVCaptureVideoPreviewLayer?
     
     func Start(camera: AVCaptureDevice) -> Void
     {
         self.camera = camera
-        captureSession = AVCaptureSession()
         captureSession.sessionPreset = AVCaptureSession.Preset.vga640x480
 
         do
@@ -29,10 +28,9 @@ class CameraCaptureService : CaptureService, AVCaptureVideoDataOutputSampleBuffe
             let videoInput = try AVCaptureDeviceInput(device: camera)
             captureSession.addInput(videoInput)
         }
-        catch let ex
+        catch
         {
-            print(ex.localizedDescription)
-            
+            print(error.localizedDescription)
             return
         }
         
@@ -44,31 +42,29 @@ class CameraCaptureService : CaptureService, AVCaptureVideoDataOutputSampleBuffe
             captureSession.addOutput(videoOutput)
         }
         
-        let queue = DispatchQueue(__label: "CameraCaptureDelegate", attr: nil)
+        let queue = DispatchQueue(label: "com.microsoft.RawVideo.CameraCaptureDelegate")
         videoOutput.setSampleBufferDelegate(self, queue: queue)
-        videoOutput.videoSettings = ["kCVPixelBufferPixelFormatTypeKey" : UInt(kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange)]
+        videoOutput.videoSettings = [String(kCVPixelBufferPixelFormatTypeKey) : UInt(kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange)]
 
         captureSession.startRunning()
     }
     
     func Stop() -> Void
     {
-        if (captureSession != nil)
-        {
-            captureSession.stopRunning()
-            captureSession = nil
-        }
+        captureSession.stopRunning()
     }
     
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection)
     {
-        let pixelBuffer: CVPixelBuffer! = CMSampleBufferGetImageBuffer(sampleBuffer)
-        let format = rawOutgoingVideoStream.format
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+            return
+        }
         
-        if (pixelBuffer != nil && format != nil)
+        let format = rawOutgoingVideoStream.format
+        if format != nil
         {
             let rawVideoFrameBuffer = RawVideoFrameBuffer()
-            rawVideoFrameBuffer.buffer = pixelBuffer!
+            rawVideoFrameBuffer.buffer = pixelBuffer
             rawVideoFrameBuffer.streamFormat = format
             
             SendRawVideoFrame(rawVideoFrameBuffer: rawVideoFrameBuffer)

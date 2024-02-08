@@ -59,6 +59,8 @@ struct ContentView : View
     @State private var callInProgress: Bool = false
     @State private var showCallSettings: Bool = false
     @State private var loading: Bool = false
+    @State private var alertMessage: String = ""
+    @State private var showAlert: Bool = false
     
     struct CameraItem : Hashable
     {
@@ -112,14 +114,14 @@ struct ContentView : View
     var body: some View {
         GeometryReader { geometryReader in
             ZStack(alignment: .center) {
-                if (loading)
+                if loading
                 {
                     ProgressView()
                         .zIndex(1)
                 }
                 
                 VStack {
-                    if (!showCallSettings)
+                    if !showCallSettings
                     {
                         VStack {
                             TextEditor(text: $token)
@@ -154,7 +156,7 @@ struct ContentView : View
                     }
                     else
                     {
-                        if (!callInProgress)
+                        if !callInProgress
                         {
                             TextEditor(text: $meetingLink)
                             .frame(width: 250, height: 30)
@@ -301,21 +303,25 @@ struct ContentView : View
                 .frame(width: geometryReader.size.width, height: geometryReader.size.height)
                 .onAppear(perform: {
                     let defaults = UserDefaults.standard
-                    let savedToken = defaults.value(forKey: "Token")
-                    
-                    if (savedToken != nil)
+                    if let savedToken = defaults.value(forKey: "Token") as? String
                     {
-                        token = savedToken as! String
+                        token = savedToken
                     }
                 })
-                .onTapGesture {
-                    if (isFocused)
-                    {
-                        isFocused = false
-                    }
-                }
                 .disabled(loading)
                 .zIndex(0)
+            }
+            .onTapGesture {
+                if isFocused
+                {
+                    isFocused = false
+                }
+            }
+            .alert(isPresented: $showAlert) { () -> Alert in
+                Alert(title: Text("ACS"), 
+                      message: Text(alertMessage),
+                      dismissButton: .default(Text("Ok"),
+                      action: { alertMessage = "" }))
             }
         }
     }
@@ -339,14 +345,13 @@ struct ContentView : View
         remoteParticipantObserver = RemoteParticipantObserver(view: self)
         callObserver = CallObserver(view: self, remoteParticipantObserver: remoteParticipantObserver!)
         
-        await CreateAgent()
+        await CreateCallAgent()
         
-        if (deviceManager == nil)
-        {
+        guard let deviceManager = deviceManager else {
             return
         }
         
-        videoDeviceInfoList = deviceManager?.cameras ?? []
+        videoDeviceInfoList = deviceManager.cameras
         videoDeviceInfoItemList = [VideoDeviceInfoItem]();
         selectedVideoDeviceInfoIndex = videoDeviceInfoList.count > 0 ? 0 : -1;
         
@@ -369,19 +374,18 @@ struct ContentView : View
         showCallSettings = true
         
         let defaults = UserDefaults.standard
-        let savedMeetingLink = defaults.value(forKey: "MeetingLink")
-        
-        if (savedMeetingLink != nil)
+        if let savedMeetingLink = defaults.value(forKey: "MeetingLink") as? String
         {
-            meetingLink = savedMeetingLink as! String
+            meetingLink = savedMeetingLink
         }
     }
     
     private func GetPermissions() async -> Void
     {
-        if (token.isEmpty || token == "ACS token")
+        if token.isEmpty || token == "ACS token"
         {
-            await ShowMessage(message: "Invalid token")
+            showAlert = true
+            alertMessage = "Invalid token"
             return
         }
         
@@ -402,16 +406,10 @@ struct ContentView : View
             })
         }
         
-        if (cameraAuthorizationStatus != .authorized || microphoneAuthorizationStatus != .authorized)
-        {
-            await ShowMessage(message: "you need to provide the camera and microphone permissions")
-            return
-        }
-        
         await InitResources()
     }
 
-    private func CreateAgent() async -> Void
+    private func CreateCallAgent() async -> Void
     {
         do
         {
@@ -420,28 +418,29 @@ struct ContentView : View
             let callAgentOptions = CallAgentOptions()
             callAgentOptions.displayName = "iOS Quickstart User"
             
-            callAgent = try await callClient!.createCallAgent(userCredential: credential, options: callAgentOptions)
+            callAgent = try await callClient?.createCallAgent(userCredential: credential, options: callAgentOptions)
 
-            deviceManager = try await callClient!.getDeviceManager()
+            deviceManager = try await callClient?.getDeviceManager()
             
             let defaults = UserDefaults.standard
             defaults.set(token, forKey: "Token")
         }
-        catch let ex
+        catch
         {
-            await ShowMessage(message: "Failed to create call agent")
-            print(ex.localizedDescription)
+            showAlert = true
+            alertMessage = "Failed to create call agent"
+            print(error.localizedDescription)
         }
     }
 
     private func StartCall() async -> Void
     {
-        if (callInProgress)
+        if callInProgress
         {
             return;
         }
         
-        if (!(await ValidateCallSettings()))
+        if !(await ValidateCallSettings())
         {
             return;
         }
@@ -462,31 +461,32 @@ struct ContentView : View
         loading = true
         do
         {
+            call = try await callAgent?.join(with: locator, joinCallOptions: joinCallOptions)
             
-            call = try await callAgent!.join(with: locator, joinCallOptions: joinCallOptions)
-            
-            try await call!.muteOutgoingAudio()
-            try await call!.muteIncomingAudio()
+            try await call?.muteOutgoingAudio()
+            try await call?.muteIncomingAudio()
             
             let defaults = UserDefaults.standard
             defaults.set(meetingLink, forKey: "MeetingLink")
         }
-        catch let ex
+        catch
         {
             callInProgress = false
             
-            await ShowMessage(message: "Failed to start")
-            print(ex.localizedDescription)
+            showAlert = true
+            alertMessage = "Failed to start"
+            print(error.localizedDescription)
         }
         
         loading = false
-
-        if (call != nil)
-        {
-            call!.delegate = callObserver!
-            
-            AddRemoteParticipantList(remoteParticipantList: call!.remoteParticipants)
+        
+        guard let call = call else {
+            return
         }
+        
+        call.delegate = callObserver!
+        
+        AddRemoteParticipantList(remoteParticipantList: call.remoteParticipants)
     }
     
     func AddRemoteParticipantList(remoteParticipantList: [RemoteParticipant]) -> Void
@@ -512,13 +512,15 @@ struct ContentView : View
                 
                 break
             case .virtualOutgoing:
-                virtualOutgoingVideoStream = VirtualOutgoingVideoStream(videoStreamOptions: rawOutgoingVideoStreamOptions)
+                virtualOutgoingVideoStream = VirtualOutgoingVideoStream(
+                    videoStreamOptions: rawOutgoingVideoStreamOptions)
                 virtualOutgoingVideoStream!.delegate = virtualRawOutgoingVideoStreamObserver
                 outgoingVideoStream = virtualOutgoingVideoStream
                 
                 break
             case .screenShareOutgoing:
-                screenShareOutgoingVideoStream = ScreenShareOutgoingVideoStream(videoStreamOptions: rawOutgoingVideoStreamOptions)
+                screenShareOutgoingVideoStream = ScreenShareOutgoingVideoStream(
+                    videoStreamOptions: rawOutgoingVideoStreamOptions)
                 screenShareOutgoingVideoStream!.delegate = screenShareRawOutgoingVideoStreamObserver
                 outgoingVideoStream = screenShareOutgoingVideoStream
                 
@@ -591,17 +593,17 @@ struct ContentView : View
     
     private func OnOutgoingVideoStreamStateChanged(stream: OutgoingVideoStream) -> Void
     {
-        switch (stream.state)
+        switch stream.state
         {
             case .available:
-                if (stream.type == .localOutgoing)
+                if stream.type == .localOutgoing
                 {
                     StartLocalPreview()
                 }
             
                 break
             case .started:
-                switch (stream.type)
+                switch stream.type
                 {
                     case .virtualOutgoing:
                         StartCameraCaptureService()
@@ -615,10 +617,11 @@ struct ContentView : View
             
                 break
             case .stopped:
-                switch (stream.type)
+                switch stream.type
                 {
                     case .localOutgoing:
-                        StopLocalPreview();
+                        StopLocalPreview()
+                        break
                     case .virtualOutgoing:
                         StopCameraCaptureService()
                         break
@@ -629,6 +632,7 @@ struct ContentView : View
                         break
                 }
             
+                outgoingVideoStream = nil
                 break
             default:
                 break
@@ -637,50 +641,55 @@ struct ContentView : View
     
     public func OnIncomingVideoStreamStateChanged(stream: IncomingVideoStream) -> Void
     {
-        if (incomingVideoStream != nil && incomingVideoStream != stream)
+        if incomingVideoStream != nil && incomingVideoStream != stream
         {
-            if (stream.state == .available)
+            if stream.state == .available
             {
                 Task
                 {
-                    await ShowMessage(message: "This app only support 1 incoming video stream from 1 remote participant")
+                    showAlert = true
+                    alertMessage = "This app only support 1 incoming video stream from 1 remote participant"
                 }
             }
             
             return
         }
         
-        switch (stream.state)
+        switch stream.state
         {
             case .available:
-                switch (stream.type)
+                switch stream.type
                 {
-                case .remoteIncoming:
-                    remoteVideoStream = stream as? RemoteVideoStream
-                    StartRemotePreview()
-                    
-                    break
-                case .rawIncoming:
-                    rawIncomingVideoStream = stream as? RawIncomingVideoStream
-                    rawIncomingVideoStream!.delegate = rawIncomingVideoStreamObserver
-                    rawIncomingVideoStream!.start()
-                    
-                    break
-                default:
-                    break
+                    case .remoteIncoming:
+                        remoteVideoStream = stream as? RemoteVideoStream
+                        StartRemotePreview()
+                        
+                        break
+                    case .rawIncoming:
+                        guard let rawIncomingVideoStreamG = stream as? RawIncomingVideoStream else {
+                            return
+                        }
+                        
+                        rawIncomingVideoStreamG.delegate = rawIncomingVideoStreamObserver
+                        rawIncomingVideoStreamG.start()
+                        rawIncomingVideoStream = rawIncomingVideoStreamG
+                        
+                        break
+                    default:
+                        break
                 }
                 
                 incomingVideoStream = stream;
                 break
             case .stopped:
-                if (incomingVideoStreamType == .remoteIncoming)
+                if incomingVideoStreamType == .remoteIncoming
                 {
                     StopRemotePreview()
                 }
             
                 break
             case .notAvailable:
-                if (incomingVideoStreamType == .rawIncoming)
+                if incomingVideoStreamType == .rawIncoming
                 {
                     rawIncomingVideoStream!.delegate = nil
                 }
@@ -704,53 +713,72 @@ struct ContentView : View
     
     private func StartRemotePreview() -> Void
     {
-        if (incomingVideoStreamRendererView == nil)
+        if incomingVideoStreamRendererView == nil
         {
-            incomingVideoStreamRenderer = try! VideoStreamRenderer(remoteVideoStream: remoteVideoStream!)
+            incomingVideoStreamRenderer = try! VideoStreamRenderer(
+                remoteVideoStream: remoteVideoStream!)
             let options = CreateViewOptions.init(scalingMode: ScalingMode.fit)
-            incomingVideoStreamRendererView = try! incomingVideoStreamRenderer?.createView(withOptions: options)
+            
+            DispatchQueue.main.async
+            {
+                incomingVideoStreamRendererView = try! incomingVideoStreamRenderer?.createView(
+                    withOptions: options)
+            }
         }
     }
     
     private func StopRemotePreview() -> Void
     {
-        if (incomingVideoStreamRendererView != nil)
+        if let incomingVideoStreamRendererView = incomingVideoStreamRendererView
         {
-            incomingVideoStreamRendererView?.dispose()
-            incomingVideoStreamRendererView = nil
-            
-            incomingVideoStreamRenderer?.dispose()
-            incomingVideoStreamRenderer = nil
+            DispatchQueue.main.async
+            {
+                incomingVideoStreamRendererView.dispose()
+                self.incomingVideoStreamRendererView = nil
+                
+                incomingVideoStreamRenderer?.dispose()
+                incomingVideoStreamRenderer = nil
+            }
         }
     }
     
     private func StartLocalPreview() -> Void
     {
-        if (outgoingVideoStreamRendererView == nil)
+        if outgoingVideoStreamRendererView == nil
         {
-            outoingVideoStreamRenderer = try! VideoStreamRenderer(localVideoStream: localVideoStream!)
+            outoingVideoStreamRenderer = try! VideoStreamRenderer(
+                localVideoStream: localVideoStream!)
             let options = CreateViewOptions.init(scalingMode: ScalingMode.fit)
-            outgoingVideoStreamRendererView = try! outoingVideoStreamRenderer?.createView(withOptions: options)
+            
+            DispatchQueue.main.async
+            {
+                outgoingVideoStreamRendererView = try! outoingVideoStreamRenderer?.createView(
+                    withOptions: options)
+            }
         }
     }
     
     private func StopLocalPreview() -> Void
     {
-        if (outgoingVideoStreamRendererView != nil)
+        if let outgoingVideoStreamRendererView = outgoingVideoStreamRendererView
         {
-            outgoingVideoStreamRendererView?.dispose()
-            outgoingVideoStreamRendererView = nil
-            
-            outoingVideoStreamRenderer?.dispose()
-            outoingVideoStreamRenderer = nil
+            DispatchQueue.main.async
+            {
+                outgoingVideoStreamRendererView.dispose()
+                self.outgoingVideoStreamRendererView = nil
+                
+                outoingVideoStreamRenderer?.dispose()
+                outoingVideoStreamRenderer = nil
+            }
         }
     }
     
     private func StartCameraCaptureService() -> Void
     {
-        if (cameraCaptureService == nil)
+        if cameraCaptureService == nil
         {
-            cameraCaptureService = CameraCaptureService(rawOutgoingVideoStream: virtualOutgoingVideoStream!)
+            cameraCaptureService = CameraCaptureService(
+                rawOutgoingVideoStream: virtualOutgoingVideoStream!)
             cameraCaptureService?.Start(camera: cameraList[selectedCameraIndex])
             cameraCaptureService?.delegate = OnRawVideoFrameCaptured
         }
@@ -758,19 +786,21 @@ struct ContentView : View
     
     private func StopCameraCaptureService() -> Void
     {
-        if (cameraCaptureService != nil)
-        {
-            cameraCaptureService?.delegate = nil
-            cameraCaptureService?.Stop()
-            cameraCaptureService = nil
+        guard let cameraCaptureService = cameraCaptureService else {
+            return
         }
+        
+        cameraCaptureService.delegate = nil
+        cameraCaptureService.Stop()
+        self.cameraCaptureService = nil
     }
     
     private func StartScreenCaptureService() -> Void
     {
-        if (screenCaptureService == nil)
+        if screenCaptureService == nil
         {
-            screenCaptureService = ScreenCaptureService(rawOutgoingVideoStream: screenShareOutgoingVideoStream!)
+            screenCaptureService = ScreenCaptureService(
+                rawOutgoingVideoStream: screenShareOutgoingVideoStream!)
             screenCaptureService?.Start()
             screenCaptureService?.delegate = OnRawVideoFrameCaptured
         }
@@ -778,17 +808,18 @@ struct ContentView : View
     
     private func StopScreenCaptureService() -> Void
     {
-        if (screenCaptureService != nil)
-        {
-            screenCaptureService?.delegate = nil
-            screenCaptureService?.Stop()
-            screenCaptureService = nil
+        guard let screenCaptureService = screenCaptureService else {
+            return
         }
+        
+        screenCaptureService.delegate = nil
+        screenCaptureService.Stop()
+        self.screenCaptureService = nil
     }
     
     private func EndCall() async -> Void
     {
-        if (!callInProgress)
+        if !callInProgress
         {
             return
         }
@@ -796,7 +827,7 @@ struct ContentView : View
         loading = true
         do
         {
-            if (call != nil)
+            if call != nil
             {
                 call!.remoteParticipants.forEach { remoteParticipant in
                     remoteParticipant.delegate = nil
@@ -814,44 +845,41 @@ struct ContentView : View
                 StopCameraCaptureService()
                 StopScreenCaptureService()
                 
-                if (localVideoStream != nil)
+                if let localVideoStream = localVideoStream
                 {
-                    localVideoStream!.delegate = nil
-                    localVideoStream = nil;
+                    localVideoStream.delegate = nil
+                    self.localVideoStream = nil;
                 }
                 
-                if (virtualOutgoingVideoStream != nil)
+                if let virtualOutgoingVideoStream = virtualOutgoingVideoStream
                 {
-                    virtualOutgoingVideoStream!.delegate = nil
-                    virtualOutgoingVideoStream = nil
+                    virtualOutgoingVideoStream.delegate = nil
+                    self.virtualOutgoingVideoStream = nil
                 }
 
-                if (screenShareOutgoingVideoStream != nil)
+                if let screenShareOutgoingVideoStream = screenShareOutgoingVideoStream
                 {
-                    screenShareOutgoingVideoStream!.delegate = nil
-                    screenShareOutgoingVideoStream = nil;
-                }
-                
-                localVideoStream = nil
-                virtualOutgoingVideoStream = nil
-                screenShareOutgoingVideoStream = nil
-
-                if (outgoingVideoStream != nil)
-                {
-                    try await call!.stopVideo(stream: outgoingVideoStream!)
-                    outgoingVideoStream = nil
+                    screenShareOutgoingVideoStream.delegate = nil
+                    self.screenShareOutgoingVideoStream = nil;
                 }
 
-                try await call!.hangUp(options: HangUpOptions())
+                if let outgoingVideoStream = outgoingVideoStream
+                {
+                    try await call?.stopVideo(stream: outgoingVideoStream)
+                    self.outgoingVideoStream = nil
+                }
+
+                try await call?.hangUp(options: HangUpOptions())
                 call = nil
             }
 
             callInProgress = false
         }
-        catch let ex
+        catch
         {
-            await ShowMessage(message: "Failed to stopped")
-            print(ex.localizedDescription)
+            showAlert = true
+            alertMessage = "Failed to stopped"
+            print(error.localizedDescription)
         }
         
         loading = false
@@ -863,14 +891,14 @@ struct ContentView : View
         w = screenSize.width
         h = screenSize.height
         
-        if (h > maxHeight)
+        if h > maxHeight
         {
             let percentage = abs((maxHeight / h) - 1);
             w = ceil((w * percentage));
             h = maxHeight;
         }
 
-        if (w > maxWidth)
+        if w > maxWidth
         {
             let percentage = abs((maxWidth / w) - 1);
             h = ceil((h * percentage));
@@ -880,14 +908,15 @@ struct ContentView : View
     
     private func ValidateCallSettings() async -> Bool
     {
-        if (meetingLink.isEmpty || !meetingLink.starts(with: "https://"))
+        if meetingLink.isEmpty || !meetingLink.starts(with: "https://")
         {
-            await ShowMessage(message: "Invalid teams meeting link")
+            showAlert = true
+            alertMessage = "Invalid teams meeting link"
             return false;
         }
         
         var isValid = true;
-        switch (outgoingVideoStreamType)
+        switch outgoingVideoStreamType
         {
             case .localOutgoing:
                 isValid = selectedVideoDeviceInfoIndex != -1
@@ -901,15 +930,6 @@ struct ContentView : View
 
         return isValid;
     }
-    
-    private func ShowMessage(message: String) async -> Void
-    {
-        let alert = await UIAlertController(title: "ACS", message: message, preferredStyle: .alert)
-        let cancelAction = await UIAlertAction(title: "Ok", style: .cancel, handler: nil)
-        await alert.addAction(cancelAction)
-        let window = await UIApplication.shared.keyWindow
-        await window?.rootViewController?.present(alert, animated: true)
-    }
 }
 
 class LocalVideoStreamObserver: NSObject, LocalVideoStreamDelegate
@@ -921,7 +941,8 @@ class LocalVideoStreamObserver: NSObject, LocalVideoStreamDelegate
         self.view = view
     }
     
-    func localVideoStream(_ localVideoStream: LocalVideoStream, didChangeState args: VideoStreamStateChangedEventArgs)
+    func localVideoStream(_ localVideoStream: LocalVideoStream, 
+                          didChangeState args: VideoStreamStateChangedEventArgs)
     {
         view.OnVideoStreamStateChanged(args: args)
     }
@@ -936,7 +957,8 @@ class VirtualRawOutgoingVideoStreamObserver: NSObject, VirtualOutgoingVideoStrea
         self.view = view
     }
     
-    func virtualOutgoingVideoStream(_ virtualOutgoingVideoStream: VirtualOutgoingVideoStream, didChangeState args: VideoStreamStateChangedEventArgs) 
+    func virtualOutgoingVideoStream(_ virtualOutgoingVideoStream: VirtualOutgoingVideoStream, 
+                                    didChangeState args: VideoStreamStateChangedEventArgs)
     {
         view.OnVideoStreamStateChanged(args: args)
     }
@@ -951,7 +973,8 @@ class ScreenShareRawOutgoingVideoStreamObserver: NSObject, ScreenShareOutgoingVi
         self.view = view
     }
     
-    func screenShareOutgoingVideoStream(_ screenShareOutgoingVideoStream: ScreenShareOutgoingVideoStream, didChangeState args: VideoStreamStateChangedEventArgs)
+    func screenShareOutgoingVideoStream(_ screenShareOutgoingVideoStream: ScreenShareOutgoingVideoStream, 
+                                        didChangeState args: VideoStreamStateChangedEventArgs)
     {
         view.OnVideoStreamStateChanged(args: args)
     }
@@ -966,7 +989,8 @@ class RemoteVideoStreamObserver: NSObject, RemoteVideoStreamDelegate
         self.view = view
     }
     
-    func remoteVideoStream(_ remoteVideoStream: RemoteVideoStream, didChangeState args: VideoStreamStateChangedEventArgs)
+    func remoteVideoStream(_ remoteVideoStream: RemoteVideoStream, 
+                           didChangeState args: VideoStreamStateChangedEventArgs)
     {
         view.OnVideoStreamStateChanged(args: args)
     }
@@ -982,16 +1006,18 @@ class RawIncomingVideoStreamObserver: NSObject, RawIncomingVideoStreamDelegate
         self.view = view
     }
     
-    func rawIncomingVideoStream(_ rawIncomingVideoStream: RawIncomingVideoStream, didChangeState args: VideoStreamStateChangedEventArgs)
+    func rawIncomingVideoStream(_ rawIncomingVideoStream: RawIncomingVideoStream, 
+                                didChangeState args: VideoStreamStateChangedEventArgs)
     {
         view.OnVideoStreamStateChanged(args: args)
     }
     
-    func rawIncomingVideoStream(_ rawIncomingVideoStream: RawIncomingVideoStream, didReceiveRawVideoFrame args: RawVideoFrameReceivedEventArgs)
+    func rawIncomingVideoStream(_ rawIncomingVideoStream: RawIncomingVideoStream, 
+                                didReceiveRawVideoFrame args: RawVideoFrameReceivedEventArgs)
     {
         let rawVideoFrameBuffer = args.frame as! RawVideoFrameBuffer
         
-        delegate!(rawVideoFrameBuffer)
+        delegate?(rawVideoFrameBuffer)
     }
 }
 
@@ -1025,7 +1051,8 @@ class RemoteParticipantObserver: NSObject, RemoteParticipantDelegate
         self.view = view
     }
     
-    func remoteParticipant(_ remoteParticipant: RemoteParticipant, didChangeVideoStreamState args: VideoStreamStateChangedEventArgs) 
+    func remoteParticipant(_ remoteParticipant: RemoteParticipant, 
+                           didChangeVideoStreamState args: VideoStreamStateChangedEventArgs)
     {
         view.OnVideoStreamStateChanged(args: args)
     }

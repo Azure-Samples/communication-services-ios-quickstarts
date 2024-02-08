@@ -11,13 +11,12 @@ import AzureCommunicationCalling
 
 class ScreenCaptureService : CaptureService
 {
-    var screenRecorder: RPScreenRecorder!
+    var screenRecorder: RPScreenRecorder = RPScreenRecorder.shared()
     
     func Start() -> Void
     {
         screenRecorder = RPScreenRecorder.shared()
-        
-        if (screenRecorder.isAvailable)
+        if screenRecorder.isAvailable
         {
             screenRecorder.startCapture(handler: captureOutput)
         }
@@ -25,31 +24,29 @@ class ScreenCaptureService : CaptureService
     
     func Stop() -> Void
     {
-        if (screenRecorder != nil)
-        {
-            screenRecorder.stopCapture()
-            screenRecorder = nil
-        }
+        screenRecorder.stopCapture()
     }
     
     func captureOutput(sampleBuffer: CMSampleBuffer, sampleBufferType: RPSampleBufferType, error: Error?) -> Void
     {
-        if (sampleBufferType != RPSampleBufferType.video)
+        if sampleBufferType != RPSampleBufferType.video
         {
             return
         }
         
-        let pixelBuffer: CVPixelBuffer! = CMSampleBufferGetImageBuffer(sampleBuffer)
-        let format = rawOutgoingVideoStream.format
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+            return
+        }
         
-        if (pixelBuffer != nil && format != nil)
+        let format = rawOutgoingVideoStream.format
+        if format != nil
         {
             let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
             let width = CVPixelBufferGetWidth(pixelBuffer)
             let height = CVPixelBufferGetHeight(pixelBuffer)
             
             let rawVideoFrameBuffer = RawVideoFrameBuffer()
-            rawVideoFrameBuffer.buffer = pixelBuffer!
+            rawVideoFrameBuffer.buffer = pixelBuffer
             
             format.width = Int32(width)
             format.height = Int32(height)
