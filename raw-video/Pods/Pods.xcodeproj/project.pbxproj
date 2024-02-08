@@ -1,0 +1,810 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		17D2EB69FA839BA1C46085F1047783CB /* AzureCommunicationCalling */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 9B8484DC33D295C398D28B22A2965560 /* Build configuration list for PBXAggregateTarget "AzureCommunicationCalling" */;
+			buildPhases = (
+				4B6724BB9F2E6B8B69BA870D6D2EF397 /* [CP] Copy XCFrameworks */,
+			);
+			dependencies = (
+				9138D34950B4667210D1EB4BD1B242D3 /* PBXTargetDependency */,
+			);
+			name = AzureCommunicationCalling;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		129F19AD0D5D2DBF9AE106C8BD73492C /* Pods-RawVideo-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 76224A6BA81576E7113AC2BBE1739B4D /* Pods-RawVideo-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3398B951E6CF6A3001269C359557A3E5 /* JwtTokenParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C58B353D2B3D0C957416AF3E684126 /* JwtTokenParser.swift */; };
+		433318E3C668C684F7505A594944F6D8 /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26CD06013E0B895CC824C20B587B118B /* Identifiers.swift */; };
+		441D236ACB1828D06E3192524A0766A9 /* CommunicationTokenRefreshOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A43C2F17303BACDDE700DD7571CE12E /* CommunicationTokenRefreshOptions.swift */; };
+		45FBB6816D4E666E549ECA0DD3FC307C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
+		46EBA36BB26563CC5689198A33BDFED9 /* Pods-RawVideo-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0796A916FED387DD6FC1020A59EBAB1F /* Pods-RawVideo-dummy.m */; };
+		5B698DC33678A01C35FF4F23EC157483 /* StaticTokenCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9C5FF3D64BEE8C41021B7F2F4C7A19 /* StaticTokenCredential.swift */; };
+		9D8A18ED7F49D7F10731DE28F2FADBD0 /* CommunicationTokenCredentialProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5029A2EDAE360351BE72CE2EF8434FC /* CommunicationTokenCredentialProviding.swift */; };
+		9F388D282F4BE59048F82B41CBBEDF70 /* ThreadSafeRefreshableAccessTokenCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC699474FBD176B7042E955935EB3C15 /* ThreadSafeRefreshableAccessTokenCache.swift */; };
+		B4697E753C880880D0E8EC6A506E9A80 /* AzureCommunicationCommon-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 7628E9E3EE16548309429ECEE3BE28F7 /* AzureCommunicationCommon-dummy.m */; };
+		DD62BDCF116841F8198DA7375F8A54DB /* CommunicationAccessToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 034FAF64E7062FFF1C1ADCC8B84E97C3 /* CommunicationAccessToken.swift */; };
+		E0A5DAF7298FABD55B939E4076A7EAC9 /* AzureCommunicationCommon-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = D552FED248760C136CE29E180C419DC2 /* AzureCommunicationCommon-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E10F03C7851EFE350F25C337FC73443D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */; };
+		E8D2517ECD2E28E543DF3A861CD109F6 /* CommunicationTokenCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34BA2E9DC9D7E166FE0DC02F9576D7D3 /* CommunicationTokenCredential.swift */; };
+		FACD2FFC72B1A711C4F0C1F015427038 /* AutoRefreshTokenCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA9CF3D51655548854CA4F2CBD57E43C /* AutoRefreshTokenCredential.swift */; };
+		FEC1217A4EA7D77D6852E29BE12FBFCD /* CommunicationCloudEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28BFF553CF9ECD0BD5527F4913539AEF /* CommunicationCloudEnvironment.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		2DE1A29AA2CCDAFB546D0D10E00C0279 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07A6CC1D379046F22ADCE2752CDEF14A;
+			remoteInfo = AzureCommunicationCommon;
+		};
+		935D716FEBCE092A194C705C91B58406 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07A6CC1D379046F22ADCE2752CDEF14A;
+			remoteInfo = AzureCommunicationCommon;
+		};
+		E521074A60E34ECF52535D236CAE0A1A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 17D2EB69FA839BA1C46085F1047783CB;
+			remoteInfo = AzureCommunicationCalling;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		034FAF64E7062FFF1C1ADCC8B84E97C3 /* CommunicationAccessToken.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CommunicationAccessToken.swift; path = sdk/communication/AzureCommunicationCommon/Source/Authentication/CommunicationAccessToken.swift; sourceTree = "<group>"; };
+		046BE0A5D32340465034A0DF75B74940 /* AzureCommunicationCommon */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = AzureCommunicationCommon; path = AzureCommunicationCommon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		04E3DBF836B80358B6219B3FA389E5D0 /* AzureCommunicationCalling.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = AzureCommunicationCalling.h; path = "AzureCommunicationCalling.xcframework/ios-arm64/AzureCommunicationCalling.framework/Headers/AzureCommunicationCalling.h"; sourceTree = "<group>"; };
+		0796A916FED387DD6FC1020A59EBAB1F /* Pods-RawVideo-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-RawVideo-dummy.m"; sourceTree = "<group>"; };
+		0A43C2F17303BACDDE700DD7571CE12E /* CommunicationTokenRefreshOptions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CommunicationTokenRefreshOptions.swift; path = sdk/communication/AzureCommunicationCommon/Source/Authentication/CommunicationTokenRefreshOptions.swift; sourceTree = "<group>"; };
+		0D7B006A22F92F4B0A80B01D8CDAB403 /* AzureCommunicationCommon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AzureCommunicationCommon.release.xcconfig; sourceTree = "<group>"; };
+		0EEB8CCA207FD1F37667F022A8C091EA /* ACSVideoStreamRendererView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ACSVideoStreamRendererView.h; path = "AzureCommunicationCalling.xcframework/ios-arm64_x86_64-simulator/AzureCommunicationCalling.framework/Headers/ACSVideoStreamRendererView.h"; sourceTree = "<group>"; };
+		11AE4CF8B5263A2779FE97EEFEC9393C /* ACSVideoStreamRendererView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ACSVideoStreamRendererView.h; path = "AzureCommunicationCalling.xcframework/ios-arm64/AzureCommunicationCalling.framework/Headers/ACSVideoStreamRendererView.h"; sourceTree = "<group>"; };
+		1265F4CD946C2B8248E735C704A203D2 /* Pods-RawVideo-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-RawVideo-Info.plist"; sourceTree = "<group>"; };
+		2013DB12F67E8B77AEB626E064E5F83D /* AzureCommunicationCalling-Swift.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "AzureCommunicationCalling-Swift.h"; path = "AzureCommunicationCalling.xcframework/ios-arm64/AzureCommunicationCalling.framework/Headers/AzureCommunicationCalling-Swift.h"; sourceTree = "<group>"; };
+		20C58B353D2B3D0C957416AF3E684126 /* JwtTokenParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JwtTokenParser.swift; path = sdk/communication/AzureCommunicationCommon/Source/Authentication/JwtTokenParser.swift; sourceTree = "<group>"; };
+		22DCB8FAE8C6CDC812FDAF8AE428ED2B /* Pods-RawVideo-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-RawVideo-acknowledgements.plist"; sourceTree = "<group>"; };
+		26BF86715ACD7E501647C958C680738D /* AzureCommunicationCalling.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = AzureCommunicationCalling.h; path = "AzureCommunicationCalling.xcframework/ios-arm64_x86_64-simulator/AzureCommunicationCalling.framework/Headers/AzureCommunicationCalling.h"; sourceTree = "<group>"; };
+		26CD06013E0B895CC824C20B587B118B /* Identifiers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Identifiers.swift; path = sdk/communication/AzureCommunicationCommon/Source/Identifiers.swift; sourceTree = "<group>"; };
+		28BFF553CF9ECD0BD5527F4913539AEF /* CommunicationCloudEnvironment.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CommunicationCloudEnvironment.swift; path = sdk/communication/AzureCommunicationCommon/Source/CommunicationCloudEnvironment.swift; sourceTree = "<group>"; };
+		34BA2E9DC9D7E166FE0DC02F9576D7D3 /* CommunicationTokenCredential.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CommunicationTokenCredential.swift; path = sdk/communication/AzureCommunicationCommon/Source/Authentication/CommunicationTokenCredential.swift; sourceTree = "<group>"; };
+		406E79335486643876B80FFA2C567C71 /* Pods-RawVideo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-RawVideo.debug.xcconfig"; sourceTree = "<group>"; };
+		5134C34AAFBF1CE90FEB5760A7BC0A50 /* AzureCommunicationCommon.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = AzureCommunicationCommon.modulemap; sourceTree = "<group>"; };
+		518B277543A2B4860528B26348224DDC /* AzureCommunicationCommon.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AzureCommunicationCommon.debug.xcconfig; sourceTree = "<group>"; };
+		56B635F69F262904C5EA2EAF7C9561F2 /* ACSStreamSize.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ACSStreamSize.h; path = "AzureCommunicationCalling.xcframework/ios-arm64/AzureCommunicationCalling.framework/Headers/ACSStreamSize.h"; sourceTree = "<group>"; };
+		56F4637618179036371B462912A0A179 /* ACSFeatures.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ACSFeatures.h; path = "AzureCommunicationCalling.xcframework/ios-arm64/AzureCommunicationCalling.framework/Headers/ACSFeatures.h"; sourceTree = "<group>"; };
+		6B33D5791E4EDDCC5281D68EABEC5DE5 /* ACSCallKit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ACSCallKit.h; path = "AzureCommunicationCalling.xcframework/ios-arm64_x86_64-simulator/AzureCommunicationCalling.framework/Headers/ACSCallKit.h"; sourceTree = "<group>"; };
+		73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		76224A6BA81576E7113AC2BBE1739B4D /* Pods-RawVideo-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-RawVideo-umbrella.h"; sourceTree = "<group>"; };
+		7628E9E3EE16548309429ECEE3BE28F7 /* AzureCommunicationCommon-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "AzureCommunicationCommon-dummy.m"; sourceTree = "<group>"; };
+		7C9C5FF3D64BEE8C41021B7F2F4C7A19 /* StaticTokenCredential.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StaticTokenCredential.swift; path = sdk/communication/AzureCommunicationCommon/Source/Authentication/StaticTokenCredential.swift; sourceTree = "<group>"; };
+		7D45EC918D28DBF763D7DE828F55940A /* AzureCommunicationCalling.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AzureCommunicationCalling.debug.xcconfig; sourceTree = "<group>"; };
+		829D8681539D94CC4ADEA97347FC83C5 /* ACSVideoStreamRenderer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ACSVideoStreamRenderer.h; path = "AzureCommunicationCalling.xcframework/ios-arm64/AzureCommunicationCalling.framework/Headers/ACSVideoStreamRenderer.h"; sourceTree = "<group>"; };
+		838A804A69EEC7B905F1344FEA0EC608 /* Pods-RawVideo */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Pods-RawVideo"; path = Pods_RawVideo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		894EAD9C5EB681482B77DC5D97B94003 /* AzureCommunicationCommon-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "AzureCommunicationCommon-Info.plist"; sourceTree = "<group>"; };
+		90E843EEA7EA524256A476FB746B05D5 /* Pods-RawVideo-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-RawVideo-acknowledgements.markdown"; sourceTree = "<group>"; };
+		9B4AB48D87A2D5EB259713D775C2FB77 /* ACSFeatures.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ACSFeatures.h; path = "AzureCommunicationCalling.xcframework/ios-arm64_x86_64-simulator/AzureCommunicationCalling.framework/Headers/ACSFeatures.h"; sourceTree = "<group>"; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9F1D45F077587E698CB0DF0FC42FAF04 /* AzureCommunicationCalling.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = AzureCommunicationCalling.release.xcconfig; sourceTree = "<group>"; };
+		BC699474FBD176B7042E955935EB3C15 /* ThreadSafeRefreshableAccessTokenCache.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ThreadSafeRefreshableAccessTokenCache.swift; path = sdk/communication/AzureCommunicationCommon/Source/Authentication/ThreadSafeRefreshableAccessTokenCache.swift; sourceTree = "<group>"; };
+		C0F079F3775D360D13C81C640031E566 /* AzureCommunicationCalling-Swift.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "AzureCommunicationCalling-Swift.h"; path = "AzureCommunicationCalling.xcframework/ios-arm64_x86_64-simulator/AzureCommunicationCalling.framework/Headers/AzureCommunicationCalling-Swift.h"; sourceTree = "<group>"; };
+		C5D3EA67E9FCB5DAF05A6CD760266660 /* ACSVideoStreamRenderer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ACSVideoStreamRenderer.h; path = "AzureCommunicationCalling.xcframework/ios-arm64_x86_64-simulator/AzureCommunicationCalling.framework/Headers/ACSVideoStreamRenderer.h"; sourceTree = "<group>"; };
+		CA2C06E565B2B73B021E4844A77199AD /* Pods-RawVideo.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-RawVideo.modulemap"; sourceTree = "<group>"; };
+		CEC1308942105BAE1BDEDB06309380CC /* AzureCommunicationCalling.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; path = AzureCommunicationCalling.xcframework; sourceTree = "<group>"; };
+		D5029A2EDAE360351BE72CE2EF8434FC /* CommunicationTokenCredentialProviding.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CommunicationTokenCredentialProviding.swift; path = sdk/communication/AzureCommunicationCommon/Source/Authentication/CommunicationTokenCredentialProviding.swift; sourceTree = "<group>"; };
+		D552FED248760C136CE29E180C419DC2 /* AzureCommunicationCommon-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "AzureCommunicationCommon-umbrella.h"; sourceTree = "<group>"; };
+		D995EE907CE799B917DEF9540CBBD563 /* AzureCommunicationCalling-xcframeworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "AzureCommunicationCalling-xcframeworks.sh"; sourceTree = "<group>"; };
+		DBF87664B2151A5D270D158876FA5CDB /* ACSCallKit.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ACSCallKit.h; path = "AzureCommunicationCalling.xcframework/ios-arm64/AzureCommunicationCalling.framework/Headers/ACSCallKit.h"; sourceTree = "<group>"; };
+		E81180CBF18DF4A4A990E59DCFC1A0BF /* Pods-RawVideo-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-RawVideo-frameworks.sh"; sourceTree = "<group>"; };
+		EBE5A4DC592748589D73C400974B21FA /* AzureCommunicationCommon-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "AzureCommunicationCommon-prefix.pch"; sourceTree = "<group>"; };
+		EECB5193C32DCB0D67829AFAC24A6AC0 /* Pods-RawVideo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-RawVideo.release.xcconfig"; sourceTree = "<group>"; };
+		FA9CF3D51655548854CA4F2CBD57E43C /* AutoRefreshTokenCredential.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AutoRefreshTokenCredential.swift; path = sdk/communication/AzureCommunicationCommon/Source/Authentication/AutoRefreshTokenCredential.swift; sourceTree = "<group>"; };
+		FABD1C8B7378919B7DDE30FD7E1C108B /* ACSStreamSize.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ACSStreamSize.h; path = "AzureCommunicationCalling.xcframework/ios-arm64_x86_64-simulator/AzureCommunicationCalling.framework/Headers/ACSStreamSize.h"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3B961A8B8FA0F0D8B6EE7BA797A0C66F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				45FBB6816D4E666E549ECA0DD3FC307C /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9F0EE9D335D261B8F540F5F05F77AFEA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E10F03C7851EFE350F25C337FC73443D /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		18994BFCF634DF0E5589E37855A29214 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				046BE0A5D32340465034A0DF75B74940 /* AzureCommunicationCommon */,
+				838A804A69EEC7B905F1344FEA0EC608 /* Pods-RawVideo */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		20152995E9F06F13EFF60C4463E0120C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CEC1308942105BAE1BDEDB06309380CC /* AzureCommunicationCalling.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		578452D2E740E91742655AC8F1636D1F /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				73010CC983E3809BECEE5348DA1BB8C6 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		6EC462F0CAA11F80C4D924986F548606 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				5134C34AAFBF1CE90FEB5760A7BC0A50 /* AzureCommunicationCommon.modulemap */,
+				7628E9E3EE16548309429ECEE3BE28F7 /* AzureCommunicationCommon-dummy.m */,
+				894EAD9C5EB681482B77DC5D97B94003 /* AzureCommunicationCommon-Info.plist */,
+				EBE5A4DC592748589D73C400974B21FA /* AzureCommunicationCommon-prefix.pch */,
+				D552FED248760C136CE29E180C419DC2 /* AzureCommunicationCommon-umbrella.h */,
+				518B277543A2B4860528B26348224DDC /* AzureCommunicationCommon.debug.xcconfig */,
+				0D7B006A22F92F4B0A80B01D8CDAB403 /* AzureCommunicationCommon.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/AzureCommunicationCommon";
+			sourceTree = "<group>";
+		};
+		6EED0D7CB94A1FFD0C2BCAF81215CAC8 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				D995EE907CE799B917DEF9540CBBD563 /* AzureCommunicationCalling-xcframeworks.sh */,
+				7D45EC918D28DBF763D7DE828F55940A /* AzureCommunicationCalling.debug.xcconfig */,
+				9F1D45F077587E698CB0DF0FC42FAF04 /* AzureCommunicationCalling.release.xcconfig */,
+			);
+			name = "Support Files";
+			path = "../Target Support Files/AzureCommunicationCalling";
+			sourceTree = "<group>";
+		};
+		7AE7C7A9F2F1A5D4803789361B61D7CF /* AzureCommunicationCommon */ = {
+			isa = PBXGroup;
+			children = (
+				FA9CF3D51655548854CA4F2CBD57E43C /* AutoRefreshTokenCredential.swift */,
+				034FAF64E7062FFF1C1ADCC8B84E97C3 /* CommunicationAccessToken.swift */,
+				28BFF553CF9ECD0BD5527F4913539AEF /* CommunicationCloudEnvironment.swift */,
+				34BA2E9DC9D7E166FE0DC02F9576D7D3 /* CommunicationTokenCredential.swift */,
+				D5029A2EDAE360351BE72CE2EF8434FC /* CommunicationTokenCredentialProviding.swift */,
+				0A43C2F17303BACDDE700DD7571CE12E /* CommunicationTokenRefreshOptions.swift */,
+				26CD06013E0B895CC824C20B587B118B /* Identifiers.swift */,
+				20C58B353D2B3D0C957416AF3E684126 /* JwtTokenParser.swift */,
+				7C9C5FF3D64BEE8C41021B7F2F4C7A19 /* StaticTokenCredential.swift */,
+				BC699474FBD176B7042E955935EB3C15 /* ThreadSafeRefreshableAccessTokenCache.swift */,
+				6EC462F0CAA11F80C4D924986F548606 /* Support Files */,
+			);
+			name = AzureCommunicationCommon;
+			path = AzureCommunicationCommon;
+			sourceTree = "<group>";
+		};
+		7FC65B92CE7ABAA9477EE97E5FEA6FD3 /* Pods-RawVideo */ = {
+			isa = PBXGroup;
+			children = (
+				CA2C06E565B2B73B021E4844A77199AD /* Pods-RawVideo.modulemap */,
+				90E843EEA7EA524256A476FB746B05D5 /* Pods-RawVideo-acknowledgements.markdown */,
+				22DCB8FAE8C6CDC812FDAF8AE428ED2B /* Pods-RawVideo-acknowledgements.plist */,
+				0796A916FED387DD6FC1020A59EBAB1F /* Pods-RawVideo-dummy.m */,
+				E81180CBF18DF4A4A990E59DCFC1A0BF /* Pods-RawVideo-frameworks.sh */,
+				1265F4CD946C2B8248E735C704A203D2 /* Pods-RawVideo-Info.plist */,
+				76224A6BA81576E7113AC2BBE1739B4D /* Pods-RawVideo-umbrella.h */,
+				406E79335486643876B80FFA2C567C71 /* Pods-RawVideo.debug.xcconfig */,
+				EECB5193C32DCB0D67829AFAC24A6AC0 /* Pods-RawVideo.release.xcconfig */,
+			);
+			name = "Pods-RawVideo";
+			path = "Target Support Files/Pods-RawVideo";
+			sourceTree = "<group>";
+		};
+		8EF9A3C8AAED691E160D69FC01CBB9DD /* Targets Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				7FC65B92CE7ABAA9477EE97E5FEA6FD3 /* Pods-RawVideo */,
+			);
+			name = "Targets Support Files";
+			sourceTree = "<group>";
+		};
+		A6B6F2978E73061F4056247C66B6C825 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				EA888C5289385E0E4DD151051E669926 /* AzureCommunicationCalling */,
+				7AE7C7A9F2F1A5D4803789361B61D7CF /* AzureCommunicationCommon */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		CF1408CF629C7361332E53B88F7BD30C = {
+			isa = PBXGroup;
+			children = (
+				9D940727FF8FB9C785EB98E56350EF41 /* Podfile */,
+				D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */,
+				A6B6F2978E73061F4056247C66B6C825 /* Pods */,
+				18994BFCF634DF0E5589E37855A29214 /* Products */,
+				8EF9A3C8AAED691E160D69FC01CBB9DD /* Targets Support Files */,
+			);
+			sourceTree = "<group>";
+		};
+		D210D550F4EA176C3123ED886F8F87F5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				578452D2E740E91742655AC8F1636D1F /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		EA888C5289385E0E4DD151051E669926 /* AzureCommunicationCalling */ = {
+			isa = PBXGroup;
+			children = (
+				DBF87664B2151A5D270D158876FA5CDB /* ACSCallKit.h */,
+				6B33D5791E4EDDCC5281D68EABEC5DE5 /* ACSCallKit.h */,
+				56F4637618179036371B462912A0A179 /* ACSFeatures.h */,
+				9B4AB48D87A2D5EB259713D775C2FB77 /* ACSFeatures.h */,
+				56B635F69F262904C5EA2EAF7C9561F2 /* ACSStreamSize.h */,
+				FABD1C8B7378919B7DDE30FD7E1C108B /* ACSStreamSize.h */,
+				829D8681539D94CC4ADEA97347FC83C5 /* ACSVideoStreamRenderer.h */,
+				C5D3EA67E9FCB5DAF05A6CD760266660 /* ACSVideoStreamRenderer.h */,
+				11AE4CF8B5263A2779FE97EEFEC9393C /* ACSVideoStreamRendererView.h */,
+				0EEB8CCA207FD1F37667F022A8C091EA /* ACSVideoStreamRendererView.h */,
+				04E3DBF836B80358B6219B3FA389E5D0 /* AzureCommunicationCalling.h */,
+				26BF86715ACD7E501647C958C680738D /* AzureCommunicationCalling.h */,
+				2013DB12F67E8B77AEB626E064E5F83D /* AzureCommunicationCalling-Swift.h */,
+				C0F079F3775D360D13C81C640031E566 /* AzureCommunicationCalling-Swift.h */,
+				20152995E9F06F13EFF60C4463E0120C /* Frameworks */,
+				6EED0D7CB94A1FFD0C2BCAF81215CAC8 /* Support Files */,
+			);
+			name = AzureCommunicationCalling;
+			path = AzureCommunicationCalling;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		73FA76F4D97DC4CA783C0F1F749155D1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E0A5DAF7298FABD55B939E4076A7EAC9 /* AzureCommunicationCommon-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D07BCFB24875D42F51574D5336F2A46F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				129F19AD0D5D2DBF9AE106C8BD73492C /* Pods-RawVideo-umbrella.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		07A6CC1D379046F22ADCE2752CDEF14A /* AzureCommunicationCommon */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F7BAE89538295192DEA20CC470562589 /* Build configuration list for PBXNativeTarget "AzureCommunicationCommon" */;
+			buildPhases = (
+				73FA76F4D97DC4CA783C0F1F749155D1 /* Headers */,
+				39581DDF0AAF7E36BA77F63C94A8EB3A /* Sources */,
+				9F0EE9D335D261B8F540F5F05F77AFEA /* Frameworks */,
+				A3E2A792E1B8BE0A2C3A8CC22AA9F228 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AzureCommunicationCommon;
+			productName = AzureCommunicationCommon;
+			productReference = 046BE0A5D32340465034A0DF75B74940 /* AzureCommunicationCommon */;
+			productType = "com.apple.product-type.framework";
+		};
+		EB5CAEE220C6206C8B38C9D1A766D98B /* Pods-RawVideo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FADF52A4D49D64F16781545058FA72BF /* Build configuration list for PBXNativeTarget "Pods-RawVideo" */;
+			buildPhases = (
+				D07BCFB24875D42F51574D5336F2A46F /* Headers */,
+				1FA58CF4C09421D10F2CF703F7931ED0 /* Sources */,
+				3B961A8B8FA0F0D8B6EE7BA797A0C66F /* Frameworks */,
+				B3F2C718BD9E29D0C1855514B712035C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F4CF161478CAC2BCD9D57D5D52FDAA8B /* PBXTargetDependency */,
+				F6E8EFF00CC75E1FF43EC1E7B1BD19BD /* PBXTargetDependency */,
+			);
+			name = "Pods-RawVideo";
+			productName = Pods_RawVideo;
+			productReference = 838A804A69EEC7B905F1344FEA0EC608 /* Pods-RawVideo */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
+			productRefGroup = 18994BFCF634DF0E5589E37855A29214 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				17D2EB69FA839BA1C46085F1047783CB /* AzureCommunicationCalling */,
+				07A6CC1D379046F22ADCE2752CDEF14A /* AzureCommunicationCommon */,
+				EB5CAEE220C6206C8B38C9D1A766D98B /* Pods-RawVideo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A3E2A792E1B8BE0A2C3A8CC22AA9F228 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B3F2C718BD9E29D0C1855514B712035C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4B6724BB9F2E6B8B69BA870D6D2EF397 /* [CP] Copy XCFrameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/AzureCommunicationCalling/AzureCommunicationCalling-xcframeworks-input-files.xcfilelist",
+			);
+			name = "[CP] Copy XCFrameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/AzureCommunicationCalling/AzureCommunicationCalling-xcframeworks-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/AzureCommunicationCalling/AzureCommunicationCalling-xcframeworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1FA58CF4C09421D10F2CF703F7931ED0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				46EBA36BB26563CC5689198A33BDFED9 /* Pods-RawVideo-dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39581DDF0AAF7E36BA77F63C94A8EB3A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FACD2FFC72B1A711C4F0C1F015427038 /* AutoRefreshTokenCredential.swift in Sources */,
+				B4697E753C880880D0E8EC6A506E9A80 /* AzureCommunicationCommon-dummy.m in Sources */,
+				DD62BDCF116841F8198DA7375F8A54DB /* CommunicationAccessToken.swift in Sources */,
+				FEC1217A4EA7D77D6852E29BE12FBFCD /* CommunicationCloudEnvironment.swift in Sources */,
+				E8D2517ECD2E28E543DF3A861CD109F6 /* CommunicationTokenCredential.swift in Sources */,
+				9D8A18ED7F49D7F10731DE28F2FADBD0 /* CommunicationTokenCredentialProviding.swift in Sources */,
+				441D236ACB1828D06E3192524A0766A9 /* CommunicationTokenRefreshOptions.swift in Sources */,
+				433318E3C668C684F7505A594944F6D8 /* Identifiers.swift in Sources */,
+				3398B951E6CF6A3001269C359557A3E5 /* JwtTokenParser.swift in Sources */,
+				5B698DC33678A01C35FF4F23EC157483 /* StaticTokenCredential.swift in Sources */,
+				9F388D282F4BE59048F82B41CBBEDF70 /* ThreadSafeRefreshableAccessTokenCache.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9138D34950B4667210D1EB4BD1B242D3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AzureCommunicationCommon;
+			target = 07A6CC1D379046F22ADCE2752CDEF14A /* AzureCommunicationCommon */;
+			targetProxy = 935D716FEBCE092A194C705C91B58406 /* PBXContainerItemProxy */;
+		};
+		F4CF161478CAC2BCD9D57D5D52FDAA8B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AzureCommunicationCalling;
+			target = 17D2EB69FA839BA1C46085F1047783CB /* AzureCommunicationCalling */;
+			targetProxy = E521074A60E34ECF52535D236CAE0A1A /* PBXContainerItemProxy */;
+		};
+		F6E8EFF00CC75E1FF43EC1E7B1BD19BD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AzureCommunicationCommon;
+			target = 07A6CC1D379046F22ADCE2752CDEF14A /* AzureCommunicationCommon */;
+			targetProxy = 2DE1A29AA2CCDAFB546D0D10E00C0279 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		30E0B9EFD9A5C45D0D351231E81B30B3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_RELEASE=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Release;
+		};
+		4777FA1C4A841740AB53FA99EF2E2B3F /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0D7B006A22F92F4B0A80B01D8CDAB403 /* AzureCommunicationCommon.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/AzureCommunicationCommon/AzureCommunicationCommon-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/AzureCommunicationCommon/AzureCommunicationCommon-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/AzureCommunicationCommon/AzureCommunicationCommon.modulemap";
+				PRODUCT_MODULE_NAME = AzureCommunicationCommon;
+				PRODUCT_NAME = AzureCommunicationCommon;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		5BCAF5F343BB7F9AA209DED7A7FB4CED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 518B277543A2B4860528B26348224DDC /* AzureCommunicationCommon.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/AzureCommunicationCommon/AzureCommunicationCommon-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/AzureCommunicationCommon/AzureCommunicationCommon-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/AzureCommunicationCommon/AzureCommunicationCommon.modulemap";
+				PRODUCT_MODULE_NAME = AzureCommunicationCommon;
+				PRODUCT_NAME = AzureCommunicationCommon;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		612B008F15D491116D6A303A874E8437 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7D45EC918D28DBF763D7DE828F55940A /* AzureCommunicationCalling.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A538A025FF34514F93C52CC645C24EDC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 406E79335486643876B80FFA2C567C71 /* Pods-RawVideo.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-RawVideo/Pods-RawVideo-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-RawVideo/Pods-RawVideo.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		ACC9365EB27535A8060F45AB664473C4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EECB5193C32DCB0D67829AFAC24A6AC0 /* Pods-RawVideo.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = "Target Support Files/Pods-RawVideo/Pods-RawVideo-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-RawVideo/Pods-RawVideo.modulemap";
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		BB49314120BFD501DAB22BFE0EADE069 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9F1D45F077587E698CB0DF0FC42FAF04 /* AzureCommunicationCalling.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F4FF6A0D1970CA9705974E3CB2134802 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"POD_CONFIGURATION_DEBUG=1",
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				SYMROOT = "${SRCROOT}/../build";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F4FF6A0D1970CA9705974E3CB2134802 /* Debug */,
+				30E0B9EFD9A5C45D0D351231E81B30B3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9B8484DC33D295C398D28B22A2965560 /* Build configuration list for PBXAggregateTarget "AzureCommunicationCalling" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				612B008F15D491116D6A303A874E8437 /* Debug */,
+				BB49314120BFD501DAB22BFE0EADE069 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F7BAE89538295192DEA20CC470562589 /* Build configuration list for PBXNativeTarget "AzureCommunicationCommon" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5BCAF5F343BB7F9AA209DED7A7FB4CED /* Debug */,
+				4777FA1C4A841740AB53FA99EF2E2B3F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FADF52A4D49D64F16781545058FA72BF /* Build configuration list for PBXNativeTarget "Pods-RawVideo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A538A025FF34514F93C52CC645C24EDC /* Debug */,
+				ACC9365EB27535A8060F45AB664473C4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BFDFE7DC352907FC980B868725387E98 /* Project object */;
+}
