@@ -19,6 +19,10 @@ class NotificationService: UNNotificationServiceExtension {
         bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
 
         if let bestAttemptContent = bestAttemptContent {
+            // Set default title and body
+            bestAttemptContent.title = "New Message"
+            bestAttemptContent.body = "Please tap here to see the message."
+            
             do{
                 let data = bestAttemptContent.userInfo
                 
@@ -50,14 +54,10 @@ class NotificationService: UNNotificationServiceExtension {
                     // Customize the content
                     let messageBody = chatMessageReceivedEvent.message
                     bestAttemptContent.body = messageBody
-                    
-                    default:
-                    bestAttemptContent.title = "New Message"
-                    bestAttemptContent.body = "Please tap here to see the message."
-                    
-                    contentHandler(bestAttemptContent)
                 }
-            
+                
+                // Call contentHandler after switch to ensure it's called in all cases
+                contentHandler(bestAttemptContent)
             } catch {
                 /*
                  If the decryption failed, the app will not be able to customize "Title" or "Message Body"
