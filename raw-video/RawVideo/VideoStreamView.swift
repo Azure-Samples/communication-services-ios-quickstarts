@@ -5,9 +5,9 @@
 //  Created by Yassir Amadh Bisteni Aldana on 20/04/23.
 //
 
-import AzureCommunicationCalling
 import Foundation
 import SwiftUI
+import AzureCommunicationCalling
 
 struct VideoStreamView : UIViewRepresentable
 {

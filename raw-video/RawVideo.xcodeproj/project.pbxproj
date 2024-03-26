@@ -17,6 +17,7 @@
 		99134B002B6C6916002D81F4 /* CameraCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99134AFF2B6C6916002D81F4 /* CameraCaptureService.swift */; };
 		99134B022B6C6925002D81F4 /* CaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99134B012B6C6925002D81F4 /* CaptureService.swift */; };
 		99134B082B6D48F5002D81F4 /* CaptureServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99134B072B6D48F5002D81F4 /* CaptureServiceDelegate.swift */; };
+		993687202B9F5C8000714A2A /* VideoFrameGeneratorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9936871F2B9F5C8000714A2A /* VideoFrameGeneratorService.swift */; };
 		C564341B8E8E6E67A95575C4 /* Pods_RawVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA9F47B316E39FEA163F585 /* Pods_RawVideo.framework */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +36,7 @@
 		99134AFF2B6C6916002D81F4 /* CameraCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCaptureService.swift; sourceTree = "<group>"; };
 		99134B012B6C6925002D81F4 /* CaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureService.swift; sourceTree = "<group>"; };
 		99134B072B6D48F5002D81F4 /* CaptureServiceDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureServiceDelegate.swift; sourceTree = "<group>"; };
+		9936871F2B9F5C8000714A2A /* VideoFrameGeneratorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoFrameGeneratorService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 				99134AFF2B6C6916002D81F4 /* CameraCaptureService.swift */,
 				99134B012B6C6925002D81F4 /* CaptureService.swift */,
 				99134B072B6D48F5002D81F4 /* CaptureServiceDelegate.swift */,
+				9936871F2B9F5C8000714A2A /* VideoFrameGeneratorService.swift */,
 			);
 			path = RawVideo;
 			sourceTree = "<group>";
@@ -231,6 +234,7 @@
 				06C279D729F1DF3500C65641 /* VideoStreamView.swift in Sources */,
 				06C279D929F1E6D100C65641 /* RawVideoFrameView.swift in Sources */,
 				99134B082B6D48F5002D81F4 /* CaptureServiceDelegate.swift in Sources */,
+				993687202B9F5C8000714A2A /* VideoFrameGeneratorService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,19 +10,19 @@ import AzureCommunicationCalling
 
 class CaptureService : NSObject
 {
-    let rawOutgoingVideoStream: RawOutgoingVideoStream
+    let stream: RawOutgoingVideoStream
     var delegate: ((RawVideoFrameBuffer) -> Void)?
     
-    init(rawOutgoingVideoStream: RawOutgoingVideoStream)
+    init(stream: RawOutgoingVideoStream)
     {
-        self.rawOutgoingVideoStream = rawOutgoingVideoStream
+        self.stream = stream
     }
     
     func SendRawVideoFrame(rawVideoFrameBuffer: RawVideoFrameBuffer) -> Void
     {
         if (CanSendRawVideoFrames())
         {
-            rawOutgoingVideoStream.send(frame: rawVideoFrameBuffer) { error in
+            stream.send(frame: rawVideoFrameBuffer) { error in
                 
             }
             
@@ -35,8 +35,8 @@ class CaptureService : NSObject
     
     private func CanSendRawVideoFrames() -> Bool
     {
-        return rawOutgoingVideoStream != nil &&
-        rawOutgoingVideoStream.format != nil &&
-        rawOutgoingVideoStream.state == .started
+        return stream != nil &&
+        stream.format != nil &&
+        stream.state == .started
     }
 }
