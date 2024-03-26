@@ -14,8 +14,10 @@ struct ContentView : View
     // UI
     @State private var videoDeviceInfoItemList: [VideoDeviceInfoItem] = []
     @State private var cameraItemList: [CameraItem] = []
-    @State private var selectedVideoDeviceInfoIndex: Int = -1
-    @State private var selectedCameraIndex: Int = -1
+    @State private var videoFormatItemList: [VideoFormatItem] = []
+    @State private var videoDeviceInfoListIndex: Int = -1
+    @State private var cameraListIndex: Int = -1
+    @State private var videoFormatListIndex: Int = -1
     @State private var outgoingVideoStreamType: VideoStreamType = VideoStreamType.virtualOutgoing
     @State private var incomingVideoStreamType: VideoStreamType = VideoStreamType.rawIncoming
     @FocusState private var isFocused: Bool
@@ -23,6 +25,7 @@ struct ContentView : View
     // App
     @State private var videoDeviceInfoList: [VideoDeviceInfo] = []
     @State private var cameraList: [AVCaptureDevice] = []
+    @State private var videoFormatList: [VideoFormatBundle] = []
     @State private var callClient: CallClient?
     @State private var callAgent: CallAgent?
     @State private var call: Call?
@@ -34,8 +37,9 @@ struct ContentView : View
     @State private var rawIncomingVideoStreamObserver: RawIncomingVideoStreamObserver?
     @State private var callObserver: CallObserver?
     @State private var remoteParticipantObserver: RemoteParticipantObserver?
-    @State private var screenCaptureService: ScreenCaptureService?
     @State private var cameraCaptureService: CameraCaptureService?
+    @State private var screenCaptureService: ScreenCaptureService?
+    @State private var videoFrameGeneratorService: VideoFrameGeneratorService?
     @State private var incomingVideoStream: IncomingVideoStream?
     @State private var remoteVideoStream: RemoteVideoStream?
     @State private var rawIncomingVideoStream: RawIncomingVideoStream?
@@ -62,16 +66,22 @@ struct ContentView : View
     @State private var alertMessage: String = ""
     @State private var showAlert: Bool = false
     
+    struct VideoDeviceInfoItem : Hashable
+    {
+        var id: Int
+        var name: String
+    }
+    
     struct CameraItem : Hashable
     {
         var id: Int
         var name: String
     }
     
-    struct VideoDeviceInfoItem : Hashable
+    struct VideoFormatItem : Hashable
     {
         var id: Int
-        var name: String
+        var resolution: String
     }
     
     enum OutgoingVideoStreamTypeItem : String, CaseIterable
@@ -84,12 +94,12 @@ struct ContentView : View
         {
             switch self
             {
-            case .localOutgoing:
-                return VideoStreamType.localOutgoing
-            case .virtualOutgoing:
-                return VideoStreamType.virtualOutgoing
-            case .screenShareOutgoing:
-                return VideoStreamType.screenShareOutgoing
+                case .localOutgoing:
+                    return VideoStreamType.localOutgoing
+                case .virtualOutgoing:
+                    return VideoStreamType.virtualOutgoing
+                case .screenShareOutgoing:
+                    return VideoStreamType.screenShareOutgoing
             }
         }
     }
@@ -125,18 +135,18 @@ struct ContentView : View
                     {
                         VStack {
                             TextEditor(text: $token)
-                            .frame(width: 250, height: 30)
-                            .padding(10)
-                            .overlay(RoundedRectangle(cornerRadius: 5)
-                                .stroke(Color.black, lineWidth: 2))
-                            .focused($isFocused)
-                            .onChange(of: token) { _ in
-                                if token.last?.isNewline == .some(true)
-                                {
-                                    token.removeLast()
-                                    isFocused = false
+                                .frame(width: 250, height: 30)
+                                .padding(10)
+                                .overlay(RoundedRectangle(cornerRadius: 5)
+                                    .stroke(Color.black, lineWidth: 2))
+                                .focused($isFocused)
+                                .onChange(of: token) { _ in
+                                    if token.last?.isNewline == .some(true)
+                                    {
+                                        token.removeLast()
+                                        isFocused = false
+                                    }
                                 }
-                            }
                             Button(action: {
                                 Task {
                                     await GetPermissions()
@@ -159,18 +169,18 @@ struct ContentView : View
                         if !callInProgress
                         {
                             TextEditor(text: $meetingLink)
-                            .frame(width: 250, height: 30)
-                            .padding(10)
-                            .overlay(RoundedRectangle(cornerRadius: 5)
-                                .stroke(Color.black, lineWidth: 2))
-                            .focused($isFocused)
-                            .onChange(of: meetingLink) { _ in
-                                if meetingLink.last?.isNewline == .some(true)
-                                {
-                                    meetingLink.removeLast()
-                                    isFocused = false
+                                .frame(width: 250, height: 30)
+                                .padding(10)
+                                .overlay(RoundedRectangle(cornerRadius: 5)
+                                    .stroke(Color.black, lineWidth: 2))
+                                .focused($isFocused)
+                                .onChange(of: meetingLink) { _ in
+                                    if meetingLink.last?.isNewline == .some(true)
+                                    {
+                                        meetingLink.removeLast()
+                                        isFocused = false
+                                    }
                                 }
-                            }
                             Picker("", selection: $incomingVideoStreamType) {
                                 ForEach (IncomingVideoStreamTypeItem.allCases, id: \.self) { videoStreamType in
                                     Text(videoStreamType.rawValue).tag(videoStreamType.ToVideoStreamType())
@@ -193,7 +203,7 @@ struct ContentView : View
                                 .stroke(Color.black, lineWidth: 2))
                             if (outgoingVideoStreamType == VideoStreamType.localOutgoing)
                             {
-                                Picker("", selection: $selectedVideoDeviceInfoIndex) {
+                                Picker("", selection: $videoDeviceInfoListIndex) {
                                     ForEach (videoDeviceInfoItemList, id: \.self) { videoDeviceInfoItem in
                                         Text(videoDeviceInfoItem.name).tag(videoDeviceInfoItem.id)
                                     }
@@ -206,9 +216,23 @@ struct ContentView : View
                             }
                             if (outgoingVideoStreamType == VideoStreamType.virtualOutgoing)
                             {
-                                Picker("", selection: $selectedCameraIndex) {
+                                Picker("", selection: $cameraListIndex) {
                                     ForEach (cameraItemList, id: \.self) { cameraItem in
                                         Text(cameraItem.name).tag(cameraItem.id)
+                                    }
+                                }
+                                .onChange(of: cameraListIndex) { _ in
+                                    didSelectedVideoFormat()
+                                }
+                                .accentColor(.black)
+                                .frame(width: 250, height: 30)
+                                .padding(10)
+                                .overlay(RoundedRectangle(cornerRadius: 5)
+                                    .stroke(Color.black, lineWidth: 2))
+                                
+                                Picker("", selection: $videoFormatListIndex) {
+                                    ForEach (videoFormatItemList, id: \.self) { videoFormatItem in
+                                        Text(videoFormatItem.resolution).tag(videoFormatItem.id)
                                     }
                                 }
                                 .accentColor(.black)
@@ -345,15 +369,19 @@ struct ContentView : View
         remoteParticipantObserver = RemoteParticipantObserver(view: self)
         callObserver = CallObserver(view: self, remoteParticipantObserver: remoteParticipantObserver!)
         
+        token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjYwNUVCMzFEMzBBMjBEQkRBNTMxODU2MkM4QTM2RDFCMzIyMkE2MTkiLCJ4NXQiOiJZRjZ6SFRDaURiMmxNWVZpeUtOdEd6SWlwaGsiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmVmZDNjMjI5LWIyMTItNDM3YS05NDVkLTkyMzI2ZjEzYTFiZV8wMDAwMDAxZS1mZTZkLTMzN2YtYWRjOC0zZTNhMGQwMDQ0OGMiLCJzY3AiOjE3OTIsImNzaSI6IjE3MTA5ODMxODgiLCJleHAiOjE3MTEwNjk1ODgsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6InZvaXAiLCJyZXNvdXJjZUlkIjoiZWZkM2MyMjktYjIxMi00MzdhLTk0NWQtOTIzMjZmMTNhMWJlIiwicmVzb3VyY2VMb2NhdGlvbiI6InVuaXRlZHN0YXRlcyIsImlhdCI6MTcxMDk4MzE4OH0.JV-v6SbVVrzl_M2-Vn9J8ItN6Id42psv-DAWSgUQ3CaEqiIIvrwXd2qF354p4MsfVmcDG5KGDbrS9tpLdZf51sKr_RBvjsqNsz3kGQ7SlbUrdGvuiMI1ItIMC8cJzU2ScHNhy8luP1PcZNFiXfwaVli8pAByyw611xwFDglVE_qkzq5-0_6ez31vbkcDauo1RA-abxdAXVpqMu-t26BWyDDtv5RsKt92PmKZMUA9hGEb5-wKTHkt2sgKhsr9hhb4Q3Ic07nfR8y8pckQTunktr76M4B9UvIt6o-ZnKj0RJheDL3cu9rJXRs0siut667UKb00cZ1l3VniGxPJNZ_hag"
+        meetingLink = "https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZTNlM2M4ZDUtOGI1Zi00YmQ3LWJkMGUtM2E2OTY3ZTdmZjYx%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%22744e8f01-fbf6-40b3-b594-00792ff4276e%22%7d"
+        
         await CreateCallAgent()
         
-        guard let deviceManager = deviceManager else {
+        guard let deviceManager = deviceManager else
+        {
             return
         }
         
         videoDeviceInfoList = deviceManager.cameras
         videoDeviceInfoItemList = [VideoDeviceInfoItem]();
-        selectedVideoDeviceInfoIndex = videoDeviceInfoList.count > 0 ? 0 : -1;
+        videoDeviceInfoListIndex = videoDeviceInfoList.count > 0 ? 0 : -1;
         
         for i in 0 ..< videoDeviceInfoList.count
         {
@@ -363,13 +391,15 @@ struct ContentView : View
         
         cameraList = CameraCaptureService.GetCameraList()
         cameraItemList = [CameraItem]();
-        selectedCameraIndex = cameraList.count > 0 ? 0 : -1;
+        cameraListIndex = cameraList.count > 0 ? 0 : -1;
         
         for i in 0 ..< cameraList.count
         {
             let cameraItem = CameraItem(id: i, name: cameraList[i].localizedName)
             cameraItemList.append(cameraItem)
         }
+        
+        didSelectedVideoFormat()
         
         showCallSettings = true
         
@@ -418,7 +448,8 @@ struct ContentView : View
             let callAgentOptions = CallAgentOptions()
             callAgentOptions.displayName = "iOS Quickstart User"
             
-            callAgent = try await callClient?.createCallAgent(userCredential: credential, options: callAgentOptions)
+            callAgent = try await callClient?.createCallAgent(userCredential: credential, 
+                                                              options: callAgentOptions)
 
             deviceManager = try await callClient?.getDeviceManager()
             
@@ -480,7 +511,8 @@ struct ContentView : View
         
         loading = false
         
-        guard let call = call else {
+        guard let call = call else
+        {
             return
         }
         
@@ -505,7 +537,7 @@ struct ContentView : View
         switch (outgoingVideoStreamType)
         {
             case .localOutgoing:
-                let videoDeviceInfo = videoDeviceInfoList[selectedVideoDeviceInfoIndex]
+                let videoDeviceInfo = videoDeviceInfoList[videoDeviceInfoListIndex]
                 localVideoStream = LocalVideoStream(camera: videoDeviceInfo)
                 localVideoStream!.delegate = localVideoStreamObserver
                 outgoingVideoStream = localVideoStream
@@ -556,19 +588,19 @@ struct ContentView : View
         switch (outgoingVideoStreamType)
         {
             case .virtualOutgoing:
-                format.resolution = VideoStreamResolution.vga
-                w = Double(format.width)
-                h = Double(format.height)
+                let size = videoFormatList[videoFormatListIndex].size
+                w = 640//size.width
+                h = 360//size.height
                 break;
             case .screenShareOutgoing:
                 GetDisplaySize()
-                format.width = Int32(w)
-                format.height = Int32(h)
                 break;
             default:
                 break;
         }
         
+        format.width = Int32(w)
+        format.height = Int32(h)
         format.stride1 = Int32(w)
         format.stride2 = Int32(w)
         
@@ -666,7 +698,8 @@ struct ContentView : View
                         
                         break
                     case .rawIncoming:
-                        guard let rawIncomingVideoStreamG = stream as? RawIncomingVideoStream else {
+                        guard let rawIncomingVideoStreamG = stream as? RawIncomingVideoStream else
+                        {
                             return
                         }
                         
@@ -778,21 +811,41 @@ struct ContentView : View
         if cameraCaptureService == nil
         {
             cameraCaptureService = CameraCaptureService(
-                rawOutgoingVideoStream: virtualOutgoingVideoStream!)
-            cameraCaptureService?.Start(camera: cameraList[selectedCameraIndex])
+                stream: virtualOutgoingVideoStream!, 
+                camera: cameraList[cameraListIndex],
+                format: videoFormatList[videoFormatListIndex].format)
+            cameraCaptureService?.Start()
             cameraCaptureService?.delegate = OnRawVideoFrameCaptured
         }
+        
+        /*if videoFrameGeneratorService == nil
+        {
+            videoFrameGeneratorService = VideoFrameGeneratorService(
+                stream: virtualOutgoingVideoStream!)
+            videoFrameGeneratorService?.Start()
+            videoFrameGeneratorService?.delegate = OnRawVideoFrameCaptured
+         }*/
     }
     
     private func StopCameraCaptureService() -> Void
     {
-        guard let cameraCaptureService = cameraCaptureService else {
+        guard let cameraCaptureService = cameraCaptureService else
+        {
             return
         }
         
         cameraCaptureService.delegate = nil
         cameraCaptureService.Stop()
         self.cameraCaptureService = nil
+        
+        /*guard let videoFrameGeneratorService = videoFrameGeneratorService else
+        {
+            return
+        }
+        
+        videoFrameGeneratorService.delegate = nil
+        videoFrameGeneratorService.Stop()
+        self.videoFrameGeneratorService = nil*/
     }
     
     private func StartScreenCaptureService() -> Void
@@ -800,7 +853,7 @@ struct ContentView : View
         if screenCaptureService == nil
         {
             screenCaptureService = ScreenCaptureService(
-                rawOutgoingVideoStream: screenShareOutgoingVideoStream!)
+                stream: screenShareOutgoingVideoStream!)
             screenCaptureService?.Start()
             screenCaptureService?.delegate = OnRawVideoFrameCaptured
         }
@@ -808,7 +861,8 @@ struct ContentView : View
     
     private func StopScreenCaptureService() -> Void
     {
-        guard let screenCaptureService = screenCaptureService else {
+        guard let screenCaptureService = screenCaptureService else
+        {
             return
         }
         
@@ -919,16 +973,38 @@ struct ContentView : View
         switch outgoingVideoStreamType
         {
             case .localOutgoing:
-                isValid = selectedVideoDeviceInfoIndex != -1
+                isValid = videoDeviceInfoListIndex != -1
                 break
             case .virtualOutgoing:
-                isValid = selectedCameraIndex != -1
+                isValid = cameraListIndex != -1
                 break
             default:
                 break
         }
 
         return isValid;
+    }
+    
+    private func didSelectedVideoFormat() -> Void
+    {
+        if cameraListIndex == -1
+        {
+            return
+        }
+        
+        videoFormatList = CameraCaptureService.GetSuportedVideoFormats(
+            camera: cameraList[cameraListIndex])
+        
+        videoFormatItemList = [VideoFormatItem]();
+        videoFormatListIndex = videoFormatList.count > 0 ? 0 : -1;
+        
+        for i in 0 ..< videoFormatList.count
+        {
+            let size = videoFormatList[i].size
+            let resolution = "\(Int(size.width))x\(Int(size.height))"
+            let videoFormatItem = VideoFormatItem(id: i, resolution: resolution)
+            videoFormatItemList.append(videoFormatItem)
+        }
     }
 }
 
