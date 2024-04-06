@@ -480,6 +480,7 @@ struct ContentView: View {
 
     private func createCallAgentOptions() -> CallAgentOptions {
         let options = CallAgentOptions()
+        options.pushNotificationTtl = 25*60*60 // Extending device token TTL to 25 hours
         options.callKitOptions = createCallKitOptions()
         return options
     }

@@ -1,7 +1,7 @@
 platform :ios, '13.0'
 use_frameworks!
 
-ACSFrameworkVersion = '2.6.0'
+ACSFrameworkVersion = '2.9.0'
 
 target 'iOSVideo' do
   pod 'AzureCommunicationCalling', ACSFrameworkVersion
