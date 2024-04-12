@@ -17,8 +17,20 @@
 		E561CA315D50CE792EEAD11F /* Pods_iOSVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBFF92893FE8B69E1D39B66B /* Pods_iOSVideo.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		5315CA9C2BBDE66000C7B343 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		53E25D672A4BB4C40094B97C /* AzureCommunicationCalling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AzureCommunicationCalling.framework; path = "../../../../Code/Skype3/SpoolCallingStack/spool/staging.d/release/ALPHA/sdk/arm64-v8a/AzureCommunicationCalling.framework"; sourceTree = "<group>"; };
 		53E25D6B2A4D45930094B97C /* CallHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallHandler.swift; sourceTree = "<group>"; };
 		53E25D6D2A4D61F70094B97C /* CallKitHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallKitHelper.swift; sourceTree = "<group>"; };
 		969CB7C9039BDBF49E9893A3 /* Pods-iOSVideo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOSVideo.release.xcconfig"; path = "Target Support Files/Pods-iOSVideo/Pods-iOSVideo.release.xcconfig"; sourceTree = "<group>"; };
@@ -98,7 +110,6 @@
 		F499A30ADFEB054F6D2CC36F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				53E25D672A4BB4C40094B97C /* AzureCommunicationCalling.framework */,
 				FBFF92893FE8B69E1D39B66B /* Pods_iOSVideo.framework */,
 			);
 			name = Frameworks;
@@ -116,6 +127,7 @@
 				BDCD1EC6261672450039C6B5 /* Frameworks */,
 				BDCD1EC7261672450039C6B5 /* Resources */,
 				B4D9B8D74A9011BDAEC72EF9 /* [CP] Embed Pods Frameworks */,
+				5315CA9C2BBDE66000C7B343 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -355,7 +367,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSVideo/iOSVideo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iOSVideo/Preview Content\"";
-				DEVELOPMENT_TEAM = 9KBH5RKYEW;
+				DEVELOPMENT_TEAM = UBF8T346G9;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -390,7 +402,7 @@
 				CODE_SIGN_ENTITLEMENTS = iOSVideo/iOSVideo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iOSVideo/Preview Content\"";
-				DEVELOPMENT_TEAM = 9KBH5RKYEW;
+				DEVELOPMENT_TEAM = UBF8T346G9;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

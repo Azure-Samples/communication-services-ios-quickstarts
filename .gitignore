@@ -353,3 +353,4 @@ MigrationBackup/
 # Pods/
 CommunicationUIToolkit/Pods/
 *.xcframework
+**/*.xcuserstate
