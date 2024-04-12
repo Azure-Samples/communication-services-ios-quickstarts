@@ -33,6 +33,8 @@ struct ContentView: View {
     private let acsToken = "<ACS_USER_ACCESS_TOKEN>"
     private let cteToken = "<CTE_USER_ACCESS_TOKEN>"
 
+    @State var currentMri: String = "<CTE_MRI>"
+    @State var callee: String = "29228d3e-040e-4656-a70e-890ab4e173e4"
     @State var callClient = CallClient()
     @State var callAgent: CallAgent?
     @State var call: Call?
@@ -343,9 +345,9 @@ struct ContentView: View {
                     self.alertMessage = "Failed to add participant \(callee.rawId)"
                 }
             }
-        } else if let teamsCall = teamsCall {
+        } else if teamsCall != nil {
             self.showAlert = true
-            self.alertMessage = "Cannit add participant to a Teams Call."
+            self.alertMessage = "Cannot add participant to a Teams Call."
         }
         
     }
@@ -433,6 +435,7 @@ struct ContentView: View {
     func provideCallKitRemoteInfo(callerInfo: CallerInfo) -> CallKitRemoteInfo
     {
         let callKitRemoteInfo = CallKitRemoteInfo()
+        // Replace CALL_TO_PHONENUMBER_BY_APP by finding the map of the
         callKitRemoteInfo.displayName = "CALL_TO_PHONENUMBER_BY_APP"
         callKitRemoteInfo.handle = CXHandle(type: .generic, value: "VALUE_TO_CXHANDLE")
         return callKitRemoteInfo
@@ -582,81 +585,100 @@ struct ContentView: View {
         }
     }
 
-    
-
     func answerIncomingCall() {
         isIncomingCall = false
-        let options: CallOptions?
-        
-        if isCte {
-            options = AcceptTeamsCallOptions()
-        } else {
-            options = AcceptCallOptions()
-        }
-
-        guard let deviceManager = deviceManager else {
-            self.showAlert = true
-            self.alertMessage = "Failed to get device manager when trying to answer call"
-            return
-        }
-
-        localVideoStream.removeAll()
+        let options: CallOptions = isCte ? AcceptTeamsCallOptions() : AcceptCallOptions()
 
         if sendingVideo {
-            let camera = deviceManager.cameras.first
             let outgoingVideoOptions = OutgoingVideoOptions()
-            outgoingVideoOptions.streams.append(LocalVideoStream(camera: camera!))
-            options!.outgoingVideoOptions = outgoingVideoOptions
+            initLocalVideoStreams()
+            if let firstLocalVideoStream = localVideoStream.first {
+                outgoingVideoOptions.streams.append(firstLocalVideoStream)
+                options.outgoingVideoOptions = outgoingVideoOptions
+            } else {
+                self.showAlert = true
+                self.alertMessage = "Failed to start video"
+            }
         }
         
         if isMuted {
             let outgoingAudioOptions = OutgoingAudioOptions()
             outgoingAudioOptions.muted = true
-            options!.outgoingAudioOptions = outgoingAudioOptions
+            options.outgoingAudioOptions = outgoingAudioOptions
         }
         
         if isCte {
             guard let teamsIncomingCall = self.teamsIncomingCall else {
                 self.showAlert = true
-                self.alertMessage = "No teams incoming call to reject"
+                self.alertMessage = "No teams incoming call to accept"
                 return
             }
             
-            teamsIncomingCall.accept(options: options! as! AcceptTeamsCallOptions) { teamsCall, error in
+            guard let options = options as? AcceptTeamsCallOptions else {
+                self.showAlert = true
+                self.alertMessage = "Options not of type AcceptTeamsCallOptions"
+                return
+            }
+
+            teamsIncomingCall.accept(options: options) { teamsCall, error in
                 setTeamsCallAndObserver(teamsCall: teamsCall, error: error)
             }
         } else {
             guard let incomingCall = self.incomingCall else {
+                self.showAlert = true
+                self.alertMessage = "No acs incoming call to accept"
                 return
             }
 
-            incomingCall.accept(options: options! as! AcceptCallOptions) { (call, error) in
+            guard let options = options as? AcceptCallOptions else {
+                self.showAlert = true
+                self.alertMessage = "Options not of type AcceptCallOptions"
+                return
+            }
+
+            incomingCall.accept(options: options) { (call, error) in
                 setCallAndObersever(call: call, error: error)
             }
         }
     }
 
-    private func createLocalVideoPreview() -> Bool {
+    private func initLocalVideoStreams() {
         guard let deviceManager = self.deviceManager else {
             self.showAlert = true
             self.alertMessage = "No DeviceManager instance exists"
-            return false
+            return
         }
-
-        let scalingMode = ScalingMode.fit
+        guard let camera = deviceManager.cameras.first else {
+            self.showAlert = true
+            self.alertMessage = "Failed to get camera"
+            return
+        }
         localVideoStream.removeAll()
-        localVideoStream.append(LocalVideoStream(camera: deviceManager.cameras.first!))
-        previewRenderer = try! VideoStreamRenderer(localVideoStream: localVideoStream.first!)
-        previewView = try! previewRenderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
-        self.sendingVideo = true
-        return true
+        localVideoStream.append(LocalVideoStream(camera: camera))
+    }
+
+    private func createLocalVideoPreview() {
+        let scalingMode = ScalingMode.fit
+        initLocalVideoStreams()
+        do {
+            if let firstLocalVideoStream = localVideoStream.first {
+                previewRenderer = try VideoStreamRenderer(localVideoStream: firstLocalVideoStream)
+                previewView = try previewRenderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
+                self.sendingVideo = true
+            } else {
+                self.showAlert = true
+                self.alertMessage = "Failed to get first video stream"
+            }
+        } catch let error as NSError {
+            self.showAlert = true
+            self.alertMessage = error.localizedDescription
+        }
     }
 
     func toggleLocalVideo() {
-
         guard let callBase = self.getCallBase() else {
             if(!sendingVideo) {
-                _ = createLocalVideoPreview()
+                createLocalVideoPreview()
             } else {
                 self.sendingVideo = false
                 self.previewView = nil
@@ -667,22 +689,30 @@ struct ContentView: View {
         }
 
         if (sendingVideo) {
-            callBase.stopVideo(stream: localVideoStream.first!) { (error) in
-                if (error != nil) {
-                    print("Cannot stop video")
-                } else {
-                    self.sendingVideo = false
-                    self.previewView = nil
-                    self.previewRenderer!.dispose()
-                    self.previewRenderer = nil
+            if let firstLocalVideoStream = localVideoStream.first {
+                callBase.stopVideo(stream: firstLocalVideoStream) { (error) in
+                    if (error == nil) {
+                        self.sendingVideo = false
+                        self.previewView = nil
+                        self.previewRenderer?.dispose()
+                        self.previewRenderer = nil
+                    } else {
+                        self.showAlert = true
+                        self.alertMessage = "Failed to stop video"
+                        return
+                    }
                 }
             }
         } else {
-            if createLocalVideoPreview() {
-                callBase.startVideo(stream:(localVideoStream.first)!) { (error) in
-                    if (error != nil) {
-                        print("Cannot send local video")
-                    }
+            createLocalVideoPreview()
+            guard let firstLocalVideoStream = localVideoStream.first else {
+                self.showAlert = true
+                self.alertMessage = "Failed to start preview"
+                return
+            }
+            callBase.startVideo(stream:firstLocalVideoStream) { (error) in
+                if (error != nil) {
+                    print("Cannot send local video")
                 }
             }
         }
@@ -784,24 +814,30 @@ struct ContentView: View {
             }
 
             
-            if(sendingVideo)
+            if sendingVideo
             {
-                guard let deviceManager = self.deviceManager else {
+                if let callOptions = callOptions {
+                    let outgoingVideoOptions = OutgoingVideoOptions()
+                    initLocalVideoStreams()
+                    outgoingVideoOptions.streams = localVideoStream
+                    callOptions.outgoingVideoOptions = outgoingVideoOptions
+                } else {
                     self.showAlert = true
-                    self.alertMessage = "No DeviceManager instance exists"
+                    self.alertMessage = "Failed to set video options"
                     return
                 }
-                let outgoingVideoOptions = OutgoingVideoOptions()
-                localVideoStream.removeAll()
-                localVideoStream.append(LocalVideoStream(camera: deviceManager.cameras.first!))
-                outgoingVideoOptions.streams = localVideoStream
-                callOptions!.outgoingVideoOptions = outgoingVideoOptions
             }
 
             if isMuted {
-                let outgoingAudioOptions = OutgoingAudioOptions()
-                outgoingAudioOptions.muted = true
-                callOptions!.outgoingAudioOptions = outgoingAudioOptions
+                if let callOptions = callOptions {
+                    let outgoingAudioOptions = OutgoingAudioOptions()
+                    outgoingAudioOptions.muted = true
+                    callOptions.outgoingAudioOptions = outgoingAudioOptions
+                } else {
+                    self.showAlert = true
+                    self.alertMessage = "Failed to start call muted"
+                    return
+                }
             }
 
             if isCte {
@@ -814,12 +850,26 @@ struct ContentView: View {
                 do {
                     var teamsCall: TeamsCall?
                     if self.callee.starts(with: "https:") {
-                        teamsCall = try await teamsCallAgent.join(with: meetingLocator as! TeamsMeetingLinkLocator,
-                                                  joinTeamsCallOptions: callOptions! as! JoinTeamsCallOptions)
+                        if let meetingLocator = meetingLocator as? TeamsMeetingLinkLocator,
+                           let options = callOptions as? JoinTeamsCallOptions {
+                            teamsCall = try await teamsCallAgent.join(with: meetingLocator,
+                                                                      joinTeamsCallOptions: options)
+                            } else {
+                                self.showAlert = true
+                                self.alertMessage = "Failed to start ACS call"
+                                return
+                            }
                     } else {
                         if callees.count == 1 {
-                            teamsCall = try await teamsCallAgent.startCall(participant: callees.first!,
-                                                                               options: callOptions! as! StartTeamsCallOptions)
+                            if let firstCallee = callees.first,
+                               let options = callOptions as? StartTeamsCallOptions {
+                                teamsCall = try await teamsCallAgent.startCall(participant: firstCallee,
+                                                                                   options: options)
+                            } else {
+                                self.showAlert = true
+                                self.alertMessage = "Failed to start teams call"
+                                return
+                            }
                         } else if callees.count > 1 {
                             self.showAlert = true
                             self.alertMessage = "Teams CallAgent cannot start a call with multiple participants"
@@ -840,11 +890,23 @@ struct ContentView: View {
                 do {
                     var call: Call?
                     if self.callee.starts(with: "https:") {
-                        call = try await callAgent.join(with: meetingLocator!, joinCallOptions: (callOptions! as! JoinCallOptions))
-                    } else if UUID(uuidString: self.callee) != nil {
-                        call = try await callAgent.join(with: meetingLocator as! GroupCallLocator, joinCallOptions: (callOptions! as! JoinCallOptions))
+                        if let meetingLocator = meetingLocator,
+                                  let options = callOptions as? JoinCallOptions {
+                            call = try await callAgent.join(with: meetingLocator, joinCallOptions: options)
+                        } else {
+                            self.showAlert = true
+                            self.alertMessage = "Failed to join call with meetingLocator"
+                            return
+                        }
+                    } else if let meetingLocator = meetingLocator as? GroupCallLocator,
+                              let options = callOptions as? JoinCallOptions {
+                        call = try await callAgent.join(with: meetingLocator, joinCallOptions: options)
+                    } else if let options = callOptions as? StartCallOptions {
+                        call = try await callAgent.startCall(participants: callees, options: options)
                     } else {
-                        call = try await callAgent.startCall(participants: callees, options: (callOptions! as! StartCallOptions))
+                        self.showAlert = true
+                        self.alertMessage = "Failed to join call"
+                        return
                     }
                     setCallAndObersever(call: call, error: nil)
                 } catch {
@@ -865,7 +927,7 @@ struct ContentView: View {
         self.call = call
         print("ACS CallId: \(call.id)")
         self.callHandler = CallHandler(self)
-        self.call!.delegate = self.callHandler
+        call.delegate = self.callHandler
         self.remoteParticipantObserver = RemoteParticipantObserver(self)
         switchSpeaker(nil)
     }

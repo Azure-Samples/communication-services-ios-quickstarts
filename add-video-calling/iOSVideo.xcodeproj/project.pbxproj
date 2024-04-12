@@ -385,7 +385,7 @@
 					/usr/lib/swift,
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.microsoft.iOSVideoNew;
+				PRODUCT_BUNDLE_IDENTIFIER = com.microsoft.iOSVideoNew2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -420,7 +420,7 @@
 					/usr/lib/swift,
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.microsoft.iOSVideoNew;
+				PRODUCT_BUNDLE_IDENTIFIER = com.microsoft.iOSVideoNew2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
