@@ -31,17 +31,7 @@ struct ContentView: View {
 
     private let log = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: "ACSVideoSample")
     private let acsToken = "<ACS_USER_ACCESS_TOKEN>"
-    
-    // CTE User 3 => iPhone
-    private let cteToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjYwNUVCMzFEMzBBMjBEQkRBNTMxODU2MkM4QTM2RDFCMzIyMkE2MTkiLCJ4NXQiOiJZRjZ6SFRDaURiMmxNWVZpeUtOdEd6SWlwaGsiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoib3JnaWQ6MGQyZGEwYzUtZTc2My00YTIyLWJiNDYtYWY4MjExMWNjN2FlIiwic2NwIjoxMDI0LCJjc2kiOiIxNzEyNzA4ODE3IiwiZXhwIjoxNzEyNzEzMzg3LCJyZ24iOiJhbWVyIiwidGlkIjoiYmM2MWY0ZmMtMjZkNy00MTFlLTkxYTktNGMxNDY5MWRhYmRmIiwiYWNzU2NvcGUiOiJ2b2lwLGNoYXQiLCJyZXNvdXJjZUlkIjoiZWZkM2MyMjktYjIxMi00MzdhLTk0NWQtOTIzMjZmMTNhMWJlIiwiYWFkX2lhdCI6IjE3MTI3MDg4MTciLCJhYWRfdXRpIjoiODBJeV9vQzRfa3VYQkpwZVoxRlBBQSIsImFhZF9hcHBpZCI6IjFmZDUxMThlLTI1NzYtNDI2My04MTMwLTk1MDMwNjRjODM3YSIsImlhdCI6MTcxMjcwOTExN30.NjS3Df8fNhDvAn2beCx1C8dM88JbpOlrJ-f5ZVlBA2GWZylZhSgaKF19en7QncdtdmfIUUcLIRjIMnlzqmeuoyIhtLCmSgq3T469MOG8S7i16JrvuexB_-EkeJTuO7esS7B9d5siRlAzfwB7boeaUc70Dtjd99nHa9M9mA1v_xdctaHG5d5MFsbo0EPdBbURDRQNM9z4XuJTG5WzA3v1D6E-AVPd69TpB94t_O4RA1JnragmOdKy2LrMIaUIjgEIFV3IfutVUo54glGDVavhfwpbjshqu6eqvfIV6TostIstCxpYGatis1ObjLiONA6mhJ4RJq46m_2uG--NbUXH_Q"
-    @State var currentMri: String = "8:orgid:0d2da0c5-e763-4a22-bb46-af82111cc7ae"
-    @State var callee: String = "8:orgid:d9bfaa59-654b-4cfe-8ad3-d887a7f2a150"
-
-    // CTE User 5 => iPad
-    //private let cteToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjYwNUVCMzFEMzBBMjBEQkRBNTMxODU2MkM4QTM2RDFCMzIyMkE2MTkiLCJ4NXQiOiJZRjZ6SFRDaURiMmxNWVZpeUtOdEd6SWlwaGsiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoib3JnaWQ6ZDliZmFhNTktNjU0Yi00Y2ZlLThhZDMtZDg4N2E3ZjJhMTUwIiwic2NwIjoxMDI0LCJjc2kiOiIxNzEyNzA4NzE5IiwiZXhwIjoxNzEyNzEzNTk0LCJyZ24iOiJhbWVyIiwidGlkIjoiYmM2MWY0ZmMtMjZkNy00MTFlLTkxYTktNGMxNDY5MWRhYmRmIiwiYWNzU2NvcGUiOiJ2b2lwLGNoYXQiLCJyZXNvdXJjZUlkIjoiZWZkM2MyMjktYjIxMi00MzdhLTk0NWQtOTIzMjZmMTNhMWJlIiwiYWFkX2lhdCI6IjE3MTI3MDg3MTkiLCJhYWRfdXRpIjoiV2xOYkw0YldiMFNEUEVwWUpBekNBQSIsImFhZF9hcHBpZCI6IjFmZDUxMThlLTI1NzYtNDI2My04MTMwLTk1MDMwNjRjODM3YSIsImlhdCI6MTcxMjcwOTAxOX0.dTm19YUezBw7Ae3ucaN1TjqQFuoLCG72IEFHuoAoZnM0t8r-rqApyuTEp6ZT15yBuIN1cG59pmnOWS2nvVPWPNk18qB5LpdNsaaC-jl4OwJxviS4twNc1Q6f_9DMW4lcOpcftJZbv_pL3xCk4fFSELr5D2wLbGKF-znNwYGvk_Xj-gV2h5nZoSIVDAswo-gSJLCcUeSEL-G786lAeRGOcjCQeCT9n1lYg3-iwgtk7PwYKxuCSwCMt6pPPFLg2Z5kFpJeHoTi2dzHBn541llz-CFYi_heBSeaNlP5HS6-3KnrfeHkVEQUrcggsHFWMP2nmwCEeWVa_WS07wU5MjPujw"
-    //@State var currentMri: String = "8:orgid:d9bfaa59-654b-4cfe-8ad3-d887a7f2a150"
-    //@State var callee: String = "8:orgid:0d2da0c5-e763-4a22-bb46-af82111cc7ae"
-    //@State var callee: String = "https://teams.microsoft.com/l/meetup-join/19%3ameeting_YjU4ZmQzYTctNTI0YS00MzVkLTgwOWMtOTEyNDUyOWRhNzIx%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2203fccfe7-287d-43f3-b1b5-a7a53a5dc8d5%22%7d"
+    private let cteToken = "<CTE_USER_ACCESS_TOKEN>"
 
     @State var callClient = CallClient()
     @State var callAgent: CallAgent?
