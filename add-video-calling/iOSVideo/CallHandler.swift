@@ -16,7 +16,6 @@ public class CallHandlerBase: NSObject {
         owner = view
     }
     
-    #if BETA
     public func onStateChanged(call: CommonCall, args: PropertyChangedEventArgs) {
         switch call.state {
         case .connected:
@@ -93,6 +92,11 @@ public class CallHandlerBase: NSObject {
         owner.remoteVideoStreamData.append(data)
     }
 
+    public func onMutedByRemoteParticipant() {
+        owner.showAlert = true
+        owner.alertMessage = "You were muted by another participant in the call !!"
+    }
+
     private func initialCallParticipant() {
         var callBase: CommonCall?
         if let call = owner.call {
@@ -113,94 +117,6 @@ public class CallHandlerBase: NSObject {
             owner.remoteParticipant = participant
         }
     }
-    #else
-    public func onStateChanged(call: Call, args: PropertyChangedEventArgs) {
-        switch call.state {
-        case .connected:
-            owner.callState = "Connected"
-            break
-        case .connecting:
-            owner.callState = "Connecting"
-            break
-        case .disconnected:
-            owner.callState = "Disconnected"
-            break
-        case .disconnecting:
-            owner.callState = "Disconnecting"
-            break
-        case .inLobby:
-            owner.callState = "InLobby"
-            break
-        case .localHold:
-            owner.callState = "LocalHold"
-            break
-        case .remoteHold:
-            owner.callState = "RemoteHold"
-            break
-        case .ringing:
-            owner.callState = "Ringing"
-            break
-        case .earlyMedia:
-            owner.callState = "EarlyMedia"
-            break
-        case .none:
-            owner.callState = "None"
-            break
-        default:
-            owner.callState = "Default"
-            break
-        }
-
-        if(call.state == CallState.connected) {
-            initialCallParticipant()
-        }
-    }
-
-    public func onRemoteParticipantUpdated(call: Call, args: ParticipantsUpdatedEventArgs) {
-        for participant in args.addedParticipants {
-            participant.delegate = owner.remoteParticipantObserver
-            for stream in participant.videoStreams {
-                if !owner.remoteVideoStreamData.isEmpty {
-                    return
-                }
-                let data:RemoteVideoStreamData = RemoteVideoStreamData(view: owner, stream: stream)
-                let scalingMode = ScalingMode.fit
-                data.renderer = try! VideoStreamRenderer(remoteVideoStream: stream)
-                let view:RendererView = try! data.renderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
-                data.rendererView = view
-                owner.remoteVideoStreamData.append(data)
-            }
-            owner.remoteParticipant = participant
-        }
-    }
-    
-    public func onOutgoingAudioStateChanged(call: Call) {
-        owner.isMuted = call.isOutgoingAudioMuted
-    }
-
-    private func renderRemoteStream(_ stream: RemoteVideoStream!) {
-        if !owner.remoteVideoStreamData.isEmpty {
-            return
-        }
-        let data:RemoteVideoStreamData = RemoteVideoStreamData(view: owner, stream: stream)
-        let scalingMode = ScalingMode.fit
-        data.renderer = try! VideoStreamRenderer(remoteVideoStream: stream)
-        let view:RendererView = try! data.renderer!.createView(withOptions: CreateViewOptions(scalingMode:scalingMode))
-        data.rendererView = view
-        owner.remoteVideoStreamData.append(data)
-    }
-
-    private func initialCallParticipant() {
-        for participant in owner.call!.remoteParticipants {
-            participant.delegate = owner.remoteParticipantObserver
-            for stream in participant.videoStreams {
-                renderRemoteStream(stream)
-            }
-            owner.remoteParticipant = participant
-        }
-    }
-    #endif
-    
 }
 
 public final class CallHandler: CallHandlerBase, CallDelegate, IncomingCallDelegate {
@@ -224,9 +140,14 @@ public final class CallHandler: CallHandlerBase, CallDelegate, IncomingCallDeleg
     public func call(_ call: Call, didChangeId args: PropertyChangedEventArgs) {
         print("ACSCall New CallId: \(call.id)")
     }
+    
+    #if BETA
+    public func call(_ call: Call, didGetMutedByOthers args: PropertyChangedEventArgs) {
+        onMutedByRemoteParticipant()
+    }
+    #endif
 }
 
-#if BETA
 public final class TeamsCallHandler: CallHandlerBase, TeamsCallDelegate, TeamsIncomingCallDelegate {
     
     override init(_ view:ContentView) {
@@ -248,5 +169,10 @@ public final class TeamsCallHandler: CallHandlerBase, TeamsCallDelegate, TeamsIn
     public func teamsCall(_ teamsCall: TeamsCall, didChangeId args: PropertyChangedEventArgs) {
         print("TeamsCall New CallId: \(teamsCall.id)")
     }
+    
+    #if BETA
+    public func teamsCall(_ teamsCall: TeamsCall, didGetMutedByOthers args: PropertyChangedEventArgs) {
+        onMutedByRemoteParticipant()
+    }
+    #endif
 }
-#endif
