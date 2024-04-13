@@ -89,6 +89,14 @@ struct ContentView: View {
                     Button(action: addParticipant) {
                         Text("Add Participant")
                     }.disabled(call == nil && teamsCall == nil)
+                    #if BETA
+                    Button(action: serverMuteParticipant1) {
+                        Text("Mute the Participant #1")
+                    }.disabled(call == nil && teamsCall == nil)
+                    Button(action: muteAllParticipants) {
+                        Text("Mute all Participants")
+                    }.disabled(call == nil && teamsCall == nil)
+                    #endif
                     Button(action: holdCall) {
                         Text(isHeld ? "Resume" : "Hold")
                     }.disabled(call == nil && teamsCall == nil)
@@ -219,6 +227,38 @@ struct ContentView: View {
             Alert(title: Text("ERROR"), message: Text(alertMessage), dismissButton: .default(Text("Dismiss")))
         }
     }
+    
+    #if BETA
+    private func serverMuteParticipant1() {
+        guard let firstParticipant = self.call?.remoteParticipants.first else {
+            self.showAlert = true
+            self.alertMessage = "No participants in the call to mute"
+            return
+        }
+        
+        firstParticipant.mute { error in
+            if error != nil {
+                self.showAlert = true
+                self.alertMessage = "Failed to mute the first participant"
+            }
+        }
+    }
+    
+    private func muteAllParticipants() {
+        guard let callBase = self.getCallBase() else {
+            self.showAlert = true
+            self.alertMessage = "No call object to mute"
+            return
+        }
+        
+        callBase.muteAllRemoteParticipants { error in
+            if error != nil {
+                self.showAlert = true
+                self.alertMessage = "Failed to mute all participants"
+            }
+        }
+    }
+    #endif
 
     private func getCallBase() -> CommonCall? {
         var callBase: CommonCall?

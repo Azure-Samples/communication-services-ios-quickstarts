@@ -92,6 +92,11 @@ public class CallHandlerBase: NSObject {
         owner.remoteVideoStreamData.append(data)
     }
 
+    public func onMutedByRemoteParticipant() {
+        owner.showAlert = true
+        owner.alertMessage = "You were muted by another participant in the call !!"
+    }
+
     private func initialCallParticipant() {
         var callBase: CommonCall?
         if let call = owner.call {
@@ -135,6 +140,12 @@ public final class CallHandler: CallHandlerBase, CallDelegate, IncomingCallDeleg
     public func call(_ call: Call, didChangeId args: PropertyChangedEventArgs) {
         print("ACSCall New CallId: \(call.id)")
     }
+    
+    #if BETA
+    public func call(_ call: Call, didGetMutedByOthers args: PropertyChangedEventArgs) {
+        onMutedByRemoteParticipant()
+    }
+    #endif
 }
 
 public final class TeamsCallHandler: CallHandlerBase, TeamsCallDelegate, TeamsIncomingCallDelegate {
@@ -158,4 +169,10 @@ public final class TeamsCallHandler: CallHandlerBase, TeamsCallDelegate, TeamsIn
     public func teamsCall(_ teamsCall: TeamsCall, didChangeId args: PropertyChangedEventArgs) {
         print("TeamsCall New CallId: \(teamsCall.id)")
     }
+    
+    #if BETA
+    public func teamsCall(_ teamsCall: TeamsCall, didGetMutedByOthers args: PropertyChangedEventArgs) {
+        onMutedByRemoteParticipant()
+    }
+    #endif
 }
