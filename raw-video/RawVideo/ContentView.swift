@@ -244,29 +244,33 @@ struct ContentView : View
                         }
                         else
                         {
-                            ZStack(alignment: .topLeading) {
+                            //ZStack(alignment: .topLeading) {
+                            //VStack {
                                 VStack {
                                     if (outgoingVideoStream != nil)
                                     {
                                         if (outgoingVideoStreamType != VideoStreamType.localOutgoing)
                                         {
                                             RawVideoFrameView(cvPixelBuffer: $outgoingPixelBuffer)
-                                                .overlay(RoundedRectangle(cornerRadius: 5)
-                                                .stroke(Color.black, lineWidth: 2))
+                                                //.overlay(RoundedRectangle(cornerRadius: 5)
+                                                //.stroke(Color.black, lineWidth: 2))
                                                 .background(Color.black)
                                         }
                                         else
                                         {
                                             VideoStreamView(view: $outgoingVideoStreamRendererView)
-                                                .overlay(RoundedRectangle(cornerRadius: 5)
-                                                .stroke(Color.black, lineWidth: 2))
+                                                //.overlay(RoundedRectangle(cornerRadius: 5)
+                                                //.stroke(Color.black, lineWidth: 2))
                                                 .background(Color.black)
                                         }
                                     }
                                 }
-                                .frame(width: 120, height: 67.5)
-                                .zIndex(1)
-                                .offset(x: 5, y: 5)
+                                .frame(width: 320, height: 180)
+                                //.frame(width: 120, height: 67.5)
+                                //.zIndex(1)
+                                //.offset(x: 5, y: 5)
+                                .overlay(RoundedRectangle(cornerRadius: 5)
+                                    .stroke(Color.black, lineWidth: 2))
 
                                 VStack {
                                     if (incomingVideoStream != nil)
@@ -284,11 +288,11 @@ struct ContentView : View
                                     }
                                 }
                                 .frame(width: 320, height: 180)
-                                .zIndex(0)
+                                //.zIndex(0)
                                 .overlay(RoundedRectangle(cornerRadius: 5)
                                     .stroke(Color.black, lineWidth: 2))
-                            }
-                            .frame(width: geometryReader.size.width - 30, height: 180)
+                            //}
+                            //.frame(width: geometryReader.size.width - 30, height: 180)
                         }
                         HStack {
                             Button(action: {
@@ -369,8 +373,7 @@ struct ContentView : View
         remoteParticipantObserver = RemoteParticipantObserver(view: self)
         callObserver = CallObserver(view: self, remoteParticipantObserver: remoteParticipantObserver!)
         
-        token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjYwNUVCMzFEMzBBMjBEQkRBNTMxODU2MkM4QTM2RDFCMzIyMkE2MTkiLCJ4NXQiOiJZRjZ6SFRDaURiMmxNWVZpeUtOdEd6SWlwaGsiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmVmZDNjMjI5LWIyMTItNDM3YS05NDVkLTkyMzI2ZjEzYTFiZV8wMDAwMDAxZS1mZTZkLTMzN2YtYWRjOC0zZTNhMGQwMDQ0OGMiLCJzY3AiOjE3OTIsImNzaSI6IjE3MTA5ODMxODgiLCJleHAiOjE3MTEwNjk1ODgsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6InZvaXAiLCJyZXNvdXJjZUlkIjoiZWZkM2MyMjktYjIxMi00MzdhLTk0NWQtOTIzMjZmMTNhMWJlIiwicmVzb3VyY2VMb2NhdGlvbiI6InVuaXRlZHN0YXRlcyIsImlhdCI6MTcxMDk4MzE4OH0.JV-v6SbVVrzl_M2-Vn9J8ItN6Id42psv-DAWSgUQ3CaEqiIIvrwXd2qF354p4MsfVmcDG5KGDbrS9tpLdZf51sKr_RBvjsqNsz3kGQ7SlbUrdGvuiMI1ItIMC8cJzU2ScHNhy8luP1PcZNFiXfwaVli8pAByyw611xwFDglVE_qkzq5-0_6ez31vbkcDauo1RA-abxdAXVpqMu-t26BWyDDtv5RsKt92PmKZMUA9hGEb5-wKTHkt2sgKhsr9hhb4Q3Ic07nfR8y8pckQTunktr76M4B9UvIt6o-ZnKj0RJheDL3cu9rJXRs0siut667UKb00cZ1l3VniGxPJNZ_hag"
-        meetingLink = "https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZTNlM2M4ZDUtOGI1Zi00YmQ3LWJkMGUtM2E2OTY3ZTdmZjYx%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%22744e8f01-fbf6-40b3-b594-00792ff4276e%22%7d"
+        token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjYwNUVCMzFEMzBBMjBEQkRBNTMxODU2MkM4QTM2RDFCMzIyMkE2MTkiLCJ4NXQiOiJZRjZ6SFRDaURiMmxNWVZpeUtOdEd6SWlwaGsiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmVmZDNjMjI5LWIyMTItNDM3YS05NDVkLTkyMzI2ZjEzYTFiZV8wMDAwMDAxZi05OGZlLWYzNzYtYjhiYS1hNDNhMGQwMDQwMmQiLCJzY3AiOjE3OTIsImNzaSI6IjE3MTM1NzY0MzEiLCJleHAiOjE3MTM2NjI4MzEsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6InZvaXAiLCJyZXNvdXJjZUlkIjoiZWZkM2MyMjktYjIxMi00MzdhLTk0NWQtOTIzMjZmMTNhMWJlIiwicmVzb3VyY2VMb2NhdGlvbiI6InVuaXRlZHN0YXRlcyIsImlhdCI6MTcxMzU3NjQzMX0.jwr18H0UxFv4ZCG5ry2r0ms127B9p3pUzFglgYn-jDKEGBjlZECjFoCjuydDtxaZRIAPH8JOwJYPFn0c7bUbcARKCq5sVfOS0cLaM4w5sP1Z4eRJ4FI4W-bsL1WoeTL0aXZI2B9FUx4W3n2vllFkn2uaVh2U_4WgZKbeQa_zSvbDriUJ-_MXQjcoqDMcLUa_QCJYx6niYTvfxd_WBiGQmNNyN1ZMAtZW33VPnvhjAOV5lCwJFzu-ON2EbHI1HZRUMWZzpq-D12SXlZjU2t7846kYw8YQKMmfJgTf4cmgIAetxgkYQd9cu6ZfWSj-WXD7YrPw6-P_5ptAAf4hISuUjg"
         
         await CreateCallAgent()
         
@@ -589,8 +592,8 @@ struct ContentView : View
         {
             case .virtualOutgoing:
                 let size = videoFormatList[videoFormatListIndex].size
-                w = 640//size.width
-                h = 360//size.height
+                w = size.width
+                h = size.height
                 break;
             case .screenShareOutgoing:
                 GetDisplaySize()
