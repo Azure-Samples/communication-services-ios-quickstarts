@@ -373,7 +373,7 @@ struct ContentView : View
         remoteParticipantObserver = RemoteParticipantObserver(view: self)
         callObserver = CallObserver(view: self, remoteParticipantObserver: remoteParticipantObserver!)
         
-        token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjYwNUVCMzFEMzBBMjBEQkRBNTMxODU2MkM4QTM2RDFCMzIyMkE2MTkiLCJ4NXQiOiJZRjZ6SFRDaURiMmxNWVZpeUtOdEd6SWlwaGsiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmVmZDNjMjI5LWIyMTItNDM3YS05NDVkLTkyMzI2ZjEzYTFiZV8wMDAwMDAxZi05OGZlLWYzNzYtYjhiYS1hNDNhMGQwMDQwMmQiLCJzY3AiOjE3OTIsImNzaSI6IjE3MTM1NzY0MzEiLCJleHAiOjE3MTM2NjI4MzEsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6InZvaXAiLCJyZXNvdXJjZUlkIjoiZWZkM2MyMjktYjIxMi00MzdhLTk0NWQtOTIzMjZmMTNhMWJlIiwicmVzb3VyY2VMb2NhdGlvbiI6InVuaXRlZHN0YXRlcyIsImlhdCI6MTcxMzU3NjQzMX0.jwr18H0UxFv4ZCG5ry2r0ms127B9p3pUzFglgYn-jDKEGBjlZECjFoCjuydDtxaZRIAPH8JOwJYPFn0c7bUbcARKCq5sVfOS0cLaM4w5sP1Z4eRJ4FI4W-bsL1WoeTL0aXZI2B9FUx4W3n2vllFkn2uaVh2U_4WgZKbeQa_zSvbDriUJ-_MXQjcoqDMcLUa_QCJYx6niYTvfxd_WBiGQmNNyN1ZMAtZW33VPnvhjAOV5lCwJFzu-ON2EbHI1HZRUMWZzpq-D12SXlZjU2t7846kYw8YQKMmfJgTf4cmgIAetxgkYQd9cu6ZfWSj-WXD7YrPw6-P_5ptAAf4hISuUjg"
+        token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjYwNUVCMzFEMzBBMjBEQkRBNTMxODU2MkM4QTM2RDFCMzIyMkE2MTkiLCJ4NXQiOiJZRjZ6SFRDaURiMmxNWVZpeUtOdEd6SWlwaGsiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmVmZDNjMjI5LWIyMTItNDM3YS05NDVkLTkyMzI2ZjEzYTFiZV8wMDAwMDAxZi1hN2Q2LTUzNjktNzFiZi1hNDNhMGQwMDVlN2IiLCJzY3AiOjE3OTIsImNzaSI6IjE3MTM4MjU0MjciLCJleHAiOjE3MTM5MTE4MjcsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6InZvaXAiLCJyZXNvdXJjZUlkIjoiZWZkM2MyMjktYjIxMi00MzdhLTk0NWQtOTIzMjZmMTNhMWJlIiwicmVzb3VyY2VMb2NhdGlvbiI6InVuaXRlZHN0YXRlcyIsImlhdCI6MTcxMzgyNTQyN30.Ui70E4HgfA7M_PAvGbQsXO-bhp-tOCkSDDqflxkZLWkNyUDd1s1QXi9rMhbVTPvicuBkPT-p5lg1zh30SjtycwLLRuBkYP2SIJUtb53oGVIFhyI3Rp6Hcb0_MU19BV54CQE2cQVQ7SQAYbx6pc1JUTgJn-5sZSatKPzco7MzpZRdWBjkxnZ6vhIMU2rRvrKRW3PccIkELQa6kZqUUjJrwelfd3m6zTyZLXcIBPvQL37i1mcm4msFXWYFOSVRM2p85IuoSVPX9fstnKKydsEz-7u5Ov7T2wMmvZ_lfZYP-rcuBOm7qTCk3hL9Hm_zjM1Lb3DGTGNVTciUzX_64-p4LA"
         
         await CreateCallAgent()
         
@@ -490,7 +490,8 @@ struct ContentView : View
         joinCallOptions.incomingVideoOptions = incomingVideoOptions
         joinCallOptions.outgoingVideoOptions = outgoingVideoOptions
         
-        let locator = TeamsMeetingLinkLocator(meetingLink: meetingLink)
+        //let locator = TeamsMeetingLinkLocator(meetingLink: meetingLink)
+        let locator = GroupCallLocator(groupId: UUID(uuidString: "ce7f47bc-8b21-420e-9535-4ac6779e52b5")!)
         
         loading = true
         do
