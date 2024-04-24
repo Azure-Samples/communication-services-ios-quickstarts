@@ -244,55 +244,43 @@ struct ContentView : View
                         }
                         else
                         {
-                            //ZStack(alignment: .topLeading) {
-                            //VStack {
-                                VStack {
-                                    if (outgoingVideoStream != nil)
+                            VStack {
+                                if (outgoingVideoStream != nil)
+                                {
+                                    if (outgoingVideoStreamType != VideoStreamType.localOutgoing)
                                     {
-                                        if (outgoingVideoStreamType != VideoStreamType.localOutgoing)
-                                        {
-                                            RawVideoFrameView(cvPixelBuffer: $outgoingPixelBuffer)
-                                                //.overlay(RoundedRectangle(cornerRadius: 5)
-                                                //.stroke(Color.black, lineWidth: 2))
-                                                .background(Color.black)
-                                        }
-                                        else
-                                        {
-                                            VideoStreamView(view: $outgoingVideoStreamRendererView)
-                                                //.overlay(RoundedRectangle(cornerRadius: 5)
-                                                //.stroke(Color.black, lineWidth: 2))
-                                                .background(Color.black)
-                                        }
+                                        RawVideoFrameView(cvPixelBuffer: $outgoingPixelBuffer)
+                                            .background(Color.black)
+                                    }
+                                    else
+                                    {
+                                        VideoStreamView(view: $outgoingVideoStreamRendererView)
+                                            .background(Color.black)
                                     }
                                 }
-                                .frame(width: 320, height: 180)
-                                //.frame(width: 120, height: 67.5)
-                                //.zIndex(1)
-                                //.offset(x: 5, y: 5)
-                                .overlay(RoundedRectangle(cornerRadius: 5)
-                                    .stroke(Color.black, lineWidth: 2))
+                            }
+                            .frame(width: 320, height: 180)
+                            .overlay(RoundedRectangle(cornerRadius: 5)
+                                .stroke(Color.black, lineWidth: 2))
 
-                                VStack {
-                                    if (incomingVideoStream != nil)
+                            VStack {
+                                if (incomingVideoStream != nil)
+                                {
+                                    if (incomingVideoStreamType != VideoStreamType.remoteIncoming)
                                     {
-                                        if (incomingVideoStreamType != VideoStreamType.remoteIncoming)
-                                        {
-                                            RawVideoFrameView(cvPixelBuffer: $incomingPixelBuffer)
-                                                .background(Color.black)
-                                        }
-                                        else
-                                        {
-                                            VideoStreamView(view: $incomingVideoStreamRendererView)
-                                                .background(Color.black)
-                                        }
+                                        RawVideoFrameView(cvPixelBuffer: $incomingPixelBuffer)
+                                            .background(Color.black)
+                                    }
+                                    else
+                                    {
+                                        VideoStreamView(view: $incomingVideoStreamRendererView)
+                                            .background(Color.black)
                                     }
                                 }
-                                .frame(width: 320, height: 180)
-                                //.zIndex(0)
-                                .overlay(RoundedRectangle(cornerRadius: 5)
-                                    .stroke(Color.black, lineWidth: 2))
-                            //}
-                            //.frame(width: geometryReader.size.width - 30, height: 180)
+                            }
+                            .frame(width: 320, height: 180)
+                            .overlay(RoundedRectangle(cornerRadius: 5)
+                                .stroke(Color.black, lineWidth: 2))
                         }
                         HStack {
                             Button(action: {
@@ -372,8 +360,6 @@ struct ContentView : View
         rawIncomingVideoStreamObserver?.delegate = OnRawVideoFrameArrived
         remoteParticipantObserver = RemoteParticipantObserver(view: self)
         callObserver = CallObserver(view: self, remoteParticipantObserver: remoteParticipantObserver!)
-        
-        token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjYwNUVCMzFEMzBBMjBEQkRBNTMxODU2MkM4QTM2RDFCMzIyMkE2MTkiLCJ4NXQiOiJZRjZ6SFRDaURiMmxNWVZpeUtOdEd6SWlwaGsiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmVmZDNjMjI5LWIyMTItNDM3YS05NDVkLTkyMzI2ZjEzYTFiZV8wMDAwMDAxZi1hN2Q2LTUzNjktNzFiZi1hNDNhMGQwMDVlN2IiLCJzY3AiOjE3OTIsImNzaSI6IjE3MTM4MjU0MjciLCJleHAiOjE3MTM5MTE4MjcsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6InZvaXAiLCJyZXNvdXJjZUlkIjoiZWZkM2MyMjktYjIxMi00MzdhLTk0NWQtOTIzMjZmMTNhMWJlIiwicmVzb3VyY2VMb2NhdGlvbiI6InVuaXRlZHN0YXRlcyIsImlhdCI6MTcxMzgyNTQyN30.Ui70E4HgfA7M_PAvGbQsXO-bhp-tOCkSDDqflxkZLWkNyUDd1s1QXi9rMhbVTPvicuBkPT-p5lg1zh30SjtycwLLRuBkYP2SIJUtb53oGVIFhyI3Rp6Hcb0_MU19BV54CQE2cQVQ7SQAYbx6pc1JUTgJn-5sZSatKPzco7MzpZRdWBjkxnZ6vhIMU2rRvrKRW3PccIkELQa6kZqUUjJrwelfd3m6zTyZLXcIBPvQL37i1mcm4msFXWYFOSVRM2p85IuoSVPX9fstnKKydsEz-7u5Ov7T2wMmvZ_lfZYP-rcuBOm7qTCk3hL9Hm_zjM1Lb3DGTGNVTciUzX_64-p4LA"
         
         await CreateCallAgent()
         
@@ -490,8 +476,7 @@ struct ContentView : View
         joinCallOptions.incomingVideoOptions = incomingVideoOptions
         joinCallOptions.outgoingVideoOptions = outgoingVideoOptions
         
-        //let locator = TeamsMeetingLinkLocator(meetingLink: meetingLink)
-        let locator = GroupCallLocator(groupId: UUID(uuidString: "ce7f47bc-8b21-420e-9535-4ac6779e52b5")!)
+        let locator = TeamsMeetingLinkLocator(meetingLink: meetingLink)
         
         loading = true
         do
