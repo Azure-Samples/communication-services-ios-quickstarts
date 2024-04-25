@@ -806,14 +806,6 @@ struct ContentView : View
             cameraCaptureService?.Start()
             cameraCaptureService?.delegate = OnRawVideoFrameCaptured
         }
-        
-        /*if videoFrameGeneratorService == nil
-        {
-            videoFrameGeneratorService = VideoFrameGeneratorService(
-                stream: virtualOutgoingVideoStream!)
-            videoFrameGeneratorService?.Start()
-            videoFrameGeneratorService?.delegate = OnRawVideoFrameCaptured
-         }*/
     }
     
     private func StopCameraCaptureService() -> Void
@@ -826,15 +818,6 @@ struct ContentView : View
         cameraCaptureService.delegate = nil
         cameraCaptureService.Stop()
         self.cameraCaptureService = nil
-        
-        /*guard let videoFrameGeneratorService = videoFrameGeneratorService else
-        {
-            return
-        }
-        
-        videoFrameGeneratorService.delegate = nil
-        videoFrameGeneratorService.Stop()
-        self.videoFrameGeneratorService = nil*/
     }
     
     private func StartScreenCaptureService() -> Void
