@@ -39,7 +39,6 @@ struct ContentView : View
     @State private var remoteParticipantObserver: RemoteParticipantObserver?
     @State private var cameraCaptureService: CameraCaptureService?
     @State private var screenCaptureService: ScreenCaptureService?
-    @State private var videoFrameGeneratorService: VideoFrameGeneratorService?
     @State private var incomingVideoStream: IncomingVideoStream?
     @State private var remoteVideoStream: RemoteVideoStream?
     @State private var rawIncomingVideoStream: RawIncomingVideoStream?
