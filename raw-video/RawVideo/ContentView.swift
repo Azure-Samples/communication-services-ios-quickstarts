@@ -966,15 +966,11 @@ struct ContentView : View
         videoFormatList = CameraCaptureService.GetSuportedVideoFormats(
             camera: cameraList[cameraListIndex])
         
-        videoFormatItemList = [VideoFormatItem]();
         videoFormatListIndex = videoFormatList.count > 0 ? 0 : -1;
-        
-        for i in 0 ..< videoFormatList.count
-        {
-            let size = videoFormatList[i].size
+        videoFormatItemList = videoFormatList.enumerated().map { i, format in 
+            let size = format.size
             let resolution = "\(Int(size.width))x\(Int(size.height))"
-            let videoFormatItem = VideoFormatItem(id: i, resolution: resolution)
-            videoFormatItemList.append(videoFormatItem)
+            return VideoFormatItem(id: i, resolution: resolution)
         }
     }
 }
