@@ -34,16 +34,17 @@ class ScreenCaptureService : CaptureService
             return
         }
         
-        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else
+        {
             return
         }
         
-        let format = rawOutgoingVideoStream.format
+        let format = stream.format
         if format != nil
         {
-            let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
             let width = CVPixelBufferGetWidth(pixelBuffer)
             let height = CVPixelBufferGetHeight(pixelBuffer)
+            let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
             
             let rawVideoFrameBuffer = RawVideoFrameBuffer()
             rawVideoFrameBuffer.buffer = pixelBuffer
