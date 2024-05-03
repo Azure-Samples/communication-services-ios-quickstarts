@@ -354,3 +354,8 @@ MigrationBackup/
 CommunicationUIToolkit/Pods/
 *.xcframework
 **/*.xcuserstate
+Pods
+
+# Xcode
+**/DerivedData
+**/.xcuserdata/
