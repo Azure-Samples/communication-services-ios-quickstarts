@@ -178,7 +178,7 @@ struct ContentView: View {
 
           self.call = call
           self.callObserver = CallObserver(self)
-          self.call!.delegate = self.callObserver
+          self.call?.delegate = self.callObserver
           self.message = "Teams meeting joined successfully"
         }
       } else {
