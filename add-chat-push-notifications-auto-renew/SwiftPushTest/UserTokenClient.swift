@@ -28,19 +28,29 @@ import Foundation
 
 class UserTokenClient {
     private let tokenIssuerURL: URL
-    private var userId: String?
+    private var acsUserId: String?
     private var userToken: String?
     private var acsEndpoint: String?
     
-    init(tokenIssuerURL: String) {
+    init(acsUserId: String, tokenIssuerURL: String) {
         guard let endpointURL = URL(string: tokenIssuerURL) else {
             fatalError("Invalid URL endpoint")
         }
         self.tokenIssuerURL = endpointURL
+        self.acsUserId = acsUserId
     }
     
-    func getNewUserContext(completion: @escaping (Bool, Error?) -> Void) {
-        let task = URLSession.shared.dataTask(with: tokenIssuerURL) { data, response, error in
+    func getTokenForAcsUserId(completion: @escaping (Bool, Error?) -> Void) {
+        var requestURL = tokenIssuerURL
+        var urlComponents = URLComponents(url: requestURL, resolvingAgainstBaseURL: false)
+        urlComponents?.queryItems = [URLQueryItem(name: "acsUserId", value: acsUserId)]
+        
+        guard let finalURL = urlComponents?.url else {
+            completion(false, NSError(domain: "InvalidURL", code: 100, userInfo: nil))
+            return
+        }
+        
+        let task = URLSession.shared.dataTask(with: finalURL) { data, response, error in
             guard let data = data, error == nil else {
                 completion(false, error)
                 return
@@ -48,7 +58,7 @@ class UserTokenClient {
             
             do {
                 let userData = try JSONDecoder().decode(UserData.self, from: data)
-                self.userId = userData.userId
+                self.acsUserId = userData.acsUserId
                 self.userToken = userData.userToken
                 self.acsEndpoint = userData.acsEndpoint
                 completion(true, nil)
@@ -59,8 +69,8 @@ class UserTokenClient {
         task.resume()
     }
     
-    var getUserId: String? {
-        return userId
+    var getacsUserId: String? {
+        return acsUserId
     }
     
     var getUserToken: String? {
@@ -73,7 +83,7 @@ class UserTokenClient {
     
     private struct UserData: Codable {
         var acsEndpoint: String
-        var userId: String
+        var acsUserId: String
         var userToken: String
     }
 }

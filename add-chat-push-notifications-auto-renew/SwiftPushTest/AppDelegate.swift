@@ -60,10 +60,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     /// Sets up the UserTokenClient with token refresh logic.
     private func setupUserTokenClient() {
-        userTokenClient = UserTokenClient(tokenIssuerURL: appSettings.tokenIssuerURL!)
+        userTokenClient = UserTokenClient(acsUserId: appSettings.acsUserId, tokenIssuerURL: appSettings.tokenIssuerURL!)
 
         tokenRefresher = { tokenCompletionHandler in
-            self.userTokenClient.getNewUserContext { success, error in
+            self.userTokenClient.getTokenForAcsUserId { success, error in
                 if success, let token = self.userTokenClient.getUserToken {
                     tokenCompletionHandler(token, nil)
                 } else {

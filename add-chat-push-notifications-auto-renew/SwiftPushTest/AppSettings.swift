@@ -29,6 +29,10 @@ import Foundation
 class AppSettings {
 
     private var settings: [String: Any] = [:]
+    
+    var acsUserId: String {
+        return settings["acsUserId"] as! String
+    }
 
     var initialToken: String {
         return settings["initialToken"] as! String
