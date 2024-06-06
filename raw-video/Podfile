@@ -6,5 +6,6 @@ target 'RawVideo' do
   project 'RawVideo.xcodeproj'
   workspace 'RawVideo.xcworkspace'
 
-  pod 'AzureCommunicationCalling', '2.8.0'
+  #pod 'AzureCommunicationCalling', '2.8.0'
+  pod 'AzureCommunicationCommon'
 end

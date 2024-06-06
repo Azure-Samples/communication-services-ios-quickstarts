@@ -322,6 +322,8 @@ struct ContentView : View
                     {
                         token = savedToken
                     }
+                    
+                    token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjYwNUVCMzFEMzBBMjBEQkRBNTMxODU2MkM4QTM2RDFCMzIyMkE2MTkiLCJ4NXQiOiJZRjZ6SFRDaURiMmxNWVZpeUtOdEd6SWlwaGsiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmVmZDNjMjI5LWIyMTItNDM3YS05NDVkLTkyMzI2ZjEzYTFiZV8wMDAwMDAyMC04YjdiLWYyZDItOWZmYi05YzNhMGQwMDNhZDYiLCJzY3AiOjE3OTIsImNzaSI6IjE3MTc2NDQ3MDkiLCJleHAiOjE3MTc3MzExMDksInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6InZvaXAiLCJyZXNvdXJjZUlkIjoiZWZkM2MyMjktYjIxMi00MzdhLTk0NWQtOTIzMjZmMTNhMWJlIiwicmVzb3VyY2VMb2NhdGlvbiI6InVuaXRlZHN0YXRlcyIsImlhdCI6MTcxNzY0NDcwOX0.m9Ncuqrs3KlAehulrET8CFHsobufcV5y-bdPThmqO0B3LJ2gJPR_nAbkvTpnCavLVwsuNALbDmWQpZKgMsBdimvhW43eAid5jytGdM-ZgvRFTVEPPR8EzdbpwQNxmNE9oF72w-MaAj4dW8_yYCxTVjg4AmferZdIS7E9ma3HgdO-PxMcl8JY5kLViEhlZMEur3sLOgcyCWxv9cHUV_VdTE0H5A8dYM3JcExNveEaCQ81KNQVDF6S3clqrg_JTvSGdJU1QlKf6ophfCYp3IAej3YTG4eE63RoN0WLi8P8FKr7qZsJfKCO0nT-w1XokYNrzU40Br5Rn4TVw-Qs5sud8A"
                 })
                 .disabled(loading)
                 .zIndex(0)
@@ -396,6 +398,8 @@ struct ContentView : View
         {
             meetingLink = savedMeetingLink
         }
+        
+        meetingLink = "https://teams.microsoft.com/l/meetup-join/19%3ameeting_ZTNlM2M4ZDUtOGI1Zi00YmQ3LWJkMGUtM2E2OTY3ZTdmZjYx%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%22744e8f01-fbf6-40b3-b594-00792ff4276e%22%7d"
     }
     
     private func GetPermissions() async -> Void

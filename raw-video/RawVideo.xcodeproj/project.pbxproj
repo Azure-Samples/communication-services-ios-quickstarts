@@ -17,8 +17,24 @@
 		99134B002B6C6916002D81F4 /* CameraCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99134AFF2B6C6916002D81F4 /* CameraCaptureService.swift */; };
 		99134B022B6C6925002D81F4 /* CaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99134B012B6C6925002D81F4 /* CaptureService.swift */; };
 		99134B082B6D48F5002D81F4 /* CaptureServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99134B072B6D48F5002D81F4 /* CaptureServiceDelegate.swift */; };
+		99ECD2992C1002C000FA8856 /* AzureCommunicationCalling.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99ECD2982C1002C000FA8856 /* AzureCommunicationCalling.framework */; };
+		99ECD29A2C1002C000FA8856 /* AzureCommunicationCalling.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 99ECD2982C1002C000FA8856 /* AzureCommunicationCalling.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C564341B8E8E6E67A95575C4 /* Pods_RawVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CA9F47B316E39FEA163F585 /* Pods_RawVideo.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		99ECD29B2C1002C000FA8856 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				99ECD29A2C1002C000FA8856 /* AzureCommunicationCalling.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		063CF56129D53E56004C9E20 /* RawVideo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RawVideo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -35,6 +51,7 @@
 		99134AFF2B6C6916002D81F4 /* CameraCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCaptureService.swift; sourceTree = "<group>"; };
 		99134B012B6C6925002D81F4 /* CaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureService.swift; sourceTree = "<group>"; };
 		99134B072B6D48F5002D81F4 /* CaptureServiceDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureServiceDelegate.swift; sourceTree = "<group>"; };
+		99ECD2982C1002C000FA8856 /* AzureCommunicationCalling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AzureCommunicationCalling.framework; path = "../../../../../../Skype/iOS/GA/SpoolCallingStack/native/staging.d/release/GA/sdk/arm64-v8a/AzureCommunicationCalling.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				99ECD2992C1002C000FA8856 /* AzureCommunicationCalling.framework in Frameworks */,
 				C564341B8E8E6E67A95575C4 /* Pods_RawVideo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -95,6 +113,7 @@
 		063CF57229D53EBE004C9E20 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				99ECD2982C1002C000FA8856 /* AzureCommunicationCalling.framework */,
 				8CA9F47B316E39FEA163F585 /* Pods_RawVideo.framework */,
 			);
 			name = Frameworks;
@@ -121,6 +140,7 @@
 				063CF55E29D53E56004C9E20 /* Frameworks */,
 				063CF55F29D53E56004C9E20 /* Resources */,
 				6939D39E22826F4B3D1448F5 /* [CP] Embed Pods Frameworks */,
+				99ECD29B2C1002C000FA8856 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -369,6 +389,7 @@
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/AppCenter/Analytics\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/AppCenter/Core\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/AppCenter/Crashes\"",
+					"/Users/bisteni/Skype/iOS/GA/SpoolCallingStack/native/staging.d/release/GA/sdk/arm64-v8a",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is needed to make video call";
@@ -402,6 +423,13 @@
 				DEVELOPMENT_ASSET_PATHS = "\"RawVideo/Preview Content\"";
 				DEVELOPMENT_TEAM = UBF8T346G9;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/AzureCommunicationCommon\"",
+					"\"${PODS_ROOT}/AzureCommunicationCalling\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/AzureCommunicationCalling\"",
+					"/Users/bisteni/Skype/iOS/GA/SpoolCallingStack/native/staging.d/release/GA/sdk/arm64-v8a",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is needed to make video call";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed to make video call";
