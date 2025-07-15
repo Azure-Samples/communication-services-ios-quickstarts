@@ -15,9 +15,11 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 
         let button = UIButton(frame: CGRect(x: 100, y: 100, width: 200, height: 50))
-        button.contentEdgeInsets = UIEdgeInsets(top: 10.0, left: 20.0, bottom: 10.0, right: 20.0)
+        var configuration = UIButton.Configuration.filled()
+        configuration.baseBackgroundColor = .systemBlue
+        configuration.contentInsets = .init(top: 10.0, leading: 20.0, bottom: 10.0, trailing: 20.0)
+        button.configuration = configuration
         button.layer.cornerRadius = 10
-        button.backgroundColor = .systemBlue
         button.setTitle("Start Experience", for: .normal)
         button.addTarget(self, action: #selector(startCallComposite), for: .touchUpInside)
 
@@ -28,17 +30,11 @@ class ViewController: UIViewController {
     }
 
     @objc private func startCallComposite() {
-        let callCompositeOptions = CallCompositeOptions()
-
-        callComposite = CallComposite(withOptions: callCompositeOptions)
-
+        let callCompositeOptions = CallCompositeOptions(displayName: "<DISPLAY_NAME>")
         let communicationTokenCredential = try! CommunicationTokenCredential(token: "<USER_ACCESS_TOKEN>")
 
-        let remoteOptions = RemoteOptions(
-            for: .groupCall(groupId: UUID(uuidString: "<GROUP_CALL_ID>")!),
-            credential: communicationTokenCredential,
-            displayName: "<DISPLAY_NAME>")
+        callComposite = CallComposite(credential: communicationTokenCredential, withOptions: callCompositeOptions)
 
-        callComposite?.launch(remoteOptions: remoteOptions)
+        callComposite?.launch(locator: .groupCall(groupId: UUID(uuidString: "<GROUP_CALL_ID>")!))
     }
 }
