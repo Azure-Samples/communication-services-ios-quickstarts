@@ -7,7 +7,7 @@ Azure Communication Services enable developers to add communication capabilities
 - An Azure account with an active subscription. [Create an account for free](https://azure.microsoft.com/free/?WT.mc_id=A261C142F). 
 - A Mac running [Xcode](https://go.microsoft.com/fwLink/p/?LinkID=266532), along with a valid developer certificate installed into your Keychain.
 - A deployed Communication Services resource. [Create a Communication Services resource](https://docs.microsoft.com/en-us/azure/communication-services/quickstarts/create-communication-resource).
-- Run `pod install` and open `AzureCommunicationCallingSample.xcworkspace` to run and build the project.
+- Run `pod install`, then open the `.xcworkspace` file. Fill in the required variables, then build and run the project.
 
 ## Quickstarts
 
