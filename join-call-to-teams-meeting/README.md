@@ -4,7 +4,7 @@ languages:
 - swift
 products:
 - azure
-- AzureCommunicationCalling
+- azure-communication-services
 ---
 
 # Quickstart: Join your calling app to a Teams meeting
