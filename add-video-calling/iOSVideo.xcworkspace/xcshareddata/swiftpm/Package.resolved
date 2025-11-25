@@ -1,0 +1,15 @@
+{
+  "originHash" : "fa51fbb2b61ee51b0fb87afe4abac9eee1c53f41ce3082ab2c0a51a8fcb32d78",
+  "pins" : [
+    {
+      "identity" : "swiftpm-azurecommunicationcalling",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Azure/SwiftPM-AzureCommunicationCalling",
+      "state" : {
+        "revision" : "b7cac340e3b406211c1292e84ee9f06c18bae763",
+        "version" : "2.17.0-beta.3"
+      }
+    }
+  ],
+  "version" : 3
+}
